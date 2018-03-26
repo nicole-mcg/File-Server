@@ -13,25 +13,61 @@ from watchdog.events import (
     FileModifiedEvent
 )
 
+
 from file_server import HubProcessor
 from file_server.io import ByteBuffer
+
+from .file_observer import FileObserver
 
 from .event_handler import EventHandler
 #from .file_observer import AsynchronousObserver
 
 class FileProcessor(HubProcessor):
     def __init__(self, directory):
+        self.accepting_packets = True
         self.directory = directory
+        self.buffer_queue = deque();
+        self.packet_queue = None
         self.event_handler = None
-        self._take_snapshot = lambda: DirectorySnapshot(self.directory, True)
-        self._snapshot = self._take_snapshot()
-        self.event_handler = None
+        self.observer = None;
 
+    def initialize(self, packet_queue):
+        self.packet_queue = packet_queue
+        self.event_handler = EventHandler(packet_queue, self.directory)
+
+        observer = FileObserver()
+        observer.schedule(self.event_handler, self.directory, recursive=True)
+        observer.start()
+
+        self.observer = observer
+
+    def shutdown(self):
+        self.observer.join();
+
+    #FIXME abstract this into HubProcessor
+    def queue_packet(self, packet):
+        if (self.accepting_packets):
+            self.packet_queue.queue_packet(packet)
+        else:
+            buffer_queue.append(packet)
+
+    # FIXME move create_file, save_file, delete_file
     def create_file(self, file_name, file_contents):
+
+        with self.observer._lock:
+            self.observer.accepting_events = False
+
         print("Creating New File: " + file_name)
         self.save_file(file_name, file_contents)
+        self.observer.accepting_events = True
+
+        print("created file")
 
     def save_file(self, file_name, file_contents):
+
+        with self.observer._lock:
+            self.observer.accepting_events = False
+
         print("Updating Modified File: " + file_name)
         #with self.observer.ignore_events():
         file_path = self.directory + file_name
@@ -39,8 +75,13 @@ class FileProcessor(HubProcessor):
         file = open(file_path,'wb')
         file.write(file_contents)
         file.close()
+        self.observer.accepting_events = True
 
     def delete_file(self, file_name):
+
+        with self.observer._lock:
+            self.observer.accepting_events = False
+
         print("Deleting File: " + file_name)
         file_path = self.directory + file_name
         #with self.observer.ignore_events():
@@ -52,60 +93,35 @@ class FileProcessor(HubProcessor):
         except OSError as e:
             pass
 
+            self.observer.accepting_events = True
+
     def move_file(self, file_name, new_name):
+
         print("Moving File '{}' to '{}'".format(file_name, new_name))
-        #with self.observer.ignore_events():
+
+        with self.observer._lock:
+            self.observer.accepting_events = False
+
         try:
             os.rename(self.directory + file_name, self.directory + new_name)
         except OSError as e:
             print(e)
             pass
+        self.observer.accepting_events = True
 
     def pre(self, packet_queue):
-        if (self.event_handler is None):
-            self.event_handler = EventHandler(packet_queue, self.directory)
 
-        event_queue = deque()
+        self.accepting_packets = False
 
-        # Get event diff between fresh snapshot and previous snapshot.
-        # Update snapshot.
-        try:
-            new_snapshot = self._take_snapshot()
-        except OSError as e:
-            event_queue.append(DirDeletedEvent(self.watch.path))
-            self.stop()
-            return
-        except Exception as e:
-            raise e
+        # Handle local events and send packets
+        while len(self.buffer_queue) > 0:
+            print("queued buffered packet")
+            self.packet_queue.queue_packet(buffer_queue.pop())
 
-        events = DirectorySnapshotDiff(self._snapshot, new_snapshot)
-        self._snapshot = new_snapshot
-
-        # Files.
-        for src_path in events.files_deleted:
-            event_queue.append(FileDeletedEvent(src_path))
-        for src_path in events.files_modified:
-            event_queue.append(FileModifiedEvent(src_path))
-        for src_path in events.files_created:
-            event_queue.append(FileCreatedEvent(src_path))
-        for src_path, dest_path in events.files_moved:
-            event_queue.append(FileMovedEvent(src_path, dest_path))
-
-        # Directories.
-        for src_path in events.dirs_deleted:
-            event_queue.append(DirDeletedEvent(src_path))
-        for src_path in events.dirs_modified:
-            event_queue.append(DirModifiedEvent(src_path))
-        for src_path in events.dirs_created:
-            event_queue.append(DirCreatedEvent(src_path))
-        for src_path, dest_path in events.dirs_moved:
-            event_queue.append(DirMovedEvent(src_path, dest_path))
-
-        while len(event_queue) > 0:
-            self.event_handler.dispatch(event_queue.pop())
+        self.accepting_packets = True
 
     def process(self, packet_queue):
-        self._snapshot = self._take_snapshot() # FIXME This should handle the directory being deleted
+        pass
 
     def post(self, packet_queue):
         self.pre(packet_queue)

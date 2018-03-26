@@ -4,6 +4,12 @@ from threading import Thread
 # It is the entry point for the program's logic
 class HubProcessor:
 
+    def initialize(self, packet_queue):
+        pass
+
+    def shutdown(self):
+        pass
+
     # Called right before incoming packets are handled
     def pre(self, packet_queue):
         pass

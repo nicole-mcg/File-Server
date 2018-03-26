@@ -14,4 +14,8 @@ def start_hub(hub_type, hub_processor):
         print("Invalid hub type specified: '{}'. Should be 'server' or 'client'.")
         return #FIXME should throw error
 
+    hub_processor.initialize(packet_queue)
+
     packet_queue.start()
+
+    hub_processor.shutdown()
