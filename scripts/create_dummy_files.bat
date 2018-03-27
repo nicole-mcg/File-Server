@@ -1,3 +1,4 @@
 @echo off
-call python -m src.create_dummy_files
+cd ..
+call python -m scripts.src.create_dummy_files
 pause
