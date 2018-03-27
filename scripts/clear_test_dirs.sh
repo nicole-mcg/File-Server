@@ -1,0 +1,1 @@
+python3 src/clear_test_dirs.py

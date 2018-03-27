@@ -6,6 +6,7 @@ def clear_dir(file_path):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
 if __name__ == "__main__":
+    os.chdir("..")
     
     directory = "./test/"
     clear_dir(directory + "serv_dir/")
