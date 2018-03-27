@@ -17,25 +17,33 @@ from watchdog.events import (
 from file_server import HubProcessor
 from file_server.io import ByteBuffer
 
-from .file_observer import FileObserver
+#from .file_observer import FileObserver
+from watchdog.observers import Observer
 
 from .event_handler import EventHandler
+
+from datetime import datetime
 #from .file_observer import AsynchronousObserver
+
+from file_server.packet.impl import FileChangePacket, FileAddPacket
+
+KILOBYTE = 1024
 
 class FileProcessor(HubProcessor):
     def __init__(self, directory):
-        self.accepting_packets = True
         self.directory = directory
         self.buffer_queue = deque();
         self.packet_queue = None
         self.event_handler = None
         self.observer = None;
+        self.block_start_time = datetime.now().microsecond
+        self.block_end_time = self.block_start_time
 
     def initialize(self, packet_queue):
         self.packet_queue = packet_queue
-        self.event_handler = EventHandler(packet_queue, self.directory)
+        self.event_handler = EventHandler(self, self.directory)
 
-        observer = FileObserver()
+        observer = Observer()
         observer.schedule(self.event_handler, self.directory, recursive=True)
         observer.start()
 
@@ -45,46 +53,61 @@ class FileProcessor(HubProcessor):
         self.observer.join();
 
     #FIXME abstract this into HubProcessor
-    def queue_packet(self, packet):
-        if (self.accepting_packets):
-            self.packet_queue.queue_packet(packet)
-        else:
-            buffer_queue.append(packet)
+    def queue_packet(self, file_event):
+        self.buffer_queue.append(file_event)
 
-    # FIXME move create_file, save_file, delete_file
-    def create_file(self, file_name, file_contents):
+    def get_file_size(self, file_name):
+        return os.path.getsize(self.directory + file_name)
 
-        with self.observer._lock:
-            self.observer.accepting_events = False
+    def send_file(self, file_name):
 
-        print("Creating New File: " + file_name)
-        self.save_file(file_name, file_contents)
-        self.observer.accepting_events = True
+        sock = self.packet_queue.sock
 
-        print("created file")
+        if hasattr(sock, "sock"):
+            sock = sock.sock
 
-    def save_file(self, file_name, file_contents):
+        file_size = self.get_file_size(file_name)
 
-        with self.observer._lock:
-            self.observer.accepting_events = False
+        sock.send(ByteBuffer.from_int(file_size).bytes())
+        sock.send(ByteBuffer.from_string(file_name).bytes())
 
-        print("Updating Modified File: " + file_name)
-        #with self.observer.ignore_events():
+        with open(self.directory + file_name, mode='rb') as file:
+
+            while(file_size > 0):
+                chunk_size = KILOBYTE if file_size > KILOBYTE else file_size
+                chunk = file.read(chunk_size)
+                sock.send(chunk)
+                file_size -= chunk_size
+
+
+    def save_file(self, sock, length):
+
+        file_size = ByteBuffer(sock.recv(4)).read_int()
+        length -= 4
+
+        name_length = length - file_size
+        file_name = ByteBuffer(sock.recv(name_length)).read_string()
+        length -= name_length
+
+        print("Saving file: " + file_name)
+
         file_path = self.directory + file_name
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
         file = open(file_path,'wb')
-        file.write(file_contents)
+
+        while(length > 0):
+            chunk_size = KILOBYTE if length > KILOBYTE else length
+            file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
+            length -= chunk_size
+
         file.close()
-        self.observer.accepting_events = True
+
+        
 
     def delete_file(self, file_name):
-
-        with self.observer._lock:
-            self.observer.accepting_events = False
-
         print("Deleting File: " + file_name)
         file_path = self.directory + file_name
-        #with self.observer.ignore_events():
         try:
             if (os.path.isdir(file_path)):
                 shutil.rmtree(file_path)
@@ -93,36 +116,30 @@ class FileProcessor(HubProcessor):
         except OSError as e:
             pass
 
-            self.observer.accepting_events = True
-
     def move_file(self, file_name, new_name):
 
         print("Moving File '{}' to '{}'".format(file_name, new_name))
-
-        with self.observer._lock:
-            self.observer.accepting_events = False
 
         try:
             os.rename(self.directory + file_name, self.directory + new_name)
         except OSError as e:
             print(e)
             pass
-        self.observer.accepting_events = True
 
     def pre(self, packet_queue):
 
-        self.accepting_packets = False
-
         # Handle local events and send packets
         while len(self.buffer_queue) > 0:
-            print("queued buffered packet")
-            self.packet_queue.queue_packet(buffer_queue.pop())
+            file_event = self.buffer_queue.pop()
+            if (file_event.time < self.block_start_time or file_event.time > self.block_end_time):
+                self.packet_queue.queue_packet(file_event.packet)
 
-        self.accepting_packets = True
+        self.block_start_time = datetime.now().microsecond
+        self.block_end_time = self.block_start_time
 
     def process(self, packet_queue):
         pass
 
     def post(self, packet_queue):
-        self.pre(packet_queue)
+        self.block_end_time = datetime.now().microsecond
         

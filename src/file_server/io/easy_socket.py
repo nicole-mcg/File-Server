@@ -23,21 +23,21 @@ class EasySocket:
         length = ByteBuffer(b).read_int()
         return ByteBuffer(self.sock.recv(length))
 
-    def send_packet(self, packet=IdlePacket()):
+    def send_packet(self, packet=IdlePacket(None)):
+        if not hasattr(packet.__class__, "name"):
+            import pdb; pdb.set_trace();
+
         print("Sending packet: {}".format(packet.__class__.name))
         buff = ByteBuffer()
 
         # Send ID and size
         buff.write(packet.__class__.id)
-        buff.write_int(len(packet))
+        buff.write_int(packet.size())
 
-        # Send payload if exists
-        payload = packet.get_payload()
-        if (payload != None and len(payload) > 0):
-            buff.write(payload)
-
-        # Flush?
         self.sock.send(buff.bytes())
+
+        #packet sock is not set at the time of writing this
+        packet.handle_outgoing()
 
         # Handle response
         buff = ByteBuffer(self.sock.recv(4))
@@ -47,7 +47,7 @@ class EasySocket:
     @contextlib.contextmanager
     def read_packet(self):
         b = self.sock.recv(5)
-        print("b={}".format(b))
+        print(str(b))
         buff = ByteBuffer(b)
 
         yield
@@ -56,13 +56,8 @@ class EasySocket:
         id = buff.read()
         length = buff.read_int()
 
-
-        print("Recieved packet with id={} len={}".format(id, length))
-        # Get payload
-        payload = ByteBuffer(self.sock.recv(length)) if length > 0 else None
-
         # Generate response
-        response = handle_incoming_packet(id, payload, self.hub_processor)
+        response = handle_incoming_packet(id, self.sock, length, self.hub_processor)
 
         # Send response if exists
         buff = ByteBuffer()

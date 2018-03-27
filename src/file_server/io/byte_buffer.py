@@ -70,6 +70,7 @@ class ByteBuffer:
     def read_int(self, signed=True):
         if (self._index >= len(self._bytes)): #TODO throw error
             return None
+
         i = struct.unpack_from("i" if signed else "I", self._bytes, self._index)
         self._index += 4
 

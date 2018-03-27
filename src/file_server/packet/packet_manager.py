@@ -3,7 +3,7 @@ packet_handlers = {}
 def register_packet(cls):
     packet_handlers[cls.id] = cls
 
-def handle_incoming_packet(id, payload, processor):
+def handle_incoming_packet(id, sock, length, processor):
     try:
         cls = packet_handlers[id]
     except:
@@ -12,6 +12,6 @@ def handle_incoming_packet(id, payload, processor):
         return None
 
     if (cls is not None):
-        handler = cls(payload)
+        handler = cls(processor, sock, length)
         print("Handling packet: " + cls.name)
-        return handler.handle_incoming(processor)
+        return handler.handle_incoming()

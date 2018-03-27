@@ -4,7 +4,10 @@ class IdlePacket(Packet):
     name = "IdlePacket"
     id = 0
 
-    def handle_incoming(self, hub_processor):
+    def handle_outgoing(self):
+        pass
+
+    def handle_incoming(self):
         pass
 
     def handle_response(self, payload):

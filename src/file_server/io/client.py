@@ -43,19 +43,22 @@ class Client:
         last_ping = 0
         while self.connected:#This should listen for file and server changes
 
-            # Send an idle packet if queue is empty and enough time has passed
-            if (len(self.packet_queue) == 0 and time.time() - last_ping >= Client.IDLE_TIME):
-                self.packet_queue.append(IdlePacket())
-
-            has_packet = not len(self.packet_queue) == 0
-
             try:
+                self.hub_processor.pre(self)
+
+                # Send an idle packet if queue is empty and enough time has passed
+                if (len(self.packet_queue) == 0 and time.time() - last_ping >= Client.IDLE_TIME):
+                    self.packet_queue.append(IdlePacket(None))
+
+                has_packet = not len(self.packet_queue) == 0
+
+            
                 # Send all packets in queue
                 while (not len(self.packet_queue) == 0):
                     self.sock.send_packet(self.packet_queue.pop())
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
-                self.hub_processor.pre(self)
+                
 
                 # Read all incoming packets
                 if (has_packet):
