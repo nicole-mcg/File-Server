@@ -1,5 +1,4 @@
 @echo off
-cd ..test/client_dir/
-del *
-cd ../serv_dir/
-del *
+cd ..
+call python -m scripts.src.clear_test_dirs
+pause
