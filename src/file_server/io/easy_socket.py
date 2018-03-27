@@ -23,7 +23,11 @@ class EasySocket:
         length = ByteBuffer(b).read_int()
         return ByteBuffer(self.sock.recv(length))
 
-    def send_packet(self, packet=IdlePacket(None)):
+    def send_packet(self, packet=None):
+
+        if packet is None:
+            packet = IdlePacket(self.hub_processor)
+
         if not hasattr(packet.__class__, "name"):
             import pdb; pdb.set_trace();
 
@@ -37,7 +41,7 @@ class EasySocket:
         self.sock.send(buff.bytes())
 
         #packet sock is not set at the time of writing this
-        packet.handle_outgoing()
+        packet.handle_outgoing(self.sock)
 
         # Handle response
         buff = ByteBuffer(self.sock.recv(4))
@@ -47,7 +51,6 @@ class EasySocket:
     @contextlib.contextmanager
     def read_packet(self):
         b = self.sock.recv(5)
-        print(str(b))
         buff = ByteBuffer(b)
 
         yield

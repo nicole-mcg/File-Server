@@ -6,14 +6,17 @@ from time import sleep
 from datetime import datetime
 from threading import Thread
 
-class FileEvent:
-
-    def __init__(self, packet, time):
-        self.packet = packet
-        self.time = time
-
 
 class EventHandler(FileSystemEventHandler):
+
+    events_to_ignore = {}
+
+    def add_ignore(self, data):
+        if data in EventHandler.events_to_ignore:
+            EventHandler.events_to_ignore[data] += 1
+        else:
+            EventHandler.events_to_ignore[data] = 1
+
     def __init__(self, hub_processor, directory):
         self.hub_processor = hub_processor
         self.directory = directory
@@ -23,11 +26,11 @@ class EventHandler(FileSystemEventHandler):
             with open(self.directory + file_name, mode='rb') as file:
                 pass
 
-            self.hub_processor.queue_packet(FileEvent(
+            self.hub_processor.queue_packet(
                 packet_class(
                     self.hub_processor,
                     file_name=file_name
-                ), time)
+                )
             )
         except PermissionError:
             # Wait until we can actually read the file
@@ -37,13 +40,40 @@ class EventHandler(FileSystemEventHandler):
     def on_created(self, event):
         if (event.is_directory): return False
 
-        time = datetime.now().microsecond
+        """time = datetime.now().microsecond
 
         file_name = event.src_path[len(self.directory):]
 
         print("Local File Created: {}".format(file_name))
 
-        Thread(target = self.send_file_contents, args = [file_name, FileAddPacket, time]).start()
+        data = {
+            "type": "change",
+            "file_name": file_name
+        }
+
+        if not data in EventHandler.events_to_ignore:
+            Thread(target = self.send_file_contents, args = [file_name, FileAddPacket, time]).start()
+        else:
+            del EventHandler.events_to_ignore[data]"""
+
+    def on_modified(self, event):
+        if (event.is_directory): return False
+
+        time = datetime.now().microsecond
+
+        file_name = event.src_path[len(self.directory):]
+
+        data = ("change", file_name)
+
+        print("Local File Modified: {}".format(file_name))
+
+        if not data in EventHandler.events_to_ignore:
+            Thread(target = self.send_file_contents, args = [file_name, FileChangePacket, time]).start()
+        else:
+            if EventHandler.events_to_ignore[data] == 1:
+                del EventHandler.events_to_ignore[data]
+            else:
+                EventHandler.events_to_ignore[data] -= 1
 
     def on_deleted(self, event):
         if (event.is_directory): return False
@@ -54,23 +84,20 @@ class EventHandler(FileSystemEventHandler):
 
         print("Local File Deleted: {}".format(file_name))
 
-        self.hub_processor.queue_packet(FileEvent(
-            FileDeletePacket(
-                self.hub_processor,
-                file_name=file_name
-            ), time)
-        )
+        data = ("delete", file_name)
 
-    def on_modified(self, event):
-        if (event.is_directory): return False
-
-        time = datetime.now().microsecond
-
-        file_name = event.src_path[len(self.directory):]
-
-        print("Local File Modified: {}".format(file_name))
-
-        Thread(target = self.send_file_contents, args = [file_name, FileChangePacket, time]).start()
+        if not data in EventHandler.events_to_ignore:
+            self.hub_processor.queue_packet(
+                FileDeletePacket(
+                    self.hub_processor,
+                    file_name=file_name
+                )
+            )
+        else:
+            if EventHandler.events_to_ignore[data] == 1:
+                del EventHandler.events_to_ignore[data]
+            else:
+                EventHandler.events_to_ignore[data] -= 1
 
     def on_moved(self, event):
         if (event.is_directory): return False
@@ -82,10 +109,18 @@ class EventHandler(FileSystemEventHandler):
 
         print("Local File Moved: {}".format(file_name))
 
-        self.hub_processor.queue_packet(FileEvent(
-            FileMovePacket(
-                self.hub_processor,
-                file_name=file_name,
-                new_name=new_name
-            ), time)
-        )
+        data = ("move", file_name, new_name)
+
+        if not data in EventHandler.events_to_ignore:
+            self.hub_processor.queue_packet(
+                FileMovePacket(
+                    self.hub_processor,
+                    file_name=file_name,
+                    new_name=new_name
+                )
+            )
+        else:
+            if EventHandler.events_to_ignore[data] == 1:
+                del EventHandler.events_to_ignore[data]
+            else:
+                EventHandler.events_to_ignore[data] -= 1

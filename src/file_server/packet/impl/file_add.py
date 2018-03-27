@@ -15,8 +15,8 @@ class FileAddPacket(Packet):
     def size(self):
         return self.hub_processor.get_file_size(self.file_name) + len(self.file_name) + 5;
 
-    def handle_outgoing(self):
-        self.hub_processor.send_file(self.file_name)
+    def handle_outgoing(self, sock):
+        self.hub_processor.send_file(self.file_name, sock)
 
     def handle_incoming(self):
         self.hub_processor.save_file(self.sock, self.length)

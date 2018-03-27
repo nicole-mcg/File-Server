@@ -17,7 +17,7 @@ class Packet:
         return None
 
     # Handles an outgoing packet
-    def handle_outgoing(self):
+    def handle_outgoing(self, sock):
         pass
 
     # Handles an incoming packet

@@ -76,12 +76,17 @@ class Client:
             
 
     def start(self):
+
+        self.connect()
+
+        self.hub_processor.event_handler.sock = self.sock.sock
+
         while 1:
-            self.connect()
             if (self.connected):
                 self.process()
                 self.connected = False
                 print("Connection to the server has been lost.")
+            self.connect()
 
     def queue_packet(self, packet):
         self.packet_queue.append(packet)

@@ -53,18 +53,13 @@ class FileProcessor(HubProcessor):
         self.observer.join();
 
     #FIXME abstract this into HubProcessor
-    def queue_packet(self, file_event):
-        self.buffer_queue.append(file_event)
+    def queue_packet(self, packet):
+        self.buffer_queue.append(packet)
 
     def get_file_size(self, file_name):
         return os.path.getsize(self.directory + file_name)
 
-    def send_file(self, file_name):
-
-        sock = self.packet_queue.sock
-
-        if hasattr(sock, "sock"):
-            sock = sock.sock
+    def send_file(self, file_name, sock):
 
         file_size = self.get_file_size(file_name)
 
@@ -97,13 +92,12 @@ class FileProcessor(HubProcessor):
         file = open(file_path,'wb')
 
         while(length > 0):
+            self.event_handler.add_ignore(("change", file_name))
             chunk_size = KILOBYTE if length > KILOBYTE else length
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
             length -= chunk_size
 
         file.close()
-
-        
 
     def delete_file(self, file_name):
         print("Deleting File: " + file_name)
@@ -130,9 +124,7 @@ class FileProcessor(HubProcessor):
 
         # Handle local events and send packets
         while len(self.buffer_queue) > 0:
-            file_event = self.buffer_queue.pop()
-            if (file_event.time < self.block_start_time or file_event.time > self.block_end_time):
-                self.packet_queue.queue_packet(file_event.packet)
+            self.packet_queue.queue_packet(self.buffer_queue.pop())
 
         self.block_start_time = datetime.now().microsecond
         self.block_end_time = self.block_start_time
