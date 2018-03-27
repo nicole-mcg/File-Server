@@ -1,5 +1,5 @@
 @echo off
-cd test/client_dir/
+cd ..test/client_dir/
 del *
 cd ../serv_dir/
 del *
