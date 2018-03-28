@@ -22,7 +22,7 @@ from watchdog.observers import Observer
 
 from .event_handler import EventHandler
 
-from datetime import datetime
+from time import time
 #from .file_observer import AsynchronousObserver
 
 from file_server.packet.impl import FileChangePacket, FileAddPacket
@@ -35,9 +35,7 @@ class FileProcessor(HubProcessor):
         self.buffer_queue = {};
         self.packet_queue = None
         self.event_handler = None
-        self.observer = None;
-        self.block_start_time = datetime.now().microsecond
-        self.block_end_time = self.block_start_time
+        self.observer = None
 
     def initialize(self, packet_queue):
         self.packet_queue = packet_queue
@@ -54,10 +52,8 @@ class FileProcessor(HubProcessor):
 
     #FIXME abstract this into HubProcessor
     def queue_packet(self, packet, data):
-        if not data in self.buffer_queue:
-            self.buffer_queue[data] = packet
-        else:
-            print("skipped duplicate packet")
+        packet.time = time()
+        self.buffer_queue[data] = packet
 
     def get_file_size(self, file_name):
         return os.path.getsize(self.directory + file_name)
@@ -96,8 +92,11 @@ class FileProcessor(HubProcessor):
             self.event_handler.add_ignore(("change", file_name))
             chunk_size = KILOBYTE if length > KILOBYTE else length
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
+            file.flush()
             length -= chunk_size
 
+
+        self.event_handler.add_ignore(("change", file_name))
         file.close()
 
     def delete_file(self, file_name):
@@ -126,15 +125,16 @@ class FileProcessor(HubProcessor):
         # Handle local events and send packets
         while len(self.buffer_queue.keys()) > 0:
             key = list(self.buffer_queue.keys())[0]
-            self.packet_queue.queue_packet(self.buffer_queue[key])
-            del self.buffer_queue[key]
+            packet = self.buffer_queue[key]
 
-        self.block_start_time = datetime.now().microsecond
-        self.block_end_time = self.block_start_time
+            if time() - packet.time > 1:
+                self.packet_queue.queue_packet(packet)
+                del self.buffer_queue[key]
+            else:
+                print(time() - packet.time)
 
     def process(self, packet_queue):
         pass
 
     def post(self, packet_queue):
-        self.block_end_time = datetime.now().microsecond
-        
+        pass

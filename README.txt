@@ -5,6 +5,5 @@ Setup
     -Run get_requirements.bat (or .sh)
 
 Running
-    -Run scripts/create_test_files.bat (or .sh)
-    -Run run_both.bat (or .sh)
-    -In "test" folder, move files from test_files to client_dir or serv_dir
+    -Run quick_reset.bat (or sh)
+    -Move files from test/test_files to test/client_dir or serv_dir for testing

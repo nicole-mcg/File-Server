@@ -11,6 +11,7 @@ class EventHandler(FileSystemEventHandler):
     events_to_ignore = {}
 
     def add_ignore(self, data):
+        print("added ignore: " + data[0] + " " + data[1])
         if data in EventHandler.events_to_ignore:
             EventHandler.events_to_ignore[data] += 1
         else:
@@ -37,26 +38,28 @@ class EventHandler(FileSystemEventHandler):
             self.send_file_contents(file_name, packet_class, data, count + 1)
 
     def on_created(self, event):
-        if (event.is_directory): return False
-
-        """time = datetime.now().microsecond
+        if (event.is_directory): 
+            print("Created directory: " + str(event.src_path))
+            return False
 
         file_name = event.src_path[len(self.directory):]
 
-        print("Local File Created: {}".format(file_name))
+        data = ("change", file_name)
 
-        data = {
-            "type": "change",
-            "file_name": file_name
-        }
+        print("Local File Modified: {}".format(file_name))
 
         if not data in EventHandler.events_to_ignore:
-            Thread(target = self.send_file_contents, args = [file_name, FileAddPacket, time]).start()
+            Thread(target = self.send_file_contents, args = [file_name, FileAddPacket, data]).start()
         else:
-            del EventHandler.events_to_ignore[data]"""
+            if EventHandler.events_to_ignore[data] == 1:
+                del EventHandler.events_to_ignore[data]
+            else:
+                EventHandler.events_to_ignore[data] -= 1
 
     def on_modified(self, event):
-        if (event.is_directory): return False
+        if (event.is_directory): 
+            print("Modified directory: " + str(event.src_path))
+            return False
 
         file_name = event.src_path[len(self.directory):]
 
@@ -73,7 +76,9 @@ class EventHandler(FileSystemEventHandler):
                 EventHandler.events_to_ignore[data] -= 1
 
     def on_deleted(self, event):
-        if (event.is_directory): return False
+        if (event.is_directory): 
+            print("Deleted directory: " + str(event.src_path))
+            return False
 
         file_name = event.src_path[len(self.directory):]
 
@@ -95,7 +100,9 @@ class EventHandler(FileSystemEventHandler):
                 EventHandler.events_to_ignore[data] -= 1
 
     def on_moved(self, event):
-        if (event.is_directory): return False
+        if (event.is_directory): 
+            print("Moved directory: " + str(event.src_path))
+            return False
 
         file_name = event.src_path[len(self.directory):]
         new_name = event.dest_path[len(self.directory):]
