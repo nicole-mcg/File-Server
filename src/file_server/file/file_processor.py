@@ -32,7 +32,7 @@ KILOBYTE = 1024
 class FileProcessor(HubProcessor):
     def __init__(self, directory):
         self.directory = directory
-        self.buffer_queue = deque();
+        self.buffer_queue = {};
         self.packet_queue = None
         self.event_handler = None
         self.observer = None;
@@ -53,8 +53,11 @@ class FileProcessor(HubProcessor):
         self.observer.join();
 
     #FIXME abstract this into HubProcessor
-    def queue_packet(self, packet):
-        self.buffer_queue.append(packet)
+    def queue_packet(self, packet, data):
+        if not data in self.buffer_queue:
+            self.buffer_queue[data] = packet
+        else:
+            print("skipped duplicate packet")
 
     def get_file_size(self, file_name):
         return os.path.getsize(self.directory + file_name)
@@ -83,8 +86,6 @@ class FileProcessor(HubProcessor):
         name_length = length - file_size
         file_name = ByteBuffer(sock.recv(name_length)).read_string()
         length -= name_length
-
-        print("Saving file: " + file_name)
 
         file_path = self.directory + file_name
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -123,8 +124,10 @@ class FileProcessor(HubProcessor):
     def pre(self, packet_queue):
 
         # Handle local events and send packets
-        while len(self.buffer_queue) > 0:
-            self.packet_queue.queue_packet(self.buffer_queue.pop())
+        while len(self.buffer_queue.keys()) > 0:
+            key = list(self.buffer_queue.keys())[0]
+            self.packet_queue.queue_packet(self.buffer_queue[key])
+            del self.buffer_queue[key]
 
         self.block_start_time = datetime.now().microsecond
         self.block_end_time = self.block_start_time

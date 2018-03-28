@@ -3,7 +3,6 @@ from watchdog.events import FileSystemEventHandler
 from file_server.packet.impl import FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
 
 from time import sleep
-from datetime import datetime
 from threading import Thread
 
 
@@ -21,7 +20,7 @@ class EventHandler(FileSystemEventHandler):
         self.hub_processor = hub_processor
         self.directory = directory
 
-    def send_file_contents(self, file_name, packet_class, time, count=0):
+    def send_file_contents(self, file_name, packet_class, data, count=0):
         try:
             with open(self.directory + file_name, mode='rb') as file:
                 pass
@@ -30,12 +29,12 @@ class EventHandler(FileSystemEventHandler):
                 packet_class(
                     self.hub_processor,
                     file_name=file_name
-                )
+                ), data
             )
         except PermissionError:
             # Wait until we can actually read the file
             sleep(500)
-            self.send_file_contents(file_name, packet_class, time, count + 1)
+            self.send_file_contents(file_name, packet_class, data, count + 1)
 
     def on_created(self, event):
         if (event.is_directory): return False
@@ -59,8 +58,6 @@ class EventHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if (event.is_directory): return False
 
-        time = datetime.now().microsecond
-
         file_name = event.src_path[len(self.directory):]
 
         data = ("change", file_name)
@@ -68,7 +65,7 @@ class EventHandler(FileSystemEventHandler):
         print("Local File Modified: {}".format(file_name))
 
         if not data in EventHandler.events_to_ignore:
-            Thread(target = self.send_file_contents, args = [file_name, FileChangePacket, time]).start()
+            Thread(target = self.send_file_contents, args = [file_name, FileChangePacket, data]).start()
         else:
             if EventHandler.events_to_ignore[data] == 1:
                 del EventHandler.events_to_ignore[data]
@@ -77,8 +74,6 @@ class EventHandler(FileSystemEventHandler):
 
     def on_deleted(self, event):
         if (event.is_directory): return False
-
-        time = datetime.now().microsecond
 
         file_name = event.src_path[len(self.directory):]
 
@@ -91,7 +86,7 @@ class EventHandler(FileSystemEventHandler):
                 FileDeletePacket(
                     self.hub_processor,
                     file_name=file_name
-                )
+                ), data
             )
         else:
             if EventHandler.events_to_ignore[data] == 1:
@@ -101,8 +96,6 @@ class EventHandler(FileSystemEventHandler):
 
     def on_moved(self, event):
         if (event.is_directory): return False
-
-        time = datetime.now().microsecond
 
         file_name = event.src_path[len(self.directory):]
         new_name = event.dest_path[len(self.directory):]
@@ -117,7 +110,7 @@ class EventHandler(FileSystemEventHandler):
                     self.hub_processor,
                     file_name=file_name,
                     new_name=new_name
-                )
+                ), data
             )
         else:
             if EventHandler.events_to_ignore[data] == 1:
