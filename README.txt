@@ -2,8 +2,13 @@ A simple cross-platform file server that syncs files between two directories, or
 
 Setup
     -Install Python: https://www.python.org/downloads/ (3.6.3+)
-    -Run get_requirements.bat (or .sh)
+        -Verify install with command "python --version"
+    -Install Node.js: https://nodejs.org/en/download/ (8.11.0+)
+        -Only install Node if you want to build web (if you plan on contributing to the project)
+        -Verify install with command "node -v"
+    -Run setup.bat (or .sh)
 
 Running
-    -Run quick_reset.bat (or sh)
-    -Move files from test/test_files to test/client_dir or serv_dir for testing
+    -Run webpack.bat (or .sh)
+        -Only required for building web
+    -Run test.bat (or .sh)
