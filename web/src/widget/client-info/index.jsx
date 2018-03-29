@@ -133,14 +133,27 @@ export default class ClientInfo extends React.Component {
             }
 
             content = (
+                
                 <div className={cls(this, "content")}>
                     <div>{"Connected: " + timeString}</div>
-                    <div>{"Files Sent: " + info.files_sent}</div>
-                    <div>{"Data Sent: " + this.format_data_size(info.data_sent)}</div>
-                    <div>{"Files Recieved: " + info.files_recieved}</div>
-                    <div>{"Data Recieved: " + this.format_data_size(info.data_recieved)}</div>
-                    <div>{"Queued Packets: " + info.queued_packets}</div>
-                    <div>{"Events to ignore: " + info.queued_packets}</div>
+                    <table className={cls(this, "table")}>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div>{"Files Sent: " + info.files_sent}</div>
+                                    <div>{"Data Sent: " + this.format_data_size(info.data_sent)}</div>
+                                </td>
+                                <td>
+                                    <div>{"Files Recieved: " + info.files_recieved}</div>
+                                    <div>{"Data Recieved: " + this.format_data_size(info.data_recieved)}</div>
+                                </td>
+                                <td>
+                                    <div>{"Queued Packets: " + info.queued_packets}</div>
+                                    <div>{"Events to ignore: " + info.queued_packets}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                     {progress_bar}
                 </div>
             )
