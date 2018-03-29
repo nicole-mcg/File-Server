@@ -18,13 +18,11 @@ export default class HomePage extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            clients: [],
-            secondsElapsed: 0
+            clients: []
         };
     }
 
     fetchData() {
-        console.log("fetching data")
         fetch("/api/activeclients", {
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
             credentials: 'same-origin', // include, same-origin, *omit
@@ -36,7 +34,6 @@ export default class HomePage extends React.Component {
         .then(res => res.json())
         .then(
             (result) => {
-                console.log(result)
                 this.setState({
                     isLoaded: true,
                     clients: result

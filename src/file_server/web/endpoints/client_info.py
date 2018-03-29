@@ -1,0 +1,30 @@
+from .base import Endpoint
+
+import json
+
+class ClientInfoEndpoint(Endpoint):
+
+    def handle_request(self, request_handler, server, id):
+        connections = server.connections
+
+        try:
+            conn = connections[id]
+
+            return json.dumps({
+                "address": conn.client_host,
+                "status": "Idle" if conn.transferring is None else "Transferring Files",
+                "time": conn.connect_time,
+                "files_sent": conn.files_sent,
+                "data_sent": conn.data_sent,
+                "files_recieved": conn.files_recieved,
+                "data_recieved": conn.data_recieved,
+                "transferring": conn.transferring,
+                "transfer_progress": conn.transfer_progress,
+                "queued_packets": len(conn.packet_queue) + len(conn.hub_processor.buffer_queue),
+                "events_to_ignore": len(conn.hub_processor.event_handler.events_to_ignore),
+            })
+
+        except KeyError:
+            pass
+
+        return json.dumps({})

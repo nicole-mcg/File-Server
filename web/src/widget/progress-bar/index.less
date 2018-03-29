@@ -1,0 +1,24 @@
+@import "../../less/core";
+
+.ProgressBar {
+    position: relative;
+    width: 100%;
+    text-align: center;
+
+    .border-radius();    
+
+    border: 1px solid @color-primary;
+
+    &-text {
+        position: relative;
+        z-index: 10;
+    }
+
+    &-fill {
+        height: 100%;
+        top: 0;
+        position: absolute;
+        background-color: @color-primary;
+    }
+
+}

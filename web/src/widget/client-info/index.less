@@ -4,11 +4,14 @@
     width: 80%;
     border: 1px solid @color-primary;
     padding: @space-small;
+    margin: @space-large;
     text-align: left;
     line-height: 30px;
     vertical-align: middle;
 
     .border-radius();
+
+    .box-shadow();
 
     &-header {
         padding: @space-small;
@@ -20,9 +23,14 @@
         }
     }
 
-    &-showBtn {
-        display: inline;
+    &-right {
+        font-size: 24px;
         float: right;
+    }
+
+    &-showBtn {
+        margin-left: @space-medium;
+        display: inline-block;
 
         background-color: @color-primary;
         cursor: pointer;

@@ -107,11 +107,13 @@ class FileProcessor(HubProcessor):
 
         file = open(file_path,'wb')
 
+        conn.transfer_progress = 0
         while(length > 0):
             self.event_handler.add_ignore(("change", file_name))
             chunk_size = KILOBYTE if length > KILOBYTE else length
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
             file.flush()
+            conn.transfer_progress += chunk_size
             conn.data_recieved += chunk_size
             length -= chunk_size
 

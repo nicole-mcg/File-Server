@@ -14,6 +14,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
 
 from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
+from file_server.web.endpoints.client_info import ClientInfoEndpoint
 
 import webbrowser
 
@@ -48,17 +49,29 @@ class RequestHandler(BaseHTTPRequestHandler):
             endpoints = RequestHandler.endpoints
             path = self.path
 
-            print(path)
-
             code = 200
             content_type = "text/html"
             expires = False
 
             if path.startswith("/api"):
+                path = path[4:]
+
+                index = path.find("/", 1)
+                if index == -1:
+                    endpoint = path
+                else:
+                    endpoint = path[:index]
+
+                id = -1
+                try: 
+                    id = path[len(endpoint) + 1:]
+                    id = int(id)
+                except (ValueError, IndexError) as e:
+                    pass
 
                 #code = 403
                 content_type = "application/json"
-                contents = str.encode(endpoints[path[4:]].handle_request(self, RequestHandler.server))
+                contents = str.encode(endpoints[endpoint].handle_request(self, RequestHandler.server, id))
 
                 expires = True
 
@@ -84,7 +97,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             self.wfile.write(contents)
 
-        except IOError as e:
+        except (IOError, KeyError) as e:
             print(e)
             self.send_error(404,'File Not Found: %s' % self.path)
 
@@ -99,12 +112,14 @@ class RequestHandler(BaseHTTPRequestHandler):
 def start_webserver(server):
     server_address = ('', 8080)
     httpd = HTTPServer(server_address, RequestHandler)
-    print('Starting httpd...')
 
     os.chdir("../web")
 
     RequestHandler.server = server
-    RequestHandler.endpoints = {"/activeclients": ActiveClientsEndpoint()}
+    RequestHandler.endpoints = {
+        "/activeclients": ActiveClientsEndpoint(),
+        "/clientinfo": ClientInfoEndpoint(),
+    }
 
     webbrowser.open('http://127.0.0.1:8080', new=2)
     httpd.serve_forever()

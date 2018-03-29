@@ -1,4 +1,6 @@
 **/test/test_files
+**/test/client_dir
+**/test/serv_dir
 **/node_modules
 
 # Byte-compiled / optimized / DLL files
