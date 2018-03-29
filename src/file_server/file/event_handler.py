@@ -11,7 +11,6 @@ class EventHandler(FileSystemEventHandler):
     events_to_ignore = {}
 
     def add_ignore(self, data):
-        print("added ignore: " + data[0] + " " + data[1])
         if data in EventHandler.events_to_ignore:
             EventHandler.events_to_ignore[data] += 1
         else:

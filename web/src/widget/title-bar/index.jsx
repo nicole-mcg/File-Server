@@ -15,22 +15,22 @@ export default class TitleBar extends React.Component {
   static get LINKS() {
     return [
       ["Home", ""],
-      ["Software", "",
+      ["###", "",
         [
             new Menu.Item("test1", "", function() {}),
             new Menu.Item("test2", "", function() {}),
             new Menu.Item("test3", "", function() {})
         ]
       ],
-      ["Blog", "/blog"],
-      ["Downloads", "",
+      ["Settings", "/settings"],
+      ["###", "",
         [
             new Menu.Item("test1", "", function() {}),
             new Menu.Item("test2", "", function() {}),
             new Menu.Item("test3", "", function() {})
         ]
       ],
-      ["About", "/about"]
+      ["###", "/about"]
     ];
   }
 
@@ -83,7 +83,7 @@ export default class TitleBar extends React.Component {
     return (
         <div>
           <div className={cls(this)}>
-            <div ref="title" className={cls(this, "title")}>Outstream Software</div>
+            <div ref="title" className={cls(this, "title")}>File Server</div>
             <div ref="bar" className={cls(this, "bar")}>
                 {buttons}
             </div>

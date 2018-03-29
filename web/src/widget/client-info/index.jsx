@@ -3,6 +3,7 @@ import React from 'react';
 import './index.less'
 
 import ProgressBar from '../progress-bar';
+import Button from '../button';
 
 import { Link } from 'react-router-dom'
 
@@ -70,7 +71,7 @@ export default class ClientInfo extends React.Component {
                 return function() {   //Return a function in the context of 'self'
                     self.tick(self); //Thing you wanted to run as non-window 'this'
                 }
-            })(self), 1000);
+            })(self), 500);
         }
     }
 
@@ -78,6 +79,19 @@ export default class ClientInfo extends React.Component {
         if (this.state.open) {
             clearInterval(this.interval);
         }
+    }
+
+    format_data_size(i) {
+        var units = [" bytes", "kb", "MB", "GB", "TB", "PB"]
+
+        var unit_index = 0;
+        
+        while (i > 1024) {
+            i /= 1024;
+            unit_index++;
+        }
+
+        return i.toFixed(2) + units[unit_index];
     }
 
     render() {
@@ -120,15 +134,14 @@ export default class ClientInfo extends React.Component {
 
             content = (
                 <div className={cls(this, "content")}>
-
-                    {progress_bar}
                     <div>{"Connected: " + timeString}</div>
                     <div>{"Files Sent: " + info.files_sent}</div>
-                    <div>{"Data Sent: " + info.data_sent}</div>
+                    <div>{"Data Sent: " + this.format_data_size(info.data_sent)}</div>
                     <div>{"Files Recieved: " + info.files_recieved}</div>
-                    <div>{"Data Recieved: " + info.data_recieved}</div>
+                    <div>{"Data Recieved: " + this.format_data_size(info.data_recieved)}</div>
                     <div>{"Queued Packets: " + info.queued_packets}</div>
                     <div>{"Events to ignore: " + info.queued_packets}</div>
+                    {progress_bar}
                 </div>
             )
         }
@@ -138,11 +151,11 @@ export default class ClientInfo extends React.Component {
                 <div className={cls(this, "header", {open: this.state.open})}>
                     {active_info.address}
                     <div className={cls(this, "right")}>
-                        {active_info.status}
-                        <div className={cls(this, "showBtn")} onClick={toggleOpen}>
+                        {active_info.status == "Idle" ? "" : (<img src="/img/3.svg" width={30} height={30}></img>)}
+                        <Button className={cls(this, "showBtn")} onClick={toggleOpen}>
                             {this.state.open ? "-" : "+"}
-                        </div>
-                    </div>>
+                        </Button>
+                    </div>
                 </div>
                 {content}
             </div>

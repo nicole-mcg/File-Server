@@ -13,7 +13,8 @@ displayName: "Button";
             className={cls(this, "", {
                 selected: this.props.selected
             }) + " " + this.props.className}
-            style={this.props.style}>
+            style={this.props.style}
+            onClick={this.props.onClick}>
             {this.props.children}
         </div>
     );

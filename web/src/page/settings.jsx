@@ -18,31 +18,14 @@ export default class SettingsPage extends React.Component {
             <div>
                 <InfoPane title="Profile Settings" size="large">
 
-                    <SubTitle>I am a:</SubTitle>
+                    <SubTitle>subtitle:</SubTitle>
                     <ContentSpacer>
-                        <RadioButton value="male" group="gender">Man</RadioButton>
-                        <RadioButton value="female" group="gender">Woman</RadioButton>
-                    </ContentSpacer>
-
-                    <SubTitle>Interested in:</SubTitle>
-                    <ContentSpacer>
-                        <CheckBox value="men">Men</CheckBox>
-                        <CheckBox value="women">Women</CheckBox>
-                    </ContentSpacer>
-
-                    <SubTitle>Looking for:</SubTitle>
-                    <ContentSpacer>
-                        <CheckBox value="friends">Friendship</CheckBox>
-                        <CheckBox value="love">Relationship</CheckBox>
-                        <CheckBox value="love">Hook-up</CheckBox>
+                        <RadioButton value="radio" group="gender">radio</RadioButton>
+                        <RadioButton value="buttons" group="gender">buttons</RadioButton>
+                        <CheckBox value="checkbox">checkbox</CheckBox>
                         <AddButton>Add another</AddButton>
                     </ContentSpacer>
-
-                    <SubTitle>Show me:</SubTitle>
-                    <ContentSpacer>
-                        <CheckBox value="friends">Men</CheckBox>
-                        <CheckBox value="love">Women</CheckBox>
-                    </ContentSpacer>
+                    
                 </InfoPane>
             </div>
         );

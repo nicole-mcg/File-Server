@@ -87,6 +87,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                     content_type = "image/gif"
                 elif path.endswith(".png"):
                     content_type = "image/png"
+                elif path.endswith(".svg"):
+                    content_type = "image/svg+xml"
                 else:
                     path = "/index.html"
 

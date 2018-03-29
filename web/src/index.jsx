@@ -30,7 +30,7 @@ export default class App extends React.Component {
 
                         <Switch>
                             <Route path="/" exact component={HomePage}/>
-                            <Route path="/blog" component={SettingsPage}/>
+                            <Route path="/settings" component={SettingsPage}/>
                         </Switch>
 
                     </center>

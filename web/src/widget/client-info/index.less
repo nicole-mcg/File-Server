@@ -6,8 +6,7 @@
     padding: @space-small;
     margin: @space-large;
     text-align: left;
-    line-height: 30px;
-    vertical-align: middle;
+    vertical-align: top;
 
     .border-radius();
 
@@ -17,6 +16,7 @@
         padding: @space-small;
         font-size: 24px;
         border: 0;
+        height: 30px;
 
         &--open {
             border-bottom: 1px solid @color-primary;
@@ -29,15 +29,18 @@
     }
 
     &-showBtn {
+        position: relative;
+        top: -4px;
         margin-left: @space-medium;
         display: inline-block;
 
-        background-color: @color-primary;
-        cursor: pointer;
+        font-size: 14px;
+
+        vertical-align: middle;
+
         width: 30px;
-        height: 30px;
-        text-align: center;
-        border: 1px solid @color-primary-dark;
+        height: 18px;
+        border-top: 4px solid @color-primary;
         color: #FFFFFF;
         .border-radius();
     }
