@@ -1,0 +1,95 @@
+@import "../../less/core";
+
+.CheckBox {
+    display: block;
+
+    cursor: pointer;
+    height: 30px;
+    width: 100%;
+    .user-select();
+
+    position: relative;
+
+    padding-left: 25px;
+
+    .mobile({
+        height: 64px;
+        padding-left: 64px;
+    });
+
+    &-text {
+        display: inline-block;
+        font-size: @font-size-small;
+
+        line-height: 25px;
+        vertical-align: top;
+
+        padding-left: @space-small;
+
+        .mobile({
+            font-size: @font-size-large;
+            line-height: 64px;
+            padding-left: @space-medium;
+        });
+    }
+
+
+    &-default {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    &-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        .border-radius(35%);
+        width: 19px;
+        height: 19px;
+        background: @color-neutral0;
+        border: 3px solid @color-primary;
+
+        .mobile({
+            width: 40px;
+            height: 40px;
+            border-width: 8px;
+            top: 4px;
+        });
+    }
+
+    &-buttonFill {
+        position: absolute;
+        display: none;
+
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid @color-primary;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+
+        .mobile({
+            left: 9px;
+            width: 12px;
+            height: 24px;
+            border-width: 0 9px 9px 0;
+        });
+    }
+
+    &-default:checked + &-button > &-buttonFill {
+        display: inline;
+    }
+
+    &:hover &-button {
+        border-color: @color-primary-dark;
+    }
+
+    &:hover &-button > &-buttonFill {
+        border-color: @color-primary-dark;
+    }
+}

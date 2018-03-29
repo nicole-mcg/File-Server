@@ -4,10 +4,11 @@ class Packet:
     name = "Packet"
     packet_handlers = {}
 
-    def __init__(self, hub_processor, sock=None, length=0):
+    def __init__(self, hub_processor, sock=None, length=0, conn=None):
         self._sock = sock
         self.length = length
         self.hub_processor = hub_processor
+        self.conn = conn
 
     def size(self):
         return 0;
@@ -17,7 +18,7 @@ class Packet:
         return None
 
     # Handles an outgoing packet
-    def handle_outgoing(self, sock):
+    def handle_outgoing(self, sock, conn):
         pass
 
     # Handles an incoming packet

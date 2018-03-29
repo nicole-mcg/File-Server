@@ -4,7 +4,7 @@ class IdlePacket(Packet):
     name = "IdlePacket"
     id = 0
 
-    def handle_outgoing(self, sock):
+    def handle_outgoing(self, sock, conn):
         pass
 
     def handle_incoming(self):

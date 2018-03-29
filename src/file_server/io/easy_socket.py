@@ -23,7 +23,7 @@ class EasySocket:
         length = ByteBuffer(b).read_int()
         return ByteBuffer(self.sock.recv(length))
 
-    def send_packet(self, packet=None):
+    def send_packet(self, packet=None, conn=None):
 
         if packet is None:
             packet = IdlePacket(self.hub_processor)
@@ -41,7 +41,7 @@ class EasySocket:
         self.sock.send(buff.bytes())
 
         #packet sock is not set at the time of writing this
-        packet.handle_outgoing(self.sock)
+        packet.handle_outgoing(self.sock, conn)
 
         # Handle response
         buff = ByteBuffer(self.sock.recv(4))
@@ -49,7 +49,7 @@ class EasySocket:
         packet.handle_response(ByteBuffer(self.sock.recv(length)))
 
     @contextlib.contextmanager
-    def read_packet(self):
+    def read_packet(self, conn=None):
         b = self.sock.recv(5)
         buff = ByteBuffer(b)
 
@@ -60,7 +60,7 @@ class EasySocket:
         length = buff.read_int()
 
         # Generate response
-        response = handle_incoming_packet(id, self.sock, length, self.hub_processor)
+        response = handle_incoming_packet(id, self.sock, length, self.hub_processor, conn)
 
         # Send response if exists
         buff = ByteBuffer()

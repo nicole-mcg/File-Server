@@ -1,0 +1,41 @@
+@import "../../less/core";
+
+.ClientInfo {
+    width: 80%;
+    border: 1px solid @color-primary;
+    padding: @space-small;
+    text-align: left;
+    line-height: 30px;
+    vertical-align: middle;
+
+    .border-radius();
+
+    &-header {
+        padding: @space-small;
+        font-size: 24px;
+        border: 0;
+
+        &--open {
+            border-bottom: 1px solid @color-primary;
+        }
+    }
+
+    &-showBtn {
+        display: inline;
+        float: right;
+
+        background-color: @color-primary;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        border: 1px solid @color-primary-dark;
+        color: #FFFFFF;
+        .border-radius();
+    }
+
+    &-content {
+        padding: @space-medium;
+    }
+
+}

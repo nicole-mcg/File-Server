@@ -1,0 +1,41 @@
+@import "../../less/core";
+
+.Menu-container {
+    position: relative;
+    display: inline-block;
+
+    &:hover > .Menu-menu {
+        height: auto;
+        opacity: 1;
+    }
+}
+
+.Menu-menu {
+    height: 0;
+    opacity: 0;
+    top: 0;
+    position: absolute;
+    background-color: @color-primary;
+    overflow: hidden;
+    .box-shadow();
+    .transition(all, 0.15s);
+}
+
+.Menu-item {
+    padding: @space-small 0;
+    border-left: 4px solid @color-primary;
+    border-right: 4px solid @color-primary;
+
+    &:hover {
+        background-color: @color-primary-light;
+        border-color: @color-primary-light;
+    }
+
+    &-selected {
+        border-color: @color-primary;
+        &:hover {
+            background-color: @color-primary;
+            border-color: @color-primary-dark;
+        }
+    }
+}

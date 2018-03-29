@@ -1,0 +1,39 @@
+@import "../../less/core";
+
+.TitleBar {
+    text-align: center;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+
+    z-index: 100;
+
+    &-buttonContainer {
+        display: inline-block;
+    }
+
+    &-button {
+        width: 100px;
+        padding-left: @space-large;
+        padding-right: @space-large;
+        position: relative;
+    }
+
+    &-menu {
+        width: 140px;
+        left: 0px;
+        top: 40px;
+    }
+
+    &-title {
+        font-family: @font-primary;
+        font-size: @font-size-huge;
+    }
+
+    &-bar {
+        top: 0;
+        border-radius: 0 0 5px 5px;
+        width: 100%;
+    }
+
+}

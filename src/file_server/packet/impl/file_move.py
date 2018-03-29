@@ -4,7 +4,7 @@ from file_server.io import ByteBuffer
 class FileMovePacket(Packet):
     name = "FileMovePacket"
     id = 4
-    def __init__(self, hub_processor, sock=None, length=0, **kwargs):
+    def __init__(self, hub_processor, sock=None, length=0, conn=None, **kwargs):
         if "file_name" in kwargs:
             self.file_name = kwargs["file_name"]
             self.new_name = kwargs["new_name"]
@@ -12,11 +12,12 @@ class FileMovePacket(Packet):
         self.hub_processor = hub_processor
         self.sock = sock
         self.length = length
+        self.conn = None
 
     def size(self):
         return len(self.file_name) + len(self.new_name) + 6;
 
-    def handle_outgoing(self, sock):
+    def handle_outgoing(self, sock, conn):
 
         print("old name=" + self.file_name)
         print("new name=" + self.new_name)

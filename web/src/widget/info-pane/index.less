@@ -1,0 +1,62 @@
+@import "../../less/core";
+
+.InfoPane {
+    .border-radius();
+    background-color: @color-neutral0;
+    border: 1px solid @color-primary;
+    display: inline-block;
+    margin: @space-large;
+    overflow: hidden;
+
+
+    //padding: @space-small;
+    width: 20%;
+    margin: @space-large;
+    
+    .mobile({
+        width: 40%;
+    });
+
+    &--medium {
+        //padding: @space-medium;
+        width: 40%;
+    }
+
+    &--large {
+        //padding: @space-large;
+        width: 90%;
+    }
+
+    &--large, &--medium {
+        .mobile({
+            margin-left: 0;
+            margin-right: 0;
+            width: 100%;
+            padding: 0;
+            border-left: 0;
+            border-right: 0;
+            .border-radius(0);
+        });
+    }
+    
+}
+
+.InfoPane-title {
+    padding: @space-small;
+    border-top-left-radius: @space-small;
+    border-top-right-radius: @space-small;
+    background-color: @color-neutral1;
+    text-align: left;
+    border-bottom: 1px solid @color-primary;
+    font-size: @font-size-small;
+    margin-bottom: @space-small;
+
+    .mobile({
+        font-size: @font-size-huge;
+    });
+}
+
+.InfoPane-content {
+    //padding: @space-medium;
+    text-align: left;
+}

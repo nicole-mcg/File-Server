@@ -36,6 +36,7 @@ class FileProcessor(HubProcessor):
         self.packet_queue = None
         self.event_handler = None
         self.observer = None
+        self.update_status = False
 
     def initialize(self, packet_queue):
         self.packet_queue = packet_queue
@@ -58,23 +59,35 @@ class FileProcessor(HubProcessor):
     def get_file_size(self, file_name):
         return os.path.getsize(self.directory + file_name)
 
-    def send_file(self, file_name, sock):
+    def send_file(self, file_name, sock, conn):
 
         file_size = self.get_file_size(file_name)
 
         sock.send(ByteBuffer.from_int(file_size).bytes())
         sock.send(ByteBuffer.from_string(file_name).bytes())
 
+        conn.transferring = {
+            "direction": "send",
+            "file_name": file_name,
+            "file_size": file_size
+        }
+
+        conn.transfer_progress = 0
         with open(self.directory + file_name, mode='rb') as file:
 
             while(file_size > 0):
                 chunk_size = KILOBYTE if file_size > KILOBYTE else file_size
                 chunk = file.read(chunk_size)
                 sock.send(chunk)
+                conn.data_sent += chunk_size
+                conn.transfer_progress += chunk_size
                 file_size -= chunk_size
 
+        conn.files_sent += 1
+        conn.transferring = None
 
-    def save_file(self, sock, length):
+
+    def save_file(self, sock, length, conn):
 
         file_size = ByteBuffer(sock.recv(4)).read_int()
         length -= 4
@@ -86,6 +99,12 @@ class FileProcessor(HubProcessor):
         file_path = self.directory + file_name
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
+        conn.transferring = {
+            "direction": "recieve",
+            "file_name": file_name,
+            "file_size": file_size
+        }
+
         file = open(file_path,'wb')
 
         while(length > 0):
@@ -93,8 +112,11 @@ class FileProcessor(HubProcessor):
             chunk_size = KILOBYTE if length > KILOBYTE else length
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
             file.flush()
+            conn.data_recieved += chunk_size
             length -= chunk_size
 
+        conn.files_recieved += 1
+        conn.transferring = None
 
         self.event_handler.add_ignore(("change", file_name))
         file.close()
@@ -127,11 +149,10 @@ class FileProcessor(HubProcessor):
             key = list(self.buffer_queue.keys())[0]
             packet = self.buffer_queue[key]
 
+            # Check time to make sure any duplicate packets are picked up
             if time() - packet.time > 1:
                 self.packet_queue.queue_packet(packet)
                 del self.buffer_queue[key]
-            else:
-                print(time() - packet.time)
 
     def process(self, packet_queue):
         pass

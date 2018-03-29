@@ -1,0 +1,19 @@
+@import "../../less/core";
+
+.Button {
+    display: inline-block;
+    background-color: @color-primary;
+    border-bottom: 4px solid @color-primary;
+    font-size: @font-size-medium;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+        background-color: @color-primary-light;
+        border-bottom: 4px solid @color-primary-light;
+    }
+}
+
+.Button--selected, .Button--selected:hover {
+    border-bottom: 4px solid @color-primary-dark;
+}

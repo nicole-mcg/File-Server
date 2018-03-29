@@ -1,0 +1,85 @@
+@import "../../less/core";
+
+.RadioButton {
+    display: block;
+
+    cursor: pointer;
+    height: 30px;
+    width: 100%;
+    .user-select();
+
+    position: relative;
+
+    padding-left: 25px;
+
+    .mobile({
+        height: 64px;
+        padding-left: 64px;
+    });
+
+    &-text {
+        display: inline-block;
+        font-size: @font-size-small;
+
+        line-height: 25px;
+        vertical-align: top;
+
+        padding-left: @space-small;
+
+        .mobile({
+            font-size: @font-size-large;
+            line-height: 64px;
+            padding-left: @space-medium;
+        });
+    }
+
+
+    &-default {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    &-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        .border-radius(50%);
+        width: 19px;
+        height: 19px;
+        background: @color-neutral0;
+        border: 3px solid @color-primary;
+
+        .mobile({
+            width: 40px;
+            height: 40px;
+            border-width: 8px;
+            top: 4px;
+        });
+    }
+
+    &-buttonFill {
+        position: absolute;
+        .border-radius(50%);
+        top: 2px;
+        left: 2px;
+        width: 15px;
+        height: 15px;
+        background: @color-primary;
+        display: none;
+
+        .mobile({
+            width: 36px;
+            height: 36px;
+        });
+    }
+
+    &-default:checked + &-button > &-buttonFill {
+        display: inline;
+    }
+
+    &:hover &-button {
+        border-color: @color-primary-dark;
+    }
+}

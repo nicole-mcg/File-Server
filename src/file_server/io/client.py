@@ -18,6 +18,12 @@ class Client:
         self.timeout_count = 0
         self.last_attempt = time.time()
 
+        # Unused but collected because of client/server code mix...
+        self.data_recieved = 0
+        self.files_recieved = 0
+        self.data_sent = 0
+        self.files_sent = 0
+
     def connect(self):
         try:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
@@ -55,7 +61,7 @@ class Client:
             
                 # Send all packets in queue
                 while (not len(self.packet_queue) == 0):
-                    self.sock.send_packet(self.packet_queue.pop())
+                    self.sock.send_packet(self.packet_queue.pop(), self)
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 
@@ -63,7 +69,7 @@ class Client:
                 # Read all incoming packets
                 if (has_packet):
                     while (self.sock.read().read_bool()):
-                        with self.sock.read_packet(): pass
+                        with self.sock.read_packet(self): pass
                     self.hub_processor.process(self)
                     last_ping = time.time()
 
