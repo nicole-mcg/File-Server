@@ -5,6 +5,7 @@ from threading import Thread
 from file_server.io import ByteBuffer
 
 from .easy_socket import EasySocket 
+from file_server.web.account import Account
 
 from time import time
 
@@ -23,7 +24,20 @@ class Server:
         while 1:
             clientsocket, address = self.sock.accept()
             print("Connection recieved: " + clientsocket.getpeername()[0])
+
+            session_length = ByteBuffer(clientsocket.recv(4)).read_int()
+            session = ByteBuffer(clientsocket.recv(session_length)).read_string()
+
+            try:
+                account = Account.sessions[session]
+            except KeyError:
+                print("Count not load account")
+                clientsocket.send(ByteBuffer(b"0")).bytes()
+
+            clientsocket.send(ByteBuffer(b"1").bytes())
+
             connection = ServerConnection(
+                account,
                 clientsocket.getpeername()[0],
                 EasySocket(self.hub_processor, clientsocket),
                 self.hub_processor,
@@ -37,8 +51,9 @@ class Server:
             conn.queue_packet(packet)
 
 class ServerConnection(Thread):
-    def __init__(self, name, socket, hub_processor, server):
+    def __init__(self, account, name, socket, hub_processor, server):
         super().__init__()
+        self.account = account
         self.client_host = name
         self.sock = socket
         self.hub_processor = hub_processor

@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import TitleBar from './widget/title-bar';
 import InfoPane from './widget/info-pane';
 import Img from 'react-image'
 
@@ -13,8 +12,59 @@ import HomePage from "./page/home"
 import SettingsPage from "./page/settings"
 import LoginPage from "./page/login"
 
+import fetch from 'isomorphic-fetch';
+
 //<Route component={NoMatch}/>
 export default class App extends React.Component {
+     constructor(props) {
+        super(props);
+        this.state = {
+            error: null,
+            isLoaded: false,
+            user: null
+        };
+    }
+
+    fetchUser() {
+        fetch("/api/user", {
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // *manual, follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+
+                if (result.needs_auth) {
+                    this.setState({
+                        isLoaded: true,
+                        user: null
+                    });
+                } else {
+                    this.setState({
+                        isLoaded: true,
+                        user: result
+                    });
+                }
+            },
+            // Note: it's important to handle errors here
+            // instead of a catch() block so that we don't swallow
+            // exceptions from actual bugs in components.
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
+    }
+
+    componentDidMount() {
+        this.fetchUser()
+    }
 
     render() {
 
@@ -28,9 +78,9 @@ export default class App extends React.Component {
                     <center>
 
                         <Switch>
-                            <Route path="/" exact component={HomePage}/>
+                            <Route path="/" exact render={() => (<HomePage user={this.state.user}/>) } />
                             <Route path="/login" component={LoginPage}/>
-                            <Route path="/settings" component={SettingsPage}/>
+                            <Route path="/settings" render={() => (<SettingsPage user={this.state.user}/>) }/>
                         </Switch>
 
                     </center>

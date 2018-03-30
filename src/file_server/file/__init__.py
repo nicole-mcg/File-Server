@@ -9,7 +9,7 @@ def start_file_hub(hub_type, directory):
 
 if __name__ == "__main__":
     if (len(sys.argv) <= 1):
-        print("Command arguments should be in the form \"directory (hostname)\". The hostname is only needed for clients.")
+        print("Command arguments should be in the form \"directory hostname user password\". Only directory is needed for server")
         sys.exit()
 
     directory = sys.argv[1]

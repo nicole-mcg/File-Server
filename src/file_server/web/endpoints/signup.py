@@ -6,7 +6,10 @@ from ..account import Account
 
 class SignupEndpoint(Endpoint):
 
-    def handle_request(self, request_handler, server, data):
+    def __init__(self):
+        self.needs_auth = False
+
+    def handle_request(self, request_handler, server, account, data):
         name = data["name"]
         password = data["password"]
 

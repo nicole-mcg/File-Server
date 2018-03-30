@@ -6,11 +6,16 @@ from file_server.io import ByteBuffer
 
 from .easy_socket import EasySocket
 
+from file_server.web.account import Account
+
+import requests
+import json
+
 class Client:
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
-    def __init__(self, hub_processor, host):
+    def __init__(self, hub_processor, host, user, password):
         self.hub_processor = hub_processor
         self.host = host if host != 'localhost' else socket.gethostname()
         self.packet_queue = deque()
@@ -24,6 +29,17 @@ class Client:
         self.data_sent = 0
         self.files_sent = 0
 
+        account = None
+        r = requests.post("http://" + host + ":8080/api/login", data=json.dumps({"name": user, "password": password}))
+        if r.status_code == 200:
+            data = json.loads(r.text)
+            account = Account(user, data["auth_code"]);
+            account.session = data["session"]
+        else:
+            raise LookupError("Could not find user")
+
+        self.account = account
+
     def connect(self):
         try:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
@@ -33,6 +49,17 @@ class Client:
             print("Trying to connect to {}".format(self.host))
             self.sock = EasySocket(self.hub_processor)
             self.sock.sock.connect((self.host, EasySocket.PORT))
+
+            self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
+            self.sock.sock.send(ByteBuffer.from_string(self.account.session).bytes())
+
+            b = ByteBuffer(self.sock.sock.recv(1)).read()
+
+            if b == 0:
+                print("Could not authenticate with server")
+                return
+
+            print(b)
 
             self.last_attempt = 0
             self.timeout_count = 0;

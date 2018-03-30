@@ -15,5 +15,5 @@ if __name__ == "__main__":
 
     for i in range(0, 50):
         file = open(file_path + str(i),'wb')
-        file.write(str.encode(file_contents * 100000))
+        file.write(str.encode(file_contents * 1000))
         file.close()

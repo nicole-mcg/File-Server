@@ -17,8 +17,12 @@ def start_hub(hub_type, hub_processor):
 
     elif (hub_type is "client"): # Client
 
-        from file_server.io.client import Client
-        packet_queue = Client(hub_processor, sys.argv[2])
+        try:
+            from file_server.io.client import Client
+            packet_queue = Client(hub_processor, sys.argv[2], sys.argv[3], sys.argv[4])
+        except LookupError: 
+            print("Invalid username or password")
+            return
 
     else:
 

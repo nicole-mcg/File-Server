@@ -6,7 +6,10 @@ from ..account import Account
 
 class LoginEndpoint(Endpoint):
 
-    def handle_request(self, request_handler, server, data):
+    def __init__(self):
+        self.needs_auth = False
+
+    def handle_request(self, request_handler, server, account, data):
         name = data["name"]
         password = data["password"]
 
@@ -15,6 +18,6 @@ class LoginEndpoint(Endpoint):
         if (account is None):
             response = {"error": "Invalid username or password"}
         else:
-            response = {"session": account.session}
+            response = {"session": account.session, "auth_code": account.auth_code}
 
         return response

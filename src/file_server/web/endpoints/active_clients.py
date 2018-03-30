@@ -4,7 +4,10 @@ import json
 
 class ActiveClientsEndpoint(Endpoint):
 
-    def handle_request(self, request_handler, server, data):
+    def __init__(self):
+        self.needs_auth = True
+
+    def handle_request(self, request_handler, server, account, data):
         connections = server.connections
 
         response = []
@@ -13,9 +16,10 @@ class ActiveClientsEndpoint(Endpoint):
         for conn in connections:
             response.append({
                 "id": i,
+                "name": conn.account.name,
                 "address": conn.client_host,
                 "status": "Idle" if conn.transferring is None else "Transferring Files"
             })
             i += 1
 
-        return json.dumps(response)
+        return response

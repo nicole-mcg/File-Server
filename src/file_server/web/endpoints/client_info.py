@@ -4,13 +4,19 @@ import json
 
 class ClientInfoEndpoint(Endpoint):
 
-    def handle_request(self, request_handler, server, data):
+    def __init__(self):
+        self.needs_auth = True
+
+    def handle_request(self, request_handler, server, account, data):
         connections = server.connections
+
+        print(data)
 
         try:
             conn = connections[data]
 
             return {
+                "name": conn.account.name,
                 "address": conn.client_host,
                 "status": "Idle" if conn.transferring is None else "Transferring Files",
                 "time": conn.connect_time,

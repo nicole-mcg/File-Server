@@ -5,6 +5,7 @@ import SubTitle from '../widget/sub-title';
 import InfoPane from '../widget/info-pane';
 import ClientInfo from '../widget/client-info';
 import Img from 'react-image'
+import TitleBar from '../widget/title-bar';
 
 import fetch from 'isomorphic-fetch';
 
@@ -86,9 +87,16 @@ export default class HomePage extends React.Component {
             client_elements.push(element);
         }
 
+        var user_name = "N/A"
+
+        if (this.props.user != null) {
+            user_name = this.props.user.name;
+        }
+
         return (
             <div>
                 <TitleBar selectedIndex={[0]}> </TitleBar>
+                {"Logged in as " + user_name}
                 <InfoPane title="Active Clients" size="large">
                     {client_elements}
                 </InfoPane>

@@ -2,6 +2,8 @@
 import json, os, random
 import uuid
 
+#This class is available for use in Client simple for data purposes
+#Methods should not be used in the client
 class Account:
     sessions = {}
 

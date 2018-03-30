@@ -170,7 +170,7 @@ export default class ClientInfo extends React.Component {
         return (
             <div className={cls(this)}>
                 <div className={cls(this, "header", {open: this.state.open})}>
-                    {active_info.address}
+                    {active_info.name}
                     <div className={cls(this, "right")}>
                         {active_info.status == "Idle" ? "" : (<img src="/img/3.svg" width={30} height={30}></img>)}
                         <Button className={cls(this, "showBtn")} onClick={toggleOpen}>

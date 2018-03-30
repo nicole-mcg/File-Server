@@ -6,6 +6,7 @@ import RadioButton from "../widget/radio-button";
 import AddButton from "../widget/add-button";
 import InfoPane from '../widget/info-pane';
 import SubTitle from '../widget/sub-title';
+import TitleBar from '../widget/title-bar';
 
 import Img from 'react-image'
 

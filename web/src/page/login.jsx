@@ -49,6 +49,11 @@ export default class LoginPage extends React.Component {
             (result) => {
                 if (result.session !== null) {
                     alert("login successful")
+                    const cookies = new Cookies();
+                    cookies.set("session", result.session);
+                    
+
+                    window.location.href = "/"
                 }
                 this.setState({
                     isLoaded: true,
@@ -104,11 +109,12 @@ export default class LoginPage extends React.Component {
 
 
                 } else {
-                    alert("Signup successful! " + result.session)
+                    alert("Signup successful! session=" + result.session)
 
                     const cookies = new Cookies();
-                    cookies.set({ session: result.session });
+                    cookies.set("session", result.session);
 
+                    window.location.href = "/"
                 }
 
                 this.setState({
