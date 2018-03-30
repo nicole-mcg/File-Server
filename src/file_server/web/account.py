@@ -31,6 +31,9 @@ class Account:
 
         data = json.loads(contents)
 
+        if password != data["password"]:
+            return None
+
         return Account._create_session(Account(name, data["auth_code"]))
 
     def create_account(name, password, auth_code):

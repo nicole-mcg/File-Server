@@ -21,9 +21,8 @@ export default class LoginPage extends React.Component {
         super(props);
         this.interval = null;
         this.state = {
-            error: null,
-            isLoaded: false,
-            client: null
+            error: "",
+            isLoaded: false
         };
     }
 
@@ -47,18 +46,18 @@ export default class LoginPage extends React.Component {
         .then(res => res.json())
         .then(
             (result) => {
-                if (result.session !== null) {
-                    alert("login successful")
+                if (result.session != null) {
                     const cookies = new Cookies();
                     cookies.set("session", result.session);
                     
 
                     window.location.href = "/"
+                } else {
+                    this.setState({
+                        error: result.error,
+                        isLoaded: true,
+                    })
                 }
-                this.setState({
-                    isLoaded: true,
-                    clients: result
-                });
             },
             (error) => {
                 this.setState({
@@ -100,27 +99,24 @@ export default class LoginPage extends React.Component {
                 if (result.needs_auth) {
 
 
-                    auth = prompt("Please enter your name", "Harry Potter");
+                    auth = prompt("Please enter an authorization code:");
                     if (auth !== null) {
-
                         console.log(auth)
                         this.signup(u, e, auth)
                     }
 
 
-                } else {
-                    alert("Signup successful! session=" + result.session)
-
+                } else if (result.session != null) {
                     const cookies = new Cookies();
                     cookies.set("session", result.session);
 
                     window.location.href = "/"
+                } else {
+                    this.setState({
+                        error: result.error,
+                        isLoaded: true,
+                    })
                 }
-
-                this.setState({
-                    isLoaded: true,
-                    clients: result
-                });
             },
             (error) => {
                 this.setState({
@@ -147,6 +143,7 @@ export default class LoginPage extends React.Component {
                     <ContentSpacer>
                         <TextField name="Name" ref={(c) => this.name = c}></TextField>
                         <TextField name="Password" password ref={(c) => this.password = c}></TextField>
+                        {this.state.error}
                         <ContentSpacer size="small">
                             <table style={{width: "100%"}}>
                                 <tbody>

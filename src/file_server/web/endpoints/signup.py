@@ -16,7 +16,7 @@ class SignupEndpoint(Endpoint):
         if not os.path.isdir("../bin/accounts/") or len(os.listdir("../bin/accounts/")) == 0:
             account = Account.create_account(name, password, Account.create_auth())
             if (account is None):
-                response = {"error": "Invalid username or password"}
+                response = {"error": "Account already exists"}
             else:
                 response = {"session": account.session}
         else:

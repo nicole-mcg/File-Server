@@ -39,14 +39,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             for c in parsed_cookie.values():
                 cookie[c.key] = c.coded_value 
 
-            print("cookie:")
-            print(cookie)
-
             if "session" in cookie:
                 try:
                     account = Account.sessions[cookie.get("session")]
-                    print("account=" + account.name)
-                    print("Loaded account from key")
                 except KeyError:
                     print("Could not load account from key")
         return account
@@ -95,7 +90,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                             account = Account.sessions[contents["session"]]
                             expires = False
                         except KeyError:
-                            print(Account.sessions)
+                            print("Expected session to exist: " + contents["session"])
 
                     contents = str.encode(json.dumps(contents))
             else:
@@ -145,7 +140,6 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         data = self.rfile.read(content_length)
-        print(data)
         data = json.loads(data.decode())
 
         self.handle_request(data)
