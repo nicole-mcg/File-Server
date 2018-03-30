@@ -75,7 +75,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 if (endpoint.needs_auth and account is None):
                     code = 401
-                    contents = ""
+                    contents = b""
                 else:
                     if data is None:
                         expires = True
