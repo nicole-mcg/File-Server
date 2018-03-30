@@ -4,7 +4,7 @@ import json
 
 class ActiveClientsEndpoint(Endpoint):
 
-    def handle_request(self, request_handler, server, id):
+    def handle_request(self, request_handler, server, data):
         connections = server.connections
 
         response = []

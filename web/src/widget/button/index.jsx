@@ -11,7 +11,8 @@ displayName: "Button";
     return (
         <div
             className={cls(this, "", {
-                selected: this.props.selected
+                selected: this.props.selected,
+                nav: this.props.nav,
             }) + " " + this.props.className}
             style={this.props.style}
             onClick={this.props.onClick}>
@@ -25,9 +26,11 @@ displayName: "Button";
 Button.propTypes = {
     className: PropTypes.string,
     selected: PropTypes.bool,
+    nav: PropTypes.bool,
 };
 
 Button.defaultProps = {
     className: "",
     selected: false,
+    nav: false,
 }

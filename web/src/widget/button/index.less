@@ -3,15 +3,35 @@
 .Button {
     display: inline-block;
     background-color: @color-primary;
-    border-bottom: 4px solid @color-primary;
-    font-size: @font-size-medium;
-    cursor: pointer;
-    text-align: center;
+
+    .border-radius();
+
+
+    padding: @space-small @space-medium;
 
     &:hover {
         background-color: @color-primary-light;
         border-color: @color-primary-light;
     }
+
+    &--nav {
+
+        padding: 0;
+        border-radius: 0;
+
+        font-size: @font-size-medium;
+
+        border-bottom: 4px solid @color-primary;
+        &:hover {
+            border-color: @color-primary-light;
+        }
+    }
+    
+    font-size: @font-size-small;
+    cursor: pointer;
+    text-align: center;
+
+    
 }
 
 .Button--selected, .Button--selected:hover {

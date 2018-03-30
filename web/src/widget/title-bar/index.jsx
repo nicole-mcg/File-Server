@@ -58,6 +58,7 @@ export default class TitleBar extends React.Component {
   }
 
   render() {
+
     var selectedIndex = this.props.selectedIndex.slice(0).shift();//TODO make this accept single values
     var selectedSubmenu = this.props.selectedIndex.slice(0);
 
@@ -73,7 +74,8 @@ export default class TitleBar extends React.Component {
               <Link to={TitleBar.LINKS[i][1]}>
                 <Button
                   selected={selected}
-                  className={cls(this, "button")}>
+                  className={cls(this, "button")}
+                  nav>
                     {TitleBar.LINKS[i][0]}
                 </Button>
               </Link>

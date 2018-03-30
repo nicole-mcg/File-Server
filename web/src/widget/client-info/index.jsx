@@ -2,6 +2,7 @@ import React from 'react';
 
 import './index.less'
 
+import ContentSpacer from "../content-spacer";
 import ProgressBar from '../progress-bar';
 import Button from '../button';
 
@@ -125,10 +126,17 @@ export default class ClientInfo extends React.Component {
                 )
 
                 progress_bar = (
-                    <div style={{textAlign: "center"}}>
-                        {info.transferring.file_name}
+                    <ContentSpacer style={{paddingBottom: 0}}>
+                        <div style={{textAlign: "center"}}>
+                            {info.transferring.file_name}
+                        </div>
                         {progress_bar}
-                    </div>
+                        <span style={{visibility: "hidden"}}>Placeholder!</span>
+                        <span style={{float: "right"}}>
+                            {this.format_data_size(info.transfer_progress) + "/" + this.format_data_size(info.transferring.file_size)}
+                            {" (###Mb/s)"}
+                        </span>
+                    </ContentSpacer>
                 )
             }
 

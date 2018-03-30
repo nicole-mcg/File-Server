@@ -88,6 +88,7 @@ export default class HomePage extends React.Component {
 
         return (
             <div>
+                <TitleBar selectedIndex={[0]}> </TitleBar>
                 <InfoPane title="Active Clients" size="large">
                     {client_elements}
                 </InfoPane>

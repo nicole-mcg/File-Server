@@ -11,6 +11,7 @@ import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import HomePage from "./page/home"
 import SettingsPage from "./page/settings"
+import LoginPage from "./page/login"
 
 //<Route component={NoMatch}/>
 export default class App extends React.Component {
@@ -26,10 +27,9 @@ export default class App extends React.Component {
 
                     <center>
 
-                        <TitleBar selectedIndex={[0]}> </TitleBar>
-
                         <Switch>
                             <Route path="/" exact component={HomePage}/>
+                            <Route path="/login" component={LoginPage}/>
                             <Route path="/settings" component={SettingsPage}/>
                         </Switch>
 

@@ -18,10 +18,11 @@ export default class InfoPane extends React.Component {
         }
 
 		return (
-			<div className={cls(this, "", {
-                medium: this.props.size == "medium",
-                large: this.props.size == "large"
-            })}>
+			<div style={this.props.style}
+                className={cls(this, "", {
+                    medium: this.props.size == "medium",
+                    large: this.props.size == "large"
+                })}>
 			    {title}
 			    <div className={cls(this, "content")}>{this.props.children}</div>
 			</div>
@@ -37,4 +38,5 @@ InfoPane.propTypes = {
 InfoPane.defaultProps = {
     size: "medium",
     showTitle: true,
+    style: {},
 }

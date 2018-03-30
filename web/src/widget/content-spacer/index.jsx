@@ -28,5 +28,6 @@ ContentSpacer.propTypes = {
 
 ContentSpacer.defaultProps = {
     className: "",
+    style: {},
     size: "medium",
 }

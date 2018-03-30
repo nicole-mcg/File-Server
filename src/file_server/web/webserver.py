@@ -1,33 +1,28 @@
-#!/usr/bin/env python
-"""
-Very simple HTTP server in python.
-Usage::
-    ./dummy-web-server.py [<port>]
-Send a GET request::
-    curl http://localhost
-Send a HEAD request::
-    curl -I http://localhost
-Send a POST request::
-    curl -d "foo=bar&bin=baz" http://localhost
-"""
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
 
+from file_server.web.account import Account
 from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
 from file_server.web.endpoints.client_info import ClientInfoEndpoint
+from file_server.web.endpoints.login import LoginEndpoint
+from file_server.web.endpoints.signup import SignupEndpoint
 
 import webbrowser
 
 import os
 
+import json
+
 class RequestHandler(BaseHTTPRequestHandler):
     server = None
-    endpoints = {}
 
-    def _set_headers(self, code=200, content_type="text/html", expires=False):
+    def _set_headers(self, account, code=200, content_type="text/html", expires=False):
+        cookie_data = self.headers.get('Cookie')
         self.send_response(code)
         self.send_header('Content-type', content_type)
-        self.send_header('Set-Cookie', 'test=1234')
+
+        if account is not None:
+            self.send_header('Set-Cookie', 'session=' + account.session)
 
         if expires:
             self.send_header("Expires", "Mon, 01 Jan 1990 00:00:00 GMT")
@@ -35,14 +30,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        cookie_data = self.headers.get('Cookie')
+        
 
+        account = None
         if (cookie_data is not None):
             cookie = SimpleCookie()
             cookie.load(cookie_data)
-        else:
-            #We've got a new session
-            pass
+
+            if "session" in cookie:
+                try:
+                    account = Account.sessions[cookie["session"]]
+                    print("account=" + account.name)
+                except KeyError:
+                    pass
 
         try:
 
@@ -89,13 +89,20 @@ class RequestHandler(BaseHTTPRequestHandler):
                     content_type = "image/png"
                 elif path.endswith(".svg"):
                     content_type = "image/svg+xml"
+                elif path != "/login" and account is None:
+                    print("redirecting to login")
+                    print(path)
+                    self.send_response(302)
+                    self.send_header('Location','/login')
+                    self.end_headers()
+                    return
                 else:
                     path = "/index.html"
 
                 with open("." + path, "rb") as content_file:
                     contents = content_file.read()
 
-            self._set_headers(code, content_type, expires)
+            self._set_headers(account, code, content_type, expires)
 
             self.wfile.write(contents)
 
@@ -104,12 +111,50 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_error(404,'File Not Found: %s' % self.path)
 
     def do_HEAD(self):
-        self._set_headers()
+        self._set_headers(None)
         
     def do_POST(self):
-        # Doesn't do anything with posted data
-        self._set_headers()
-        self.wfile.write(b"<html><body><h1>POST!</h1></body></html>")
+
+        content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+        data = json.loads(self.rfile.read(content_length).decode())
+
+        path = self.path
+
+        if path.startswith("/api"):
+            endpoints = RequestHandler.endpoints
+
+            path = path[4:]
+
+            index = path.find("/", 1)
+            if index == -1:
+                endpoint = path
+            else:
+                endpoint = path[:index]
+
+            try:
+                code = 200
+                content_type = "application/json"
+                expires = True
+                print(endpoint)
+                contents = endpoints[endpoint].handle_request(self, RequestHandler.server, data)
+
+                account = None
+                print(contents)
+                if "session" in contents.keys():
+                    try:
+                        print("loaded session from login")
+                        account = Account.sessions[contents["session"]]
+                        expires = False
+                    except KeyError:
+                        print("session not found: " + contents["session"])
+                        print(Account.sessions)
+
+                self._set_headers(account, code, content_type, expires)
+                self.wfile.write(str.encode(json.dumps(contents)))
+            except KeyError as e:
+                print(e)
+                self.send_error(404,'File Not Found: %s' % self.path)
+
         
 def start_webserver(server):
     server_address = ('', 8080)
@@ -121,6 +166,8 @@ def start_webserver(server):
     RequestHandler.endpoints = {
         "/activeclients": ActiveClientsEndpoint(),
         "/clientinfo": ClientInfoEndpoint(),
+        "/login": LoginEndpoint(),
+        "/signup": SignupEndpoint(),
     }
 
     webbrowser.open('http://127.0.0.1:8080', new=2)

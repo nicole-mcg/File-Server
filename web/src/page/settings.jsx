@@ -16,6 +16,9 @@ export default class SettingsPage extends React.Component {
 
         return (
             <div>
+
+                <TitleBar selectedIndex={[0]}> </TitleBar>
+
                 <InfoPane title="Profile Settings" size="large">
 
                     <SubTitle>subtitle:</SubTitle>

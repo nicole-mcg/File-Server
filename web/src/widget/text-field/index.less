@@ -1,0 +1,20 @@
+@import "../../less/core";
+
+.TextField {
+    display: block;
+
+    cursor: text;
+    height: 30px;
+    width: 100%;
+    .user-select();
+
+    position: relative;
+
+    &-default {
+        font-size: 18px;
+        font-family: "Arial";
+        width: 100%;
+        .border-radius();
+        border: 3px solid @color-primary;
+    }
+}
