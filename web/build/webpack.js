@@ -31583,7 +31583,7 @@ var LoginPage = function (_React$Component) {
                 _react2.default.createElement(
                     _infoPane2.default,
                     { title: "Login", size: "small", style: {
-                            height: this.state.error == "" ? "232px" : "255px",
+                            height: this.state.error == "" ? "302px" : "255px",
                             margin: "auto",
                             position: "absolute",
                             top: 0,

@@ -132,7 +132,7 @@ export default class LoginPage extends React.Component {
         return (
             <div style={{width: "100%", height: "100%"}}>
                 <InfoPane title="Login" size="small" style={{
-                    height: this.state.error == ""  ? "232px" : "255px",
+                    height: this.state.error == ""  ? "302px" : "255px",
                     margin: "auto",
                     position: "absolute",
                     top: 0,
