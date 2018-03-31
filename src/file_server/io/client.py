@@ -47,7 +47,7 @@ class Client:
                 time.sleep(0.5)
 
             print("Trying to connect to {}".format(self.host))
-            self.sock = EasySocket(self.hub_processor)
+            self.sock = EasySocket(self.hub_processor, None, self.account.session)
             self.sock.sock.connect((self.host, EasySocket.PORT))
 
             self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())

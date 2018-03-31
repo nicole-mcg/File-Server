@@ -38,6 +38,9 @@ class Account:
 
         return auth_code
 
+    def is_valid_session(session):
+        return session in Account.sessions
+
     def is_valid_auth(auth_code):
         directory = "../bin/"
         file_name = directory + "auths.json"

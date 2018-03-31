@@ -4,11 +4,14 @@ from file_server.io import ByteBuffer
 from file_server.packet import handle_incoming_packet
 from file_server.packet.impl import IdlePacket
 
+from file_server.web.account import Account
+
 class EasySocket:
     PORT = 1234
 
-    def __init__(self, hub_processor, sock=None):
+    def __init__(self, hub_processor, sock, session=None):
         self.hub_processor = hub_processor
+        self.session = session
         if sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         else:
@@ -38,7 +41,21 @@ class EasySocket:
         buff.write(packet.__class__.id)
         buff.write_int(packet.size())
 
+        if self.session is not None:
+            buff.write_int(len(self.session) + 1)
+            buff.write_string(self.session)
+        else:
+            buff.write_int(0)
+
         self.sock.send(buff.bytes())
+
+        
+        auth_response = ByteBuffer(self.sock.recv(1))
+
+        b = auth_response.read()
+        if b == 0:
+            print("invalid client authentification")
+            return
 
         #packet sock is not set at the time of writing this
         packet.handle_outgoing(self.sock, conn)
@@ -58,6 +75,17 @@ class EasySocket:
         # Read ID and size
         id = buff.read()
         length = buff.read_int()
+
+        buff = ByteBuffer(self.sock.recv(4))
+        auth_length = buff.read_int()
+        if (auth_length > 0):
+            auth = ByteBuffer(self.sock.recv(auth_length)).read_string()
+            auth_response = ByteBuffer()
+            if not Account.is_valid_session(auth):
+                auth_response.write(0)
+            else:
+                auth_response.write(1)
+            self.sock.send(auth_response.bytes())
 
         # Generate response
         response = handle_incoming_packet(id, self.sock, length, self.hub_processor, conn)
