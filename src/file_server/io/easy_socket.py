@@ -12,6 +12,8 @@ class EasySocket:
     def __init__(self, hub_processor, sock, session=None):
         self.hub_processor = hub_processor
         self.session = session
+        self.needs_auth = self.session is None
+
         if sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         else:
@@ -78,14 +80,18 @@ class EasySocket:
 
         buff = ByteBuffer(self.sock.recv(4))
         auth_length = buff.read_int()
+
+        auth_response = ByteBuffer()
         if (auth_length > 0):
             auth = ByteBuffer(self.sock.recv(auth_length)).read_string()
-            auth_response = ByteBuffer()
             if not Account.is_valid_session(auth):
                 auth_response.write(0)
             else:
                 auth_response.write(1)
-            self.sock.send(auth_response.bytes())
+        else:
+            auth_response.write(1 if not self.needs_auth else 0)
+
+        self.sock.send(auth_response.bytes())
 
         # Generate response
         response = handle_incoming_packet(id, self.sock, length, self.hub_processor, conn)
