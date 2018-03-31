@@ -3,6 +3,7 @@ bin/**
 **/test/client_dir
 **/test/serv_dir
 **/node_modules
+build/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
