@@ -21,6 +21,7 @@ from file_server.io import ByteBuffer
 from watchdog.observers import Observer
 
 from .event_handler import EventHandler
+from .snapshot import DirectorySnapshot
 
 from time import time
 #from .file_observer import AsynchronousObserver
@@ -37,10 +38,16 @@ class FileProcessor(HubProcessor):
         self.event_handler = None
         self.observer = None
         self.update_status = False
+        self.snapshot = None
+
+    def create_snapshot(self):
+        self.snapshot = DirectorySnapshot(self.directory)
 
     def initialize(self, packet_queue):
         self.packet_queue = packet_queue
         self.event_handler = EventHandler(self, self.directory)
+
+        self.create_snapshot()
 
         observer = Observer()
         observer.schedule(self.event_handler, self.directory, recursive=True)
@@ -105,6 +112,10 @@ class FileProcessor(HubProcessor):
             "file_size": file_size
         }
 
+
+        if not os.path.isfile(file_path):
+            self.event_handler.add_ignore(("change", file_name))
+                
         file = open(file_path,'wb')
 
         conn.transfer_progress = 0

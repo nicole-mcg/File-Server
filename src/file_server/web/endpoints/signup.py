@@ -13,12 +13,16 @@ class SignupEndpoint(Endpoint):
         name = data["name"]
         password = data["password"]
 
+        if "auth_code" in data:
+            print(data)
+            account = Account.create_account(name, password, data["auth_code"])
+            if (account is None):
+                return {"error": "Account already exists"}
+            else:
+                return {"session": account.session}
+
         if not os.path.isdir("../bin/accounts/") or len(os.listdir("../bin/accounts/")) == 0:
             account = Account.create_account(name, password, Account.create_auth())
-            if (account is None):
-                response = {"error": "Account already exists"}
-            else:
-                response = {"session": account.session}
-        else:
-            response = {"needs_auth": True}
-        return response
+            return {"session": account.session}
+
+        return {"needs_auth": True}

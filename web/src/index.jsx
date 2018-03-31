@@ -39,11 +39,22 @@ export default class App extends React.Component {
             (result) => {
 
                 if (result.needs_auth) {
+                    console.log("coult not authenticate")
                     this.setState({
                         isLoaded: true,
                         user: null
                     });
                 } else {
+
+                    result.refresh_rate_index = result.refresh_rate;
+                    if (result.refresh_rate == 0) {
+                        result.refresh_rate = 1000;
+                    } else if (result.refresh_rate == 1) {
+                        result.refresh_rate = 500;
+                    } else if (result.refresh_rate == 2) {
+                        result.refresh_rate = 100;
+                    }
+
                     this.setState({
                         isLoaded: true,
                         user: result
@@ -81,6 +92,7 @@ export default class App extends React.Component {
                             <Route path="/" exact render={() => (<HomePage user={this.state.user}/>) } />
                             <Route path="/login" component={LoginPage}/>
                             <Route path="/settings" render={() => (<SettingsPage user={this.state.user}/>) }/>
+                            <Route path="/logout" render={() => window.location.href = "/api/logout"}/>
                         </Switch>
 
                     </center>

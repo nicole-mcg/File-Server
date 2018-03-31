@@ -23,24 +23,38 @@ export class Menu extends React.Component {
 
         var menuItems = this.props.items;
 
+
+
         var menuComponents = []
         if (menuItems != null) {
             for (var i = 0; i < menuItems.length; i++) {
-                menuComponents.push(
-                    <Link to={menuItems[i].link} key={i}>
-                        <div key={i} className={cls(this, "item", {selected: selectedIndex == i})}>
-                            {menuItems[i].text}
-                        </div>
-                    </Link>
-                );
+                var element = (
+                    <div key={i} className={cls(this, "item", {selected: selectedIndex == i})} onClick={menuItems[i].callback}>
+                        {menuItems[i].text}
+                    </div>
+                )
+                if (this.props.link) {
+                    menuComponents.push(
+                        <Link to={menuItems[i].link} key={i}>
+                            {element}
+                        </Link>
+                    );
+                } else {
+                    menuComponents.push(element);
+                }
             }
+        }
+
+        var style = {}
+        if (!this.props.fit_content) {
+            style = {width: "100%"}
         }
 
         //TODO submenus!!
         var children = (
-            <div className={cls(this, "container")}>
+            <div className={cls(this, "container")} style={style} onMouseLeave={this.props.onMouseLeave}>
                 {this.props.children}
-                <div className={cls(this, "menu") + " " + this.props.className}>
+                <div className={cls(this, "menu") + " " + this.props.className} >
                     {menuComponents}
                 </div>
             </div>

@@ -5,8 +5,11 @@ from file_server.web.account import Account
 from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
 from file_server.web.endpoints.client_info import ClientInfoEndpoint
 from file_server.web.endpoints.login import LoginEndpoint
+from file_server.web.endpoints.logout import LogoutEndpoint
 from file_server.web.endpoints.signup import SignupEndpoint
 from file_server.web.endpoints.user import UserEndpoint
+from file_server.web.endpoints.createauth import CreateAuthEndpoint
+from file_server.web.endpoints.update_settings import UpdateSettingsEndpoint
 
 import webbrowser
 
@@ -16,6 +19,9 @@ import json
 
 class RequestHandler(BaseHTTPRequestHandler):
     server = None
+
+    def log_message(self, format, *args):
+        return
 
     def _set_headers(self, account, code=200, content_type="text/html", expires=False):
         cookie_data = self.headers.get('Cookie')
@@ -39,11 +45,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             for c in parsed_cookie.values():
                 cookie[c.key] = c.coded_value 
 
-            if "session" in cookie:
+            if "session" in cookie and cookie["session"] != "":
                 try:
                     account = Account.sessions[cookie.get("session")]
                 except KeyError:
-                    print("Could not load account from key")
+                    pass
         return account
 
 
@@ -85,12 +91,19 @@ class RequestHandler(BaseHTTPRequestHandler):
                     content_type = "application/json"
                     contents = endpoint.handle_request(self, RequestHandler.server, account, data)
 
-                    if hasattr(contents, "keys") and "session" in contents.keys():
-                        try:
-                            account = Account.sessions[contents["session"]]
-                            expires = False
-                        except KeyError:
-                            print("Expected session to exist: " + contents["session"])
+                    if hasattr(contents, "keys"):
+                        if "session" in contents.keys():
+                            try:
+                                account = Account.sessions[contents["session"]]
+                                expires = False
+                            except KeyError:
+                                print("Expected session to exist: " + contents["session"])
+
+                        if "redirect" in contents.keys():
+                            self.send_response(302)
+                            self.send_header('Location', contents["redirect"])
+                            self.end_headers()
+                            return
 
                     contents = str.encode(json.dumps(contents))
             else:
@@ -116,6 +129,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     self.send_response(302)
                     self.send_header('Location','/')
                     self.end_headers()
+                    return
                 else:
                     path = "/index.html"
 
@@ -126,6 +140,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(contents)
 
         except (IOError, KeyError) as e:
+            print("exception: " + self.path)
             print(e)
             self.send_error(404,'File Not Found: %s' % self.path)
 
@@ -156,8 +171,11 @@ def start_webserver(server):
         "/activeclients": ActiveClientsEndpoint(),
         "/clientinfo": ClientInfoEndpoint(),
         "/login": LoginEndpoint(),
+        "/logout": LogoutEndpoint(),
         "/signup": SignupEndpoint(),
         "/user": UserEndpoint(),
+        "/createauth": CreateAuthEndpoint(),
+        "/updatesettings": UpdateSettingsEndpoint(),
     }
 
     webbrowser.open('http://127.0.0.1:8080', new=2)

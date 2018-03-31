@@ -33,7 +33,7 @@ class Client:
         r = requests.post("http://" + host + ":8080/api/login", data=json.dumps({"name": user, "password": password}))
         if r.status_code == 200:
             data = json.loads(r.text)
-            account = Account(user, data["auth_code"]);
+            account = Account(user, data["auth_code"], data["settings"]);
             account.session = data["session"]
         else:
             raise LookupError("Could not find user")

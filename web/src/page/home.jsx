@@ -53,13 +53,19 @@ export default class HomePage extends React.Component {
     }
 
     tick(self) {
+        var refresh_rate = 1000
+
+        if (this.props.user != null) {
+            refresh_rate = this.props.user.refresh_rate;
+        }
+        
         self.fetchData()
         if (self.interval == null) {
             self.interval = setInterval((function(self) {         //Self-executing func which takes 'this' as self
                 return function() {   //Return a function in the context of 'self'
                     self.tick(self); //Thing you wanted to run as non-window 'this'
                 }
-            })(self), 1000);
+            })(self), refresh_rate);
         }
     }
 
@@ -79,7 +85,7 @@ export default class HomePage extends React.Component {
             var element = (
                 <ContentSpacer key={i}>
                     <center>
-                        <ClientInfo info={this.state.clients[i]}></ClientInfo>
+                        <ClientInfo info={this.state.clients[i]} user={this.props.user}></ClientInfo>
                     </center>
                 </ContentSpacer>
             );
@@ -87,16 +93,9 @@ export default class HomePage extends React.Component {
             client_elements.push(element);
         }
 
-        var user_name = "N/A"
-
-        if (this.props.user != null) {
-            user_name = this.props.user.name;
-        }
-
         return (
             <div>
-                <TitleBar selectedIndex={[0]}> </TitleBar>
-                {"Logged in as " + user_name}
+                <TitleBar selectedIndex={[0]} user={this.props.user}> </TitleBar>
                 <InfoPane title="Active Clients" size="large">
                     {client_elements}
                 </InfoPane>

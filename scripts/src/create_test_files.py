@@ -13,7 +13,7 @@ if __name__ == "__main__":
     file_path +=  "test_files/"
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-    for i in range(0, 50):
+    for i in range(0, 100):
         file = open(file_path + str(i),'wb')
         file.write(str.encode(file_contents * 1000))
         file.close()

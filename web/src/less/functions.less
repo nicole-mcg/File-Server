@@ -17,6 +17,12 @@
 	border-radius: @radius;
 }
 
+.custom-radius (@x: 5px, @y: 5px, @z: 5px, @t: 5px) {
+	-webkit-border-radius: @x @y @z @t;
+	-moz-border-radius: @x @y @z @t;
+	border-radius: @x @y @z @t;
+}
+
 .box-shadow (@x: 0px, @y: 8px, @blur: 15px, @alpha: 0.25) {
 	-webkit-box-shadow: @x @y @blur rgba(0, 0, 0, @alpha);
 	-moz-box-shadow: @x @y @blur rgba(0, 0, 0, @alpha);

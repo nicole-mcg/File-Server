@@ -37,6 +37,7 @@ export default class ClientInfo extends React.Component {
     }
 
     fetchData() {
+        this.fetching_data = true;
         fetch("/api/clientinfo/" + this.props.info.id, {
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
             credentials: 'same-origin', // include, same-origin, *omit
@@ -48,6 +49,8 @@ export default class ClientInfo extends React.Component {
         .then(res => res.json())
         .then(
             (result) => {
+
+                this.fetching_data = false;
                 this.setState({
                     isLoaded: true,
                     client: result
@@ -66,13 +69,17 @@ export default class ClientInfo extends React.Component {
     }
 
     tick(self) {
-        self.fetchData()
+
+        if (!this.fetching_data) {
+            self.fetchData()
+        }
+        
         if (self.interval == null) {
             self.interval = setInterval((function(self) {         //Self-executing func which takes 'this' as self
                 return function() {   //Return a function in the context of 'self'
                     self.tick(self); //Thing you wanted to run as non-window 'this'
                 }
-            })(self), 500);
+            })(self), this.props.user.refresh_rate);
         }
     }
 
@@ -171,6 +178,9 @@ export default class ClientInfo extends React.Component {
             <div className={cls(this)}>
                 <div className={cls(this, "header", {open: this.state.open})}>
                     {active_info.name}
+                    <span style={{fontSize: "18px"}}>
+                        {" (" + active_info.address + ")"}
+                    </span>
                     <div className={cls(this, "right")}>
                         {active_info.status == "Idle" ? "" : (<img src="/img/3.svg" width={30} height={30}></img>)}
                         <Button className={cls(this, "showBtn")} onClick={toggleOpen}>

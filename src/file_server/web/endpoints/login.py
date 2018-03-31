@@ -18,6 +18,10 @@ class LoginEndpoint(Endpoint):
         if (account is None):
             response = {"error": "Invalid username or password"}
         else:
-            response = {"session": account.session, "auth_code": account.auth_code}
+            response = {
+                "session": account.session,
+                "auth_code": account.auth_code,
+                "settings": account.settings,
+            }
 
         return response

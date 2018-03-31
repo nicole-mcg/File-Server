@@ -1,0 +1,52 @@
+@import "../../less/core";
+
+.DropdownMenu {
+
+    
+
+    &-menu {
+        width: 100%;
+        padding: 0 @space-small;
+        max-width: 250px;
+        top: 28px;
+        .custom-radius(0, 0);
+        border: 3px solid @color-primary-dark;
+    }
+
+    &-button {
+        .user-select();
+        padding: 0 @space-small;
+        max-width: 250px;
+        font-size: 18px;
+        font-family: "Arial";
+        width: 100%;
+        .border-radius();
+        border: 3px solid @color-primary;
+        font-family: @font-primary;
+    }
+
+    &-arrow {
+        position: relative;
+        color: @color-primary;
+        float: right;
+        top: @space-small;
+        font-size: 12px;
+    }
+
+    &-arrow--open {
+        color: @color-primary-dark;
+    }
+
+    &-button--open {
+        border-color: @color-primary-dark;
+    }
+
+    &-button:hover > .DropdownMenu-arrow {
+        color: @color-primary-dark;
+    }
+
+    &-button:hover {
+        border-color: @color-primary-dark;
+    }
+
+}

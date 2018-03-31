@@ -12,9 +12,14 @@ export default class TitleBar extends React.Component {
 
   displayName: "TitleBar";
 
-  static get LINKS() {
+  get_links() {
+    var name = "N/A";
+    if (this.props.user) {
+      name = this.props.user.name;
+    }
     return [
       ["Home", ""],
+      ["Files", ""],
       ["###", "",
         [
             new Menu.Item("test1", "", function() {}),
@@ -23,14 +28,11 @@ export default class TitleBar extends React.Component {
         ]
       ],
       ["Settings", "/settings"],
-      ["###", "",
-        [
-            new Menu.Item("test1", "", function() {}),
-            new Menu.Item("test2", "", function() {}),
-            new Menu.Item("test3", "", function() {})
-        ]
-      ],
-      ["###", "/about"]
+      [name, "",
+          [
+              new Menu.Item("Logout", "/logout", function() {}),
+          ]
+      ]
     ];
   }
 
@@ -62,21 +64,25 @@ export default class TitleBar extends React.Component {
     var selectedIndex = this.props.selectedIndex.slice(0).shift();//TODO make this accept single values
     var selectedSubmenu = this.props.selectedIndex.slice(0);
 
+    var links = this.get_links();
+
     var buttons = [];
-    for (var i = 0; i < TitleBar.LINKS.length; i++) {
+    for (var i = 0; i < links.length; i++) {
         var selected = selectedIndex === i;
         buttons.push((
             <Menu
-              key={i - TitleBar.LINKS.length}
+              key={i - links.length}
               className={cls(this, "menu")}
               selectedIndex={selected ? selectedSubmenu : []}
-              items={TitleBar.LINKS[i][2]}>
-              <Link to={TitleBar.LINKS[i][1]}>
+              items={links[i][2]}
+              fit_content
+              link>
+              <Link to={links[i][1]}>
                 <Button
                   selected={selected}
                   className={cls(this, "button")}
                   nav>
-                    {TitleBar.LINKS[i][0]}
+                    {links[i][0]}
                 </Button>
               </Link>
             </Menu>

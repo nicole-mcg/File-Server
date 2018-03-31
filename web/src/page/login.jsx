@@ -78,7 +78,7 @@ export default class LoginPage extends React.Component {
         };
 
         console.log(auth);
-        if (auth !== null) {
+        if (auth != null) {
             data["auth_code"] = auth;
         }
 
@@ -121,7 +121,7 @@ export default class LoginPage extends React.Component {
             (error) => {
                 this.setState({
                     isLoaded: true,
-                    error
+                    error: "Could not connect to server"
                 });
             }
         )
@@ -132,18 +132,17 @@ export default class LoginPage extends React.Component {
         return (
             <div style={{width: "100%", height: "100%"}}>
                 <InfoPane title="Login" size="small" style={{
-                    height: "232px",
+                    height: this.state.error == ""  ? "232px" : "255px",
                     margin: "auto",
                     position: "absolute",
                     top: 0,
                     bottom: 0,
                     left: 0,
-                    right: 0
+                    right: 0,
                 }}>
                     <ContentSpacer>
                         <TextField name="Name" ref={(c) => this.name = c}></TextField>
                         <TextField name="Password" password ref={(c) => this.password = c}></TextField>
-                        {this.state.error}
                         <ContentSpacer size="small">
                             <table style={{width: "100%"}}>
                                 <tbody>
@@ -158,6 +157,9 @@ export default class LoginPage extends React.Component {
                                 </tbody>
                             </table>
                         </ContentSpacer>
+                        <div style={{textAlign: "center"}}>
+                            {this.state.error}
+                        </div>
                     </ContentSpacer>
                 </InfoPane>
             </div>

@@ -21,6 +21,7 @@ def start_hub(hub_type, hub_processor):
             from file_server.io.client import Client
             packet_queue = Client(hub_processor, sys.argv[2], sys.argv[3], sys.argv[4])
         except LookupError: 
+            print(username + " " + password)
             print("Invalid username or password")
             return
 
