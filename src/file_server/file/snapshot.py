@@ -29,6 +29,7 @@ class DirectorySnapshot(Snapshot):
         Snapshot.__init__(self, directory)
         self.snapshots = {};
         self.add_path(directory)
+        print(str(self))
 
     def add_path(self, path):
         for file in os.listdir(path):
@@ -63,9 +64,24 @@ class DirectorySnapshot(Snapshot):
         if allparts[0] in self.snapshots.keys():
             self.snapshots[allparts[0]].update(file_path)
 
-    def __str__(self):
+    def to_json(self, recursive=True):
         string = '{"file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
-        for key in self.snapshots.keys():
-            string += str(self.snapshots[key]) + ","
+
+        if not recursive:
+            wanted_snapshots = list()
+            for index, key in enumerate(self.snapshots.keys()):
+                snapshot = self.snapshots[key]
+                if not isinstance(snapshot, DirectorySnapshot):
+                    wanted_snapshots.append(snapshot)
+        else:
+            wanted_snapshots = self.snapshots.values()
+
+        for index, value in enumerate(wanted_snapshots):
+            string += str(value)
+            if index != len(wanted_snapshots) - 1:
+                string +=  ","
         string += "]}"
         return string
+
+    def __str__(self):
+        return self.to_json()

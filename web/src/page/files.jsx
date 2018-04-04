@@ -38,7 +38,9 @@ export default class FilePage extends React.Component {
             <div>
                 <TitleBar selectedIndex={[0]} user={this.props.user}> </TitleBar>
                 <InfoPane title="Files" size="large">
-                    <FileViewer> </FileViewer>
+                    <FileViewer>
+                        
+                    </FileViewer>
                 </InfoPane>
             </div>
         );

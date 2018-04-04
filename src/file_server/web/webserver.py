@@ -10,6 +10,7 @@ from file_server.web.endpoints.signup import SignupEndpoint
 from file_server.web.endpoints.user import UserEndpoint
 from file_server.web.endpoints.createauth import CreateAuthEndpoint
 from file_server.web.endpoints.update_settings import UpdateSettingsEndpoint
+from file_server.web.endpoints.directory_contents import DirectoryContentsEndpoint
 
 import webbrowser
 
@@ -176,6 +177,7 @@ def start_webserver(server):
         "/user": UserEndpoint(),
         "/createauth": CreateAuthEndpoint(),
         "/updatesettings": UpdateSettingsEndpoint(),
+        "/directorycontents": DirectoryContentsEndpoint(),
     }
 
     webbrowser.open('http://127.0.0.1:8080', new=2)

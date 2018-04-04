@@ -10,6 +10,31 @@ import { Link } from 'react-router-dom'
 
 import {cls} from "../../util/"
 
+
+class Directory extends React.Component {
+    displayName: "Directory";
+
+    constructor(props) {
+        super(props);
+        this.interval = null;
+        this.state = {
+            open: false
+        };
+    }
+
+    toggleOpen() {
+    }
+
+    render() {
+
+        return (
+            <div className={cls(this)}>
+            </div>
+        )
+        
+    }
+}
+
 export default class FileViewer extends React.Component {
     displayName: "FileViewer";
 
@@ -19,14 +44,11 @@ export default class FileViewer extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            client: null
+            data: null
         };
     }
 
-    toggleOpen() {
-    }
-
-    fetchData() {
+    fetchDirectory(directory) {
     }
 
     componentWillUnmount() {
