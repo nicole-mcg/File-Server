@@ -23,10 +23,36 @@ export default class FilePage extends React.Component {
         };
     }
 
-    fetchData() {
+    fetchData(path) {
+        fetch("/api/directorycontents", {
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                "path": path
+            }),
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // *manual, follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log(result)
+                alert("Worked")
+            },
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
     }
 
     componentDidMount() {
+        this.fetchData(".")
     }
 
     componentWillUnmount() {

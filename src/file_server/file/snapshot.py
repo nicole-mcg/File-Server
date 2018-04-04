@@ -1,21 +1,27 @@
 import os
+from enum import Enum
 
 class Snapshot:
+    types = Enum("SnapshotType", "DIRECTORY FILE")
 
-    def __init__(self, file_path):
-        self.last_modified = os.path.getmtime(file_path)
-        self.file_name = file_path
+    def __init__(self, full_path, file_name):
+        self.full_path = full_path
+        self.file_name = file_name
+        self.last_modified = os.path.getmtime(full_path)
 
     def update(self, file_path=""):
         pass
 
+    def get_type(self):
+        return Snapshot.types.FILE
+
     def __str__(self):
-        return '{"file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + '}'
+        return '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + '}'
 
 class FileSnapshot(Snapshot):
 
-    def __init__(self, file_name):
-        Snapshot.__init__(self, file_name)
+    def __init__(self, full_path, file_name):
+        Snapshot.__init__(self, full_path, file_name)
 
     def update(self, file_path=""):
         Snapshot.update(self)
@@ -25,15 +31,31 @@ class FileSnapshot(Snapshot):
 
 class DirectorySnapshot(Snapshot):
 
-    def __init__(self, directory):
-        Snapshot.__init__(self, directory)
+    def split_path(file_path):
+        allparts = []
+        while 1:
+            parts = os.path.split(file_path)
+            if parts[0] == file_path:  # sentinel for absolute paths
+                allparts.insert(0, parts[0])
+                break
+            elif parts[1] == file_path: # sentinel for relative paths
+                allparts.insert(0, parts[1])
+                break
+            else:
+                file_path = parts[0]
+                allparts.insert(0, parts[1])
+        return allparts
+
+
+    def __init__(self, full_path, file_name):
+        Snapshot.__init__(self, full_path, file_name)
         self.snapshots = {};
-        self.add_path(directory)
+        self.add_path(full_path)
         print(str(self))
 
     def add_path(self, path):
         for file in os.listdir(path):
-            file_path = self.file_name + "/" + file
+            file_path = self.full_path + "/" + file
 
             cls = FileSnapshot
 
@@ -43,42 +65,39 @@ class DirectorySnapshot(Snapshot):
             else:
                 print("Added file" + file_path)
 
-            self.snapshots[file] = cls(file_path)
+            self.snapshots[file] = cls(file_path, file)
 
     def update(self, file_path=""):
         Snapshot.update(self)
 
-        allparts = []
-        while 1:
-            parts = os.path.split(file_path)
-            if parts[0] == file_path:  # sentinel for absolute paths
-                allparts.insert(0, parts[0])
-                break
-            elif parts[1] == path: # sentinel for relative paths
-                allparts.insert(0, parts[1])
-                break
-            else:
-                file_path = parts[0]
-                allparts.insert(0, parts[1])
+        parts = DirectorySnapshot.split_path(file_path)
 
-        if allparts[0] in self.snapshots.keys():
+        if parts[0] in self.snapshots.keys():
             self.snapshots[allparts[0]].update(file_path)
 
-    def to_json(self, recursive=True):
-        string = '{"file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
+    def get_type(self):
+        return Snapshot.types.DIRECTORY
 
-        if not recursive:
-            wanted_snapshots = list()
-            for index, key in enumerate(self.snapshots.keys()):
-                snapshot = self.snapshots[key]
-                if not isinstance(snapshot, DirectorySnapshot):
-                    wanted_snapshots.append(snapshot)
-        else:
-            wanted_snapshots = self.snapshots.values()
+    def to_json(self, path="./", recursive=True):
+        string = '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
 
-        for index, value in enumerate(wanted_snapshots):
-            string += str(value)
-            if index != len(wanted_snapshots) - 1:
+        snapshots = self.snapshots
+
+        print(path)
+        path_parts = DirectorySnapshot.split_path(path)
+        for index, part in enumerate(path_parts):
+            if part == "." or part == "":
+                continue
+            if part in snapshots:
+                return snapshots[part].to_json("/".join(path_parts[index:]))
+
+        for index, key in enumerate(snapshots.keys()):
+            snapshot = snapshots[key]
+            if not recursive and isinstance(snapshot, DirectorySnapshot):
+                string += Snapshot.__str__(snapshot)
+            else:
+                string += str(snapshot)
+            if index != len(snapshots) - 1:
                 string +=  ","
         string += "]}"
         return string

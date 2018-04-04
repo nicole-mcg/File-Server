@@ -41,7 +41,7 @@ class FileProcessor(HubProcessor):
         self.snapshot = None
 
     def create_snapshot(self):
-        self.snapshot = DirectorySnapshot(self.directory)
+        self.snapshot = DirectorySnapshot(self.directory, self.directory)
 
     def initialize(self, packet_queue):
         self.packet_queue = packet_queue
