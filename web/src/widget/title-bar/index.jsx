@@ -19,7 +19,7 @@ export default class TitleBar extends React.Component {
     }
     return [
       ["Home", ""],
-      ["Files", ""],
+      ["Files", "/files"],
       ["###", "",
         [
             new Menu.Item("test1", "", function() {}),

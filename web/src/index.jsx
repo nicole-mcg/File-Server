@@ -11,6 +11,7 @@ import { Link, BrowserRouter, Switch, Route } from 'react-router-dom'
 import HomePage from "./page/home"
 import SettingsPage from "./page/settings"
 import LoginPage from "./page/login"
+import FilePage from "./page/files"
 
 import fetch from 'isomorphic-fetch';
 
@@ -89,8 +90,9 @@ export default class App extends React.Component {
                     <center>
 
                         <Switch>
-                            <Route path="/" exact render={() => (<HomePage user={this.state.user}/>) } />
                             <Route path="/login" component={LoginPage}/>
+                            <Route path="/" exact render={() => (<HomePage user={this.state.user}/>) } />
+                            <Route path="/files" render={() => (<FilePage user={this.state.user}/>) }/>
                             <Route path="/settings" render={() => (<SettingsPage user={this.state.user}/>) }/>
                             <Route path="/logout" render={() => window.location.href = "/api/logout"}/>
                         </Switch>
