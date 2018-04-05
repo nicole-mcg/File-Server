@@ -8,12 +8,13 @@
 
 * Install [Node.js]( https://nodejs.org/en/download/) (8.11.0+)
        
-       * Only install Node if you want to build web (if you plan on contributing to the project)
+    * Only install Node if you want to build web (if you plan on contributing to the project)
        
-       * Verify install with command ```node -v```
+    * Verify install with command ```node -v```
        
-       * Node is currently required as a web build is not included (This will come with a proper release)
-    -Run setup.bat (or .sh)
+    * Node is currently required as a web build is not included (This will come with a proper release)
+
+* Run setup.bat (or .sh)
 
 **Running:**
 
