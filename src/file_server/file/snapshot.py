@@ -52,7 +52,6 @@ class DirectorySnapshot(Snapshot):
         Snapshot.__init__(self, full_path, file_name, root_path)
         self.snapshots = {};
         self.add_path(full_path, root_path)
-        print(str(self))
 
     def add_path(self, path, root_path):
         for file in os.listdir(path):
