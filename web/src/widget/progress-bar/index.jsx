@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './index.less'
 
@@ -24,4 +25,10 @@ export default class ProgressBar extends React.Component {
         )
         
     }
+}
+ProgressBar.propTypes = {
+    progress: PropTypes.number
+}
+ProgressBar.defaultProps = {
+    progress: 0
 }
