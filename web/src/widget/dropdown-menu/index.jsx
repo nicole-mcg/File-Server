@@ -110,7 +110,7 @@ displayName: "DropdownMenu";
 }
 DropdownMenu.propTypes = {
     className: PropTypes.string,
-    items: PropTypes.array,
+    items: PropTypes.arrayOf(PropTypes.string),
     label: PropTypes.string,
     nav: PropTypes.bool,
     onChange: PropTypes.func,
