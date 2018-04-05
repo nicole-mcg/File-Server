@@ -49,21 +49,18 @@ class File extends React.Component {
             }
         }
 
-
         var arrow = "";
         if (isDir) {
             arrow = this.state.open ? "\u25bc" : "\u25b6";
-            arrow = (
-                <div className={cls(this, "arrowColumn")}>
-                    <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
-                </div>
-            )
+
         }
 
         return (
             <div className={cls(this) + " " + this.props.className}>
-                {arrow}
-                <div className={cls(this, "nameColumn", {dir: isDir})}>
+                <div className={cls(this, "arrowColumn")}>
+                    <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
+                </div>
+                <div className={cls(this, "nameColumn", {openDir: isDir && this.state.open})}>
                     {file.file_name}
                     {children}
                 </div>
@@ -87,6 +84,7 @@ export default class FileViewer extends React.Component {
         };
     }
 
+    //file_data is used to have easy access to the file within the data tree
     fetchDirectory(path, file_data=null, isRoot=false) {
         fetch("/api/directorycontents", {
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -103,10 +101,13 @@ export default class FileViewer extends React.Component {
         .then(res => res.json())
         .then(
             (result) => {
+
+                //This 
                 if (file_data != null) {
                     file_data.snapshots = result.snapshots;
                     result = this.state.data;
                 }
+
                 this.setState({
                     error: null,
                     isLoaded: true,

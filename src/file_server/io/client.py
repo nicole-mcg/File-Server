@@ -91,8 +91,6 @@ class Client:
                     self.sock.send_packet(self.packet_queue.pop(), self)
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
-                
-
                 # Read all incoming packets
                 if (has_packet):
                     while (self.sock.read().read_bool()):
