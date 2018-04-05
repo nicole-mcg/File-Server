@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './index.less'
 
@@ -193,4 +194,12 @@ export default class ClientInfo extends React.Component {
         )
         
     }
+}
+ClientInfo.propTypes = {
+    info: PropTypes.object,
+    user: PropTypes.object
+}
+ClientInfo.defaultProps = {
+    info: {},
+    user: {}
 }
