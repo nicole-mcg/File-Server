@@ -72,59 +72,63 @@ export default class LoginPage extends React.Component {
         var name = this.name.state.value
         var password = this.password.state.value
 
-        var data = {
-            "name": name,
-            "password": password
-        };
-
-        console.log(auth);
-        if (auth != null) {
-            data["auth_code"] = auth;
-        }
-
-        fetch("/api/signup", {
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, same-origin, *omit
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(data),
-            mode: 'cors', // no-cors, cors, *same-origin
-            redirect: 'follow', // *manual, follow, error
-            referrer: 'no-referrer', // *client, no-referrer
-        })
-        .then(res => res.json())
-        .then(
-            (result) => {
-
-                if (result.needs_auth) {
-
-
-                    auth = prompt("Please enter an authorization code:");
-                    if (auth !== null) {
-                        console.log(auth)
-                        this.signup(u, e, auth)
-                    }
-
-
-                } else if (result.session != null) {
-                    const cookies = new Cookies();
-                    cookies.set("session", result.session);
-
-                    window.location.href = "/"
-                } else {
-                    this.setState({
-                        error: result.error,
-                        isLoaded: true,
-                    })
-                }
-            },
-            (error) => {
-                this.setState({
-                    isLoaded: true,
-                    error: "Could not connect to server"
-                });
+        if (!!!name || !!!password) {
+            alert("Please enter a username and password to sign up with.");
+        } else {
+            var data = {
+                "name": name,
+                "password": password
+            };
+    
+            console.log(auth);
+            if (auth != null) {
+                data["auth_code"] = auth;
             }
-        )
+    
+            fetch("/api/signup", {
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, same-origin, *omit
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(data),
+                mode: 'cors', // no-cors, cors, *same-origin
+                redirect: 'follow', // *manual, follow, error
+                referrer: 'no-referrer', // *client, no-referrer
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {
+    
+                    if (result.needs_auth) {
+    
+    
+                        auth = prompt("Please enter an authorization code:");
+                        if (auth !== null) {
+                            console.log(auth)
+                            this.signup(u, e, auth)
+                        }
+    
+    
+                    } else if (result.session != null) {
+                        const cookies = new Cookies();
+                        cookies.set("session", result.session);
+    
+                        window.location.href = "/"
+                    } else {
+                        this.setState({
+                            error: result.error,
+                            isLoaded: true,
+                        })
+                    }
+                },
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        error: "Could not connect to server"
+                    });
+                }
+            )
+        }
     }
 
     render() {
