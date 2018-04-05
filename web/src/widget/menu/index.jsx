@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './index.less'
 
@@ -22,8 +23,6 @@ export class Menu extends React.Component {
         var selectedIndex = this.props.selectedIndex.slice(0).shift()
 
         var menuItems = this.props.items;
-
-
 
         var menuComponents = []
         if (menuItems != null) {
@@ -62,6 +61,22 @@ export class Menu extends React.Component {
 
         return children;
     }
+}
+Menu.propTypes = {
+    className: PropTypes.string,
+    fit_content: PropTypes.bool,
+    items: PropTypes.array,
+    link: PropTypes.bool,
+    onMouseLeave: PropTypes.func,
+    selectedIndex: PropTypes.array
+}
+Menu.defaultProps = {
+    className: "",
+    fit_content: true,
+    items: [],
+    link: true,
+    onMouseLeave: (e) => {},
+    selectedIndex: []
 }
 
 exports.Menu.Item = MenuItem;

@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '../button';
-import {Menu} from '../menu'
+import {Menu} from '../menu';
 
-import './index.less'
+import './index.less';
 
-import { Link } from 'react-router-dom'
-import {cls} from "../../util/"
+import { Link } from 'react-router-dom';
+import {cls} from "../../util/";
 
 export default class TitleBar extends React.Component {
 
