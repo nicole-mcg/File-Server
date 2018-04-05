@@ -10,8 +10,6 @@ class ClientInfoEndpoint(Endpoint):
     def handle_request(self, request_handler, server, account, data):
         connections = server.connections
 
-        print(data)
-
         try:
             conn = connections[data]
 

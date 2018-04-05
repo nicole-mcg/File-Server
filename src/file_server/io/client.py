@@ -59,8 +59,6 @@ class Client:
                 print("Could not authenticate with server")
                 return
 
-            print(b)
-
             self.last_attempt = 0
             self.timeout_count = 0;
             self.connected = True

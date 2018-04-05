@@ -19,9 +19,6 @@ class FileMovePacket(Packet):
 
     def handle_outgoing(self, sock, conn):
 
-        print("old name=" + self.file_name)
-        print("new name=" + self.new_name)
-
         buff = ByteBuffer.from_string(self.file_name)
         buff.write_string(self.new_name)
 
@@ -36,9 +33,6 @@ class FileMovePacket(Packet):
         new_name = buff.read_string()
 
         self.hub_processor.event_handler.add_ignore(("move", file_name, new_name))
-
-        print("old name=" + file_name)
-        print("new name=" + new_name)
 
         self.hub_processor.move_file(file_name, new_name)
 

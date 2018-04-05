@@ -84,7 +84,6 @@ class DirectorySnapshot(Snapshot):
 
         snapshots = self.snapshots
 
-        print(path)
         path_parts = DirectorySnapshot.split_path(path)
         for index, part in enumerate(path_parts):
             if part == "." or part == "":

@@ -56,9 +56,6 @@ class Account:
 
         existing_auths = json.loads(contents)
 
-        print(auth_code)
-        print(existing_auths)
-
         if auth_code in existing_auths.keys():
 
             if existing_auths[auth_code] > time():
@@ -95,8 +92,6 @@ class Account:
 
         if sha512_crypt.verify(password, data["password"]) == False:
             return None
-
-        print(data)
 
         return Account._create_session(Account(name, data["auth_code"], data["settings"]))
 
