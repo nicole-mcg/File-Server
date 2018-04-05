@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Button from '../button';
 import {Menu} from '../menu'
@@ -99,4 +100,13 @@ export default class TitleBar extends React.Component {
         </div>
     );
   }
+}
+
+TitleBar.propTypes = {
+  selectedIndex: PropTypes.array,
+  user: PropTypes.object
+}
+TitleBar.defaultProps = {
+  selectedIndex: [],
+  user: {}
 }
