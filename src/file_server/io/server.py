@@ -100,4 +100,3 @@ class ServerConnection(Thread):
 
     def queue_packet(self, packet):
         self.packet_queue.append(packet)
-
