@@ -108,16 +108,20 @@ displayName: "DropdownMenu";
     }
 
 }
-
-
 DropdownMenu.propTypes = {
     className: PropTypes.string,
-    selected: PropTypes.number,
+    items: PropTypes.array,
+    label: PropTypes.string,
     nav: PropTypes.bool,
+    onChange: PropTypes.func,
+    selected: PropTypes.number
 };
 
 DropdownMenu.defaultProps = {
     className: "",
-    selected: 0,
+    items: [],
+    label: "",
     nav: false,
+    onChange: () => {},
+    selected: 0
 }
