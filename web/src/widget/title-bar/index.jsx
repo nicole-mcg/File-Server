@@ -103,7 +103,7 @@ export default class TitleBar extends React.Component {
 }
 
 TitleBar.propTypes = {
-  selectedIndex: PropTypes.array,
+  selectedIndex: PropTypes.arrayOf(PropTypes.number),
   user: PropTypes.object
 }
 TitleBar.defaultProps = {
