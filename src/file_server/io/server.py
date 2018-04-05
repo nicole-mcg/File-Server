@@ -98,7 +98,6 @@ class ServerConnection(Thread):
             if connections[i] is self:
                 del connections[i]
 
-
     def queue_packet(self, packet):
         self.packet_queue.append(packet)
 
