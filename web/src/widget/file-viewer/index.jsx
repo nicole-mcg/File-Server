@@ -11,8 +11,9 @@ import { Link } from 'react-router-dom'
 import {cls} from "../../util/"
 
 
-class Directory extends React.Component {
-    displayName: "Directory";
+//Props: data, fetch
+class File extends React.Component {
+    displayName: "File";
 
     constructor(props) {
         super(props);
@@ -23,18 +24,56 @@ class Directory extends React.Component {
     }
 
     toggleOpen() {
+        var data = this.props.data;
+        if (data.snapshots == null) {
+            this.props.fetch("./" + data.full_path, data);
+        }
+
+
+        this.setState({
+            open: !this.state.open,
+        });
     }
 
     render() {
 
+        var file = this.props.data;
+        var isDir = file.type == 1;
+
+        var children = [];
+        if (file.snapshots != null) {
+            for (var i = 0; i < file.snapshots.length; i++) {
+                children.push(
+                    <File fetch={this.props.fetch} className={cls(this, "child", {open: this.state.open})} key={i} data={file.snapshots[i]}> </File>
+                )
+            }
+        }
+
+
+        var arrow = "";
+        if (isDir) {
+            arrow = this.state.open ? "\u25bc" : "\u25b6";
+            arrow = (
+                <div className={cls(this, "arrowColumn")}>
+                    <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
+                </div>
+            )
+        }
+
         return (
-            <div className={cls(this)}>
+            <div className={cls(this) + " " + this.props.className}>
+                {arrow}
+                <div className={cls(this, "nameColumn", {dir: isDir})}>
+                    {file.file_name}
+                    {children}
+                </div>
             </div>
         )
         
     }
 }
 
+//Props: path
 export default class FileViewer extends React.Component {
     displayName: "FileViewer";
 
@@ -48,7 +87,44 @@ export default class FileViewer extends React.Component {
         };
     }
 
-    fetchDirectory(directory) {
+    fetchDirectory(path, file_data=null, isRoot=false) {
+        fetch("/api/directorycontents", {
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                "path": path
+            }),
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // *manual, follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                if (file_data != null) {
+                    file_data.snapshots = result.snapshots;
+                    result = this.state.data;
+                }
+                this.setState({
+                    error: null,
+                    isLoaded: true,
+                    data: result,
+                });
+                console.log(result)
+            },
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
+    }
+
+    componentDidMount() {
+        this.fetchDirectory(this.props.path, null, true)
     }
 
     componentWillUnmount() {
@@ -56,8 +132,17 @@ export default class FileViewer extends React.Component {
 
     render() {
 
+        var contents = ""
+
+        if (this.state.data != null) {
+            contents = (
+                <File fetch={this.fetchDirectory.bind(this)} data={this.state.data}> </File>
+            )
+        }
+
         return (
             <div className={cls(this)}>
+                {contents}
             </div>
         )
         

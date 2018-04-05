@@ -4,9 +4,10 @@ from enum import Enum
 class Snapshot:
     types = Enum("SnapshotType", "DIRECTORY FILE")
 
-    def __init__(self, full_path, file_name):
+    def __init__(self, full_path, file_name, root_path):
         self.full_path = full_path
         self.file_name = file_name
+        self.rel_path = os.path.relpath(full_path, root_path).replace("\\", "/")
         self.last_modified = os.path.getmtime(full_path)
 
     def update(self, file_path=""):
@@ -16,12 +17,12 @@ class Snapshot:
         return Snapshot.types.FILE
 
     def __str__(self):
-        return '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + '}'
+        return '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + '}'
 
 class FileSnapshot(Snapshot):
 
-    def __init__(self, full_path, file_name):
-        Snapshot.__init__(self, full_path, file_name)
+    def __init__(self, full_path, file_name, root_path):
+        Snapshot.__init__(self, full_path, file_name, root_path)
 
     def update(self, file_path=""):
         Snapshot.update(self)
@@ -47,13 +48,13 @@ class DirectorySnapshot(Snapshot):
         return allparts
 
 
-    def __init__(self, full_path, file_name):
-        Snapshot.__init__(self, full_path, file_name)
+    def __init__(self, full_path, file_name, root_path):
+        Snapshot.__init__(self, full_path, file_name, root_path)
         self.snapshots = {};
-        self.add_path(full_path)
+        self.add_path(full_path, root_path)
         print(str(self))
 
-    def add_path(self, path):
+    def add_path(self, path, root_path):
         for file in os.listdir(path):
             file_path = self.full_path + "/" + file
 
@@ -65,7 +66,7 @@ class DirectorySnapshot(Snapshot):
             else:
                 print("Added file" + file_path)
 
-            self.snapshots[file] = cls(file_path, file)
+            self.snapshots[file] = cls(file_path, file, root_path)
 
     def update(self, file_path=""):
         Snapshot.update(self)
@@ -79,7 +80,7 @@ class DirectorySnapshot(Snapshot):
         return Snapshot.types.DIRECTORY
 
     def to_json(self, path="./", recursive=True):
-        string = '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
+        string = '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
 
         snapshots = self.snapshots
 
