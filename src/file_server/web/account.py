@@ -2,6 +2,7 @@
 import json, os, random
 import uuid
 
+from passlib.hash import sha512_crypt
 from time import time
 
 #This class is available for use in Client simply for data purposes
@@ -92,7 +93,7 @@ class Account:
 
         data = json.loads(contents)
 
-        if password != data["password"]:
+        if sha512_crypt.verify(password, data["password"]) == False:
             return None
 
         print(data)
@@ -121,7 +122,7 @@ class Account:
         os.makedirs("../bin/accounts/", exist_ok=True)
         file = open(file_name, "w")
         file.write(json.dumps({
-            "password": password,
+            "password": sha512_crypt.hash(password),
             "auth_code": auth_code,
             "settings": settings,
         }))
