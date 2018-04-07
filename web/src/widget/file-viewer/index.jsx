@@ -80,7 +80,8 @@ export default class FileViewer extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            data: null
+            data: null,
+            view: "tree"
         };
     }
 
@@ -143,7 +144,20 @@ export default class FileViewer extends React.Component {
 
         return (
             <div className={cls(this)}>
-                {contents}
+                <div className={cls(this, "settingsBar")}>
+                    <div className={cls(this, "viewChoice")}>
+                        <Button className={cls(this, "viewButton")} selected={this.state.view == "tree"} nav>
+                            <img className={cls(this, "icon")} src="img/tree_view.svg"/>
+                        </Button>
+                        <Button className={cls(this, "viewButton")} selected={this.state.view == "file"} nav>
+                            <img className={cls(this, "icon")} src="img/file_view.svg"/>
+                        </Button>
+                    </div>
+                    <div className={cls(this, "gradient")}/>
+                </div>
+                <ContentSpacer>
+                    {contents}
+                </ContentSpacer>
             </div>
         )
         
