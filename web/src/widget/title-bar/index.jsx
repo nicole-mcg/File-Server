@@ -76,7 +76,6 @@ export default class TitleBar extends React.Component {
               className={cls(this, "menu")}
               selectedIndex={selected ? selectedSubmenu : []}
               items={links[i][2]}
-              fit_content
               link>
               <Link to={links[i][1]}>
                 <Button

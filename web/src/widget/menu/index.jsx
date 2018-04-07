@@ -44,14 +44,10 @@ export class Menu extends React.Component {
             }
         }
 
-        var style = {}
-        if (!this.props.fit_content) {
-            style = {width: "100%"}
-        }
 
         //TODO submenus!!
         var children = (
-            <div className={cls(this, "container")} style={style} onMouseLeave={this.props.onMouseLeave}>
+            <div className={cls(this, "container", {fitContent: this.props.fit_content})} onMouseLeave={this.props.onMouseLeave}>
                 {this.props.children}
                 <div className={cls(this, "menu") + " " + this.props.className} >
                     {menuComponents}
@@ -72,9 +68,9 @@ Menu.propTypes = {
 }
 Menu.defaultProps = {
     className: "",
-    fit_content: true,
+    fit_content: false,
     items: [],
-    link: true,
+    link: false,
     onMouseLeave: (e) => {},
     selectedIndex: []
 }

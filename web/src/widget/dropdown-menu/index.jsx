@@ -91,7 +91,8 @@ displayName: "DropdownMenu";
                   onMouseLeave={function() {
                     _this.state.open = true;
                     _this.toggleOpen();
-                }}>
+                }}
+                fit_content>
                     {elements}
                 </Menu>
             );
