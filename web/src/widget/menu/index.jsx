@@ -61,7 +61,7 @@ export class Menu extends React.Component {
 Menu.propTypes = {
     className: PropTypes.string,
     fit_content: PropTypes.bool,
-    items: PropTypes.arrayOf(PropTypes.instanceOf(MenuItem)),
+    items: PropTypes.arrayOf(PropTypes.instanceOf(MenuItem)).isRequired,
     link: PropTypes.bool,
     onMouseLeave: PropTypes.func,
     selectedIndex: PropTypes.arrayOf(PropTypes.number)

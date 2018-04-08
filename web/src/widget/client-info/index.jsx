@@ -196,8 +196,8 @@ export default class ClientInfo extends React.Component {
     }
 }
 ClientInfo.propTypes = {
-    info: PropTypes.object,
-    user: PropTypes.object
+    info: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired
 }
 ClientInfo.defaultProps = {
     info: {},

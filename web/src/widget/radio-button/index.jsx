@@ -24,11 +24,13 @@ export default class RadioButton extends React.Component {
     );
   }
 }
+
 RadioButton.propTypes = {
     className: PropTypes.string,
     group: PropTypes.string,
     value: PropTypes.string.isRequired,
 };
+
 RadioButton.defaultProps = {
     className: "",
     group: "default",

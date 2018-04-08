@@ -2,6 +2,8 @@ import React from 'react';
 
 import './index.less'
 
+import PropTypes from 'prop-types';
+
 import ContentSpacer from "../content-spacer";
 import ProgressBar from '../progress-bar';
 import Button from '../button';
@@ -21,6 +23,10 @@ class File extends React.Component {
         this.state = {
             open: false
         };
+    }
+
+    openDir() {
+
     }
 
     toggleOpen() {
@@ -44,7 +50,13 @@ class File extends React.Component {
         if (file.snapshots != null) {
             for (var i = 0; i < file.snapshots.length; i++) {
                 children.push(
-                    <File fetch={this.props.fetch} className={cls(this, "child", {open: this.state.open})} key={i} data={file.snapshots[i]}> </File>
+                    <File
+                        isChild
+                        fetch={this.props.fetch}
+                        className={cls(this, "child", {open: this.state.open})}
+                        key={i}
+                        data={file.snapshots[i]}>
+                    </File>
                 )
             }
         }
@@ -68,6 +80,20 @@ class File extends React.Component {
         )
         
     }
+}
+
+File.propTypes = {
+    className: PropTypes.string,
+    data: PropTypes.object.isRequired,
+    fetch: PropTypes.func.isRequired,
+    fileView: PropTypes.bool,
+    isChild: PropTypes.bool
+}
+
+File.defaultProps = {
+    className: "",
+    fileView: false,
+    isChild: false,
 }
 
 //Props: path
@@ -146,7 +172,11 @@ export default class FileViewer extends React.Component {
 
         if (this.state.data != null) {
             contents = (
-                <File fetch={this.fetchDirectory.bind(this)} data={this.state.data}> </File>
+                <File 
+                    fileView={this.props.view == "file"} 
+                    fetch={this.fetchDirectory.bind(this)} 
+                    data={this.state.data}> 
+                </File>
             )
         }
 
@@ -155,14 +185,14 @@ export default class FileViewer extends React.Component {
                 <div className={cls(this, "settingsBar")}>
                     <div className={cls(this, "viewChoice")}>
                         <Button 
-                            onClick={function() {_this.setView("tree");}}
+                            onClick={()=> _this.setView("tree")}
                             className={cls(this, "viewButton")}
                             selected={this.state.view == "tree"}
                             nav>
                             <img className={cls(this, "icon")} src="img/tree_view.svg"/>
                         </Button>
                         <Button 
-                            onClick={function() {_this.setView("file");}}
+                            onClick={() => _this.setView("file")}
                             className={cls(this, "viewButton")}
                             selected={this.state.view == "file"}
                             nav>
@@ -178,4 +208,13 @@ export default class FileViewer extends React.Component {
         )
         
     }
+}
+
+FileViewer.propTypes = {
+    className: PropTypes.string,
+    path: PropTypes.string.isRequired
+}
+
+FileViewer.defaultProps = {
+    className: ""
 }
