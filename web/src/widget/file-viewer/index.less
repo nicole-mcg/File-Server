@@ -37,16 +37,17 @@
     }
 
     &-fileIcon {
-        width: 30px;
+        width: 50px;
     }
 
     &--childView {
         display: inline-block;
+        padding: @space-small;
         margin: @space-medium;
     }
 
     &--selected {
-        background-color: @color-primary;
+        background-color: fadeout(@color-primary, 20%);
     }
 
 }
@@ -61,6 +62,11 @@
         height: 35px;
         .box-shadow(0, 2px, 4px);
         z-index: 5;
+    }
+
+    &-path {
+        float: left;
+        padding: @space-small;
     }
 
     &-gradient {

@@ -25,12 +25,17 @@ class File extends React.Component {
         };
     }
 
-    openDir() {
+    openFile() {
 
     }
 
     toggleOpen() {
         var data = this.props.data;
+
+        if (!this.state.open && this.props.root.state.selected == data) {
+            this.props.root.setSelected(null);
+        }
+
         if (data.snapshots == null) {
             this.props.root.fetchDirectory("./" + data.full_path, data);
         }
@@ -47,7 +52,7 @@ class File extends React.Component {
 
         var file = this.props.data;
         var isDir = file.type == 1;
-        var selected = root.state.selected == file;
+        var selected = root.state.selected != null && root.state.selected == file;
 
         if (isDir && file.snapshots == null && this.props.fileView) {
             root.fetchDirectory("./" + file.full_path, file);
@@ -96,6 +101,7 @@ class File extends React.Component {
             }
 
         } else {//List style view
+            var _this = this;
 
             var arrow = "";
             if (isDir) {
@@ -103,15 +109,20 @@ class File extends React.Component {
 
             }
 
-            var onClick = () => root.setSelected(file);
+            var onClick, onDoubleClick;
             if (isDir && this.state.open) {
                 onClick = function() {};
+                onDoubleClick = onClick;
+            } else {
+                onClick = () => root.setSelected(file)
+                onDoubleClick = (isDir ? _this.toggleOpen : _this.openFile).bind(_this);
             }
 
             return (
                 <div
                     className={cls(this, "", {selected: selected}) + " " + this.props.className}
-                    onClick={onClick}>
+                    onClick={onClick}
+                    onDoubleClick={onDoubleClick}>
 
                     <div className={cls(this, "arrowColumn")}>
                         <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
@@ -214,31 +225,41 @@ export default class FileViewer extends React.Component {
 
         var contents = ""
 
+        var fileView = this.state.view == "file";
+
         if (this.state.data != null) {
             contents = (
                 <File 
-                    fileView={this.state.view == "file"} 
+                    fileView={fileView} 
                     root={this} 
                     data={this.state.data}> 
                 </File>
             )
         }
 
+        var path = "";
+        if (fileView) {
+            path = this.props.path;
+        }
+
         return (
             <div className={cls(this)}>
                 <div className={cls(this, "settingsBar")}>
+                    <div className={cls(this, "path")}>
+                    {path}
+                    </div>
                     <div className={cls(this, "viewChoice")}>
                         <Button 
                             onClick={() => _this.setView("tree")}
                             className={cls(this, "viewButton")}
-                            selected={this.state.view == "tree"}
+                            selected={!fileView}
                             nav>
                             <img className={cls(this, "icon")} src="img/tree_view.svg"/>
                         </Button>
                         <Button 
                             onClick={() => _this.setView("file")}
                             className={cls(this, "viewButton")}
-                            selected={this.state.view == "file"}
+                            selected={fileView}
                             nav>
                             <img className={cls(this, "icon")} src="img/file_view.svg"/>
                         </Button>
