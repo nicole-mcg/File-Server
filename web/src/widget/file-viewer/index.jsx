@@ -125,6 +125,13 @@ export default class FileViewer extends React.Component {
         )
     }
 
+    //view: either "tree" or "file"
+    setView(view) {
+        this.setState({
+            view: view
+        });
+    }
+
     componentDidMount() {
         this.fetchDirectory(this.props.path, null, true)
     }
@@ -133,6 +140,7 @@ export default class FileViewer extends React.Component {
     }
 
     render() {
+        var _this = this;
 
         var contents = ""
 
@@ -146,10 +154,18 @@ export default class FileViewer extends React.Component {
             <div className={cls(this)}>
                 <div className={cls(this, "settingsBar")}>
                     <div className={cls(this, "viewChoice")}>
-                        <Button className={cls(this, "viewButton")} selected={this.state.view == "tree"} nav>
+                        <Button 
+                            onClick={function() {_this.setView("tree");}}
+                            className={cls(this, "viewButton")}
+                            selected={this.state.view == "tree"}
+                            nav>
                             <img className={cls(this, "icon")} src="img/tree_view.svg"/>
                         </Button>
-                        <Button className={cls(this, "viewButton")} selected={this.state.view == "file"} nav>
+                        <Button 
+                            onClick={function() {_this.setView("file");}}
+                            className={cls(this, "viewButton")}
+                            selected={this.state.view == "file"}
+                            nav>
                             <img className={cls(this, "icon")} src="img/file_view.svg"/>
                         </Button>
                     </div>
