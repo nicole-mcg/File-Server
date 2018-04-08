@@ -36,6 +36,16 @@ class EventHandler(FileSystemEventHandler):
             sleep(500)
             self.send_file_contents(file_name, packet_class, data, count + 1)
 
+    def check_ignore(self, data):
+        if not data in EventHandler.events_to_ignore:
+            return False
+        else:
+            if EventHandler.events_to_ignore[data] == 1:
+                del EventHandler.events_to_ignore[data]
+            else:
+                EventHandler.events_to_ignore[data] -= 1
+        return True
+
     def on_created(self, event):
         if (event.is_directory): 
             print("Created directory: " + str(event.src_path))
@@ -43,17 +53,12 @@ class EventHandler(FileSystemEventHandler):
 
         file_name = event.src_path[len(self.directory):]
 
-        data = ("change", file_name)
-
         print("Local File Modified: {}".format(file_name))
 
-        if not data in EventHandler.events_to_ignore:
+        data = ("change", file_name)
+
+        if not self.check_ignore(data):
             Thread(target = self.send_file_contents, args = [file_name, FileAddPacket, data]).start()
-        else:
-            if EventHandler.events_to_ignore[data] == 1:
-                del EventHandler.events_to_ignore[data]
-            else:
-                EventHandler.events_to_ignore[data] -= 1
 
     def on_modified(self, event):
         if (event.is_directory): 
@@ -62,17 +67,12 @@ class EventHandler(FileSystemEventHandler):
 
         file_name = event.src_path[len(self.directory):]
 
-        data = ("change", file_name)
-
         print("Local File Modified: {}".format(file_name))
 
-        if not data in EventHandler.events_to_ignore:
+        data = ("change", file_name)
+
+        if not self.check_ignore(data):
             Thread(target = self.send_file_contents, args = [file_name, FileChangePacket, data]).start()
-        else:
-            if EventHandler.events_to_ignore[data] == 1:
-                del EventHandler.events_to_ignore[data]
-            else:
-                EventHandler.events_to_ignore[data] -= 1
 
     def on_deleted(self, event):
         if (event.is_directory): 
@@ -85,18 +85,13 @@ class EventHandler(FileSystemEventHandler):
 
         data = ("delete", file_name)
 
-        if not data in EventHandler.events_to_ignore:
+        if not self.check_ignore(data):
             self.hub_processor.queue_packet(
                 FileDeletePacket(
                     self.hub_processor,
                     file_name=file_name
                 ), data
             )
-        else:
-            if EventHandler.events_to_ignore[data] == 1:
-                del EventHandler.events_to_ignore[data]
-            else:
-                EventHandler.events_to_ignore[data] -= 1
 
     def on_moved(self, event):
         if (event.is_directory): 
@@ -110,7 +105,7 @@ class EventHandler(FileSystemEventHandler):
 
         data = ("move", file_name, new_name)
 
-        if not data in EventHandler.events_to_ignore:
+        if not self.check_ignore(data):
             self.hub_processor.queue_packet(
                 FileMovePacket(
                     self.hub_processor,
@@ -118,8 +113,3 @@ class EventHandler(FileSystemEventHandler):
                     new_name=new_name
                 ), data
             )
-        else:
-            if EventHandler.events_to_ignore[data] == 1:
-                del EventHandler.events_to_ignore[data]
-            else:
-                EventHandler.events_to_ignore[data] -= 1
