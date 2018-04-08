@@ -2,6 +2,10 @@
 
 .File {
 
+    .user-select();
+
+    cursor: pointer;
+
     &-arrowColumn {
         width: 20px;
         vertical-align: top;
@@ -39,6 +43,10 @@
     &--childView {
         display: inline-block;
         margin: @space-medium;
+    }
+
+    &--selected {
+        background-color: @color-primary;
     }
 
 }

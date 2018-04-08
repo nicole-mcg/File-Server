@@ -32,7 +32,7 @@ class File extends React.Component {
     toggleOpen() {
         var data = this.props.data;
         if (data.snapshots == null) {
-            this.props.fetch("./" + data.full_path, data);
+            this.props.root.fetchDirectory("./" + data.full_path, data);
         }
 
 
@@ -43,11 +43,14 @@ class File extends React.Component {
 
     render() {
 
+        var root = this.props.root;
+
         var file = this.props.data;
         var isDir = file.type == 1;
+        var selected = root.state.selected == file;
 
         if (isDir && file.snapshots == null && this.props.fileView) {
-            this.props.fetch("./" + file.full_path, file);
+            root.fetchDirectory("./" + file.full_path, file);
         } 
 
         var children = [];
@@ -57,7 +60,7 @@ class File extends React.Component {
                     <File
                         fileView={this.props.fileView}
                         isChild
-                        fetch={this.props.fetch}
+                        root={root}
                         className={cls(this, "child", {open: this.state.open})}
                         key={i}
                         data={file.snapshots[i]}>
@@ -72,9 +75,13 @@ class File extends React.Component {
             if (this.props.isChild) {//Child is a file within the current directory
 
                 return (
-                    <div className={cls(this, "", {childView: true}) + " " + this.props.className}>
+                    <div 
+                        className={cls(this, "", {childView: true, selected: selected}) + " " + this.props.className}
+                        onClick={() => root.setSelected(file)}>
+
                         <img className={cls(this, "fileIcon")} src="img/file_view.svg"/>
                         <div>{file.file_name}</div>
+
                     </div>
                 );
 
@@ -96,35 +103,31 @@ class File extends React.Component {
 
             }
 
+            var onClick = () => root.setSelected(file);
+            if (isDir && this.state.open) {
+                onClick = function() {};
+            }
+
             return (
-                <div className={cls(this) + " " + this.props.className}>
+                <div
+                    className={cls(this, "", {selected: selected}) + " " + this.props.className}
+                    onClick={onClick}>
+
                     <div className={cls(this, "arrowColumn")}>
                         <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
                     </div>
+
                     <div className={cls(this, "nameColumn", {openDir: isDir && this.state.open})}>
                         {file.file_name}
                         {children}
                     </div>
+
                 </div>
             );
 
         }
         
     }
-}
-
-File.propTypes = {
-    className: PropTypes.string,
-    data: PropTypes.object.isRequired,
-    fetch: PropTypes.func.isRequired,
-    fileView: PropTypes.bool,
-    isChild: PropTypes.bool
-}
-
-File.defaultProps = {
-    className: "",
-    fileView: false,
-    isChild: false,
 }
 
 //Props: path
@@ -140,6 +143,12 @@ export default class FileViewer extends React.Component {
             data: null,
             view: "tree"
         };
+    }
+
+    setSelected(file_data) {
+        this.setState({
+            selected: file_data
+        });
     }
 
     //file_data is used to have easy access to the file within the data tree
@@ -209,7 +218,7 @@ export default class FileViewer extends React.Component {
             contents = (
                 <File 
                     fileView={this.state.view == "file"} 
-                    fetch={this.fetchDirectory.bind(this)} 
+                    root={this} 
                     data={this.state.data}> 
                 </File>
             )
@@ -243,6 +252,20 @@ export default class FileViewer extends React.Component {
         )
         
     }
+}
+
+File.propTypes = {
+    className: PropTypes.string,
+    data: PropTypes.object.isRequired,
+    root: PropTypes.instanceOf(FileViewer).isRequired,
+    fileView: PropTypes.bool,
+    isChild: PropTypes.bool
+}
+
+File.defaultProps = {
+    className: "",
+    fileView: false,
+    isChild: false,
 }
 
 FileViewer.propTypes = {
