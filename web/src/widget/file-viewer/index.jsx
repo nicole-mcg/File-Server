@@ -133,7 +133,7 @@ class File extends React.Component {
 
                         {file.file_name}
                         {children}
-                        
+
                     </div>
 
                 </div>
@@ -155,13 +155,20 @@ export default class FileViewer extends React.Component {
             error: null,
             isLoaded: false,
             data: null,
-            view: "tree"
+            view: "tree",
+            selected: null,
+            lastSelected: null, //This will be used when switching to file view.
+                //If selected is a file then it will open it's directory
+                //If selected is a directory it will open it
+                //If selected is null and lastSelected is a directory then it will be opened
         };
     }
 
     setSelected(file_data) {
+        var lastSelected = file_data == null ? this.state.selected : file_data;
         this.setState({
-            selected: file_data
+            selected: file_data,
+            lastSelected: lastSelected,
         });
     }
 
