@@ -46,11 +46,16 @@ class File extends React.Component {
         var file = this.props.data;
         var isDir = file.type == 1;
 
+        if (isDir && file.snapshots == null && this.props.fileView) {
+            this.props.fetch("./" + file.full_path, file);
+        } 
+
         var children = [];
         if (file.snapshots != null) {
             for (var i = 0; i < file.snapshots.length; i++) {
                 children.push(
                     <File
+                        fileView={this.props.fileView}
                         isChild
                         fetch={this.props.fetch}
                         className={cls(this, "child", {open: this.state.open})}
@@ -61,23 +66,49 @@ class File extends React.Component {
             }
         }
 
-        var arrow = "";
-        if (isDir) {
-            arrow = this.state.open ? "\u25bc" : "\u25b6";
+        var contents = ""
+        if (this.props.fileView) {//OS Style view
+
+            if (this.props.isChild) {//Child is a file within the current directory
+
+                return (
+                    <div className={cls(this, "", {childView: true}) + " " + this.props.className}>
+                        <img className={cls(this, "fileIcon")} src="img/file_view.svg"/>
+                        <div>{file.file_name}</div>
+                    </div>
+                );
+
+            } else {//This is the currently open folder
+
+                return (
+                    <div className={cls(this) + " " + this.props.className}>
+                        {children}
+                    </div>
+                );
+
+            }
+
+        } else {//List style view
+
+            var arrow = "";
+            if (isDir) {
+                arrow = this.state.open ? "\u25bc" : "\u25b6";
+
+            }
+
+            return (
+                <div className={cls(this) + " " + this.props.className}>
+                    <div className={cls(this, "arrowColumn")}>
+                        <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
+                    </div>
+                    <div className={cls(this, "nameColumn", {openDir: isDir && this.state.open})}>
+                        {file.file_name}
+                        {children}
+                    </div>
+                </div>
+            );
 
         }
-
-        return (
-            <div className={cls(this) + " " + this.props.className}>
-                <div className={cls(this, "arrowColumn")}>
-                    <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
-                </div>
-                <div className={cls(this, "nameColumn", {openDir: isDir && this.state.open})}>
-                    {file.file_name}
-                    {children}
-                </div>
-            </div>
-        )
         
     }
 }
@@ -130,7 +161,7 @@ export default class FileViewer extends React.Component {
             (result) => {
 
                 if (result.error != null) {
-                    alert("Error" + result.error);
+                    alert("Error: " + result.error);
                     return;
                 }
 
@@ -177,7 +208,7 @@ export default class FileViewer extends React.Component {
         if (this.state.data != null) {
             contents = (
                 <File 
-                    fileView={this.props.view == "file"} 
+                    fileView={this.state.view == "file"} 
                     fetch={this.fetchDirectory.bind(this)} 
                     data={this.state.data}> 
                 </File>

@@ -31,7 +31,7 @@ export default class FilePage extends React.Component {
         return (
             <div>
                 <TitleBar selectedIndex={[1]} user={this.props.user}> </TitleBar>
-                <FileViewer path=".">
+                <FileViewer path="./">
                     
                 </FileViewer>
             </div>
