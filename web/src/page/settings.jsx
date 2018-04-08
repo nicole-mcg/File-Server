@@ -69,6 +69,7 @@ export default class SettingsPage extends React.Component {
         .then(res => res.json())
         .then(
             (result) => {
+                //FIXME this should actually check if settings were updated correctly
                 console.log(result)
             },
             // Note: it's important to handle errors here

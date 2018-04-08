@@ -14,11 +14,6 @@ displayName: "DropdownMenu";
         super(props);
         this.interval = null;
 
-        var selected = 0
-        if (this.props.selected != null) {
-            this.props.selected;
-        }
-        console.log(props)
         this.state = {
             open: false,
         };
@@ -37,14 +32,12 @@ displayName: "DropdownMenu";
         var selected = props.selected
         this.setState({
             open: false,
-            selected: selected,
             value: props.items[selected]
         });
 
     }
 
     componentDidMount() {
-        console.log(this.props)
         var selected = this.props.selected
         this.setState({
             open: false,
@@ -69,8 +62,6 @@ displayName: "DropdownMenu";
         var _this = this;
 
         var MenuItem = Menu.Item;
-
-        //console.log(this.props)
 
         var elements = (
             <div className={cls(this, "button", {open: this.state.open})} onClick={this.toggleOpen.bind(this)}>

@@ -40,7 +40,6 @@ export default class App extends React.Component {
             (result) => {
 
                 if (result.needs_auth) {
-                    console.log("coult not authenticate")
                     this.setState({
                         isLoaded: true,
                         user: null

@@ -129,6 +129,11 @@ export default class FileViewer extends React.Component {
         .then(
             (result) => {
 
+                if (result.error != null) {
+                    alert("Error" + result.error);
+                    return;
+                }
+
                 //This 
                 if (file_data != null) {
                     file_data.snapshots = result.snapshots;
@@ -140,7 +145,6 @@ export default class FileViewer extends React.Component {
                     isLoaded: true,
                     data: result,
                 });
-                console.log(result)
             },
             (error) => {
                 this.setState({
@@ -185,7 +189,7 @@ export default class FileViewer extends React.Component {
                 <div className={cls(this, "settingsBar")}>
                     <div className={cls(this, "viewChoice")}>
                         <Button 
-                            onClick={()=> _this.setView("tree")}
+                            onClick={() => _this.setView("tree")}
                             className={cls(this, "viewButton")}
                             selected={this.state.view == "tree"}
                             nav>

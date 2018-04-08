@@ -80,7 +80,6 @@ export default class LoginPage extends React.Component {
                 "password": password
             };
     
-            console.log(auth);
             if (auth != null) {
                 data["auth_code"] = auth;
             }
@@ -101,11 +100,9 @@ export default class LoginPage extends React.Component {
     
                     if (result.needs_auth) {
     
-    
                         auth = prompt("Please enter an authorization code:");
-                        if (auth !== null) {
-                            console.log(auth)
-                            this.signup(u, e, auth)
+                        if (auth != null) {
+                            this.signup(u, e, auth);
                         }
     
     

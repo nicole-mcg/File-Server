@@ -199,7 +199,3 @@ ClientInfo.propTypes = {
     info: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired
 }
-ClientInfo.defaultProps = {
-    info: {},
-    user: {}
-}
