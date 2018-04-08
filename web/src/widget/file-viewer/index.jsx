@@ -29,7 +29,7 @@ class File extends React.Component {
 
     }
 
-    toggleOpen() {
+    toggleOpen(e) {
         var data = this.props.data;
 
         if (!this.state.open && this.props.root.state.selected == data) {
@@ -40,10 +40,11 @@ class File extends React.Component {
             this.props.root.fetchDirectory("./" + data.full_path, data);
         }
 
-
         this.setState({
             open: !this.state.open,
         });
+
+        return false;
     }
 
     render() {
@@ -119,18 +120,20 @@ class File extends React.Component {
             }
 
             return (
-                <div
-                    className={cls(this, "", {selected: selected}) + " " + this.props.className}
-                    onClick={onClick}
-                    onDoubleClick={onDoubleClick}>
+                <div className={cls(this, "", {selected: selected}) + " " + this.props.className}>
 
                     <div className={cls(this, "arrowColumn")}>
                         <span className={cls(this, "arrow")} onClick={this.toggleOpen.bind(this)}>{arrow}</span>
                     </div>
 
-                    <div className={cls(this, "nameColumn", {openDir: isDir && this.state.open})}>
+                    <div
+                        className={cls(this, "nameColumn", {openDir: isDir && this.state.open})}
+                        onClick={onClick}
+                        onDoubleClick={onDoubleClick}>
+
                         {file.file_name}
                         {children}
+                        
                     </div>
 
                 </div>
@@ -246,7 +249,7 @@ export default class FileViewer extends React.Component {
             <div className={cls(this)}>
                 <div className={cls(this, "settingsBar")}>
                     <div className={cls(this, "path")}>
-                    {path}
+                        {path}
                     </div>
                     <div className={cls(this, "viewChoice")}>
                         <Button 
