@@ -1,6 +1,17 @@
+# Contents
+
+### Project Structure
+  * Whole Project
+  * Front End
+  * Back End
+### Coding Conventions
+  * Whole Project
+  * Front End
+  * Back End
+
 # Project Structure
 
-### Whole project
+### Whole Project
   * Developer scripts: `scripts/src/`
     * These scripts make it quicker and easier to do repetative things while working on the project
     * These scripts are designed to be run together in another command (without pausing) to create useful commands (E.g `setup.bat`)
@@ -29,6 +40,9 @@
   * Space out blocks of code and group lines with similar functionality
   * Attempt to write a short comment on each block of code
   * A good example of this can be found at `src/file_server/file/__test__/test_snapshot.py`
+  
+### Front End (ReactJS)
+  * ...
 
 ### Back End (Python)
   * Variables, functions, and methods should be named with underscores between words. E.g `example_var`
