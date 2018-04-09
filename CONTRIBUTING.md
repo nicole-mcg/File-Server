@@ -1,13 +1,13 @@
 # Contents
 
-### Project Structure
-  * Whole Project
-  * Front End
-  * Back End
-### Coding Conventions
-  * Whole Project
-  * Front End
-  * Back End
+  * ### Project Structure
+    * Whole Project
+    * Front End
+    * Back End
+  * ### Coding Conventions
+    * Whole Project
+    * Front End
+    * Back End
 
 # Project Structure
 
