@@ -10,6 +10,7 @@ from time import time
 class Account:
     TWO_DAYS = 172800
     sessions = {}
+    directory = "../bin/" #This can be changed in tests
 
     def end_session(session):
         if session in Account.sessions.keys():
@@ -18,7 +19,7 @@ class Account:
     def create_auth():
         auth_code = uuid.uuid4().hex
 
-        directory = "../bin/"
+        directory = Account.directory
         file_name = directory + "auths.json"
 
         existing_auths = {}
@@ -43,7 +44,7 @@ class Account:
         return session in Account.sessions
 
     def is_valid_auth(auth_code):
-        directory = "../bin/"
+        directory = Account.directory
         file_name = directory + "auths.json"
 
         existing_auths = {}
@@ -79,7 +80,7 @@ class Account:
     def load_account(name, password):
         name = name.lower()
 
-        file_name = "../bin/accounts/" + name + ".json"
+        file_name = Account.directory + "accounts/" + name + ".json"
 
         if not os.path.isfile(file_name):
             return None
@@ -97,7 +98,9 @@ class Account:
 
 
     def create_account(name, password, auth_code):
-        file_name = "../bin/accounts/" + name + ".json"
+        directory = Account.directory
+
+        file_name = directory + "accounts/" + name + ".json"
 
         if os.path.isfile(file_name):
             return None
@@ -112,9 +115,7 @@ class Account:
 
         account = Account(name, auth_code, settings)
 
-        
-
-        os.makedirs("../bin/accounts/", exist_ok=True)
+        os.makedirs(directory + "accounts/", exist_ok=True)
         file = open(file_name, "w")
         file.write(json.dumps({
             "password": sha512_crypt.hash(password),
@@ -126,9 +127,10 @@ class Account:
         return Account._create_session(Account(name, auth_code, settings))
 
     def save_settings(account):
-        file_name = "../bin/accounts/" + account.name.lower() + ".json"
+        directory = Account.directory
+        file_name = directory + "accounts/" + account.name.lower() + ".json"
 
-        os.makedirs("../bin/accounts/", exist_ok=True)
+        os.makedirs(directory + "accounts/", exist_ok=True)
 
         if not os.path.isfile(file_name):
             raise Exception("WTF")
