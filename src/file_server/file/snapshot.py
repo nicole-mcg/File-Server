@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from file_server.util import split_path
 
 class Snapshot:
     types = Enum("SnapshotType", "DIRECTORY FILE")
@@ -32,23 +33,6 @@ class FileSnapshot(Snapshot):
 
 class DirectorySnapshot(Snapshot):
 
-    def split_path(file_path):
-        allparts = []
-        while 1:
-            parts = os.path.split(file_path)
-            if parts[0] == file_path:  # sentinel for absolute paths
-                allparts.insert(0, parts[0])
-                break
-            elif parts[1] == file_path: # sentinel for relative paths
-                allparts.insert(0, parts[1])
-                break
-            else:
-                file_path = parts[0]
-                if parts[1] != "":
-                    allparts.insert(0, parts[1])
-        return allparts
-
-
     def __init__(self, full_path, file_name, root_path):
         Snapshot.__init__(self, full_path, file_name, root_path)
         self.snapshots = {};
@@ -68,7 +52,7 @@ class DirectorySnapshot(Snapshot):
     def update(self, file_path=""):
         Snapshot.update(self)
 
-        parts = DirectorySnapshot.split_path(file_path)
+        parts = split_path(file_path)
 
         if parts[0] in self.snapshots.keys():
             self.snapshots[allparts[0]].update(file_path)
@@ -81,7 +65,7 @@ class DirectorySnapshot(Snapshot):
 
         snapshots = self.snapshots
 
-        path_parts = DirectorySnapshot.split_path(path)
+        path_parts = split_path(path)
         for index, part in enumerate(path_parts):
             if part == "." or part == "":
                 continue

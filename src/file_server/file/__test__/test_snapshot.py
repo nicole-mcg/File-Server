@@ -6,22 +6,7 @@ from file_server.file.snapshot import Snapshot, FileSnapshot, DirectorySnapshot
 
 import inspect, os, json
 
-@pytest.mark.parametrize("path,parts", [
-    ("C:/test1", ["C:/", "test1"]),
-    ("/usr/", ["/", "usr"]),
-    ("./img/test1/test2", [".", "img", "test1", "test2"]),
-    ("../img", ["..", "img"]),
-    ("hello/img/", ["hello", "img"]),
-])
-def test_split(path, parts):
-    split = DirectorySnapshot.split_path(path);
-
-    assert len(split) == len(parts)
-
-    for index, part in enumerate(parts):
-        assert split[index] == part
-
-def test_directory_snapshot():
+def test_snapshot():
     curr_path = os.path.split(inspect.stack()[0][1])[0]
     path = curr_path + "/test_dir"
 
@@ -52,30 +37,28 @@ def test_directory_snapshot():
 
     def confirm_json(expected_snapshots, snapshot_dict):
 
-        if "snapshots" in snapshot_dict:
-            assert snapshot_dict["type"] == 1
-
-            #Loop through expected files
-            for key in expected_snapshots.keys():
-
-                snapshots = snapshot_dict["snapshots"]
-
-                #Make sure we have the right amount of files
-                assert len(expected_snapshots) == len(snapshots)
-
-                #Make sure all the files we expected are there
-                found = -1
-                for index, snapshot in enumerate(snapshots):
-                    if snapshot["file_name"] == key:
-                        found = index
-                assert found != -1
-
-                confirm_json(expected_snapshots[key], snapshots[found])
-
-        else:
+        if not "snapshots" in snapshot_dict:
             assert snapshot_dict["type"] == 2
+            return
 
-        
+        assert snapshot_dict["type"] == 1
+
+        #Loop through expected files
+        for key in expected_snapshots.keys():
+
+            snapshots = snapshot_dict["snapshots"]
+
+            #Make sure we have the right amount of files
+            assert len(expected_snapshots) == len(snapshots)
+
+            #Make sure all the files we expected are there
+            index = -1
+            for i, snapshot in enumerate(snapshots):
+                if snapshot["file_name"] == key:
+                    index = i
+            assert index != -1
+
+            confirm_json(expected_snapshots[key], snapshots[index])
 
     snapshots = {
         "test2": {
@@ -95,3 +78,6 @@ def test_directory_snapshot():
     test_snapshot = DirectorySnapshot(path, "test_dir", path)
     confirm_snapshot(snapshots, test_snapshot, path)
     confirm_json(snapshots, json.loads(test_snapshot.to_json()))
+
+    print(test_snapshot)
+    assert False
