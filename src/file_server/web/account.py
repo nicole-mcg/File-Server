@@ -160,3 +160,6 @@ class Account:
         self.name = name.title()
         self.auth_code = auth_code
         self.settings = settings
+
+    def __eq__(self, other):
+        return other.name == self.name and other.auth_code == self.auth_code
