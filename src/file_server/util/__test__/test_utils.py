@@ -27,6 +27,35 @@ def test_split(path, parts):
             }
         }
     }),
+    ({
+        "test": "test2",
+        "dict": {
+            "nested": "works",
+            "again": {
+                "working": "yes",
+                "dict": {
+                    "nested": "works",
+                    "again": {
+                        "working": {
+                            "test": "test2",
+                            "dict": {
+                                "nested": "works",
+                                "again": {
+                                    "working": "yes",
+                                    "dict": {
+                                        "nested": "works",
+                                        "again": {
+                                            "working": "yes"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }),
 ])
 def test_create_object(obj_dict):
 

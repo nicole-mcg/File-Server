@@ -38,6 +38,7 @@ def test_snapshot():
     def confirm_json(expected_snapshots, snapshot_dict):
 
         if not "snapshots" in snapshot_dict:
+            #It's not a directory
             assert snapshot_dict["type"] == 2
             return
 
@@ -76,8 +77,6 @@ def test_snapshot():
     }
     
     test_snapshot = DirectorySnapshot(path, "test_dir", path)
+
     confirm_snapshot(snapshots, test_snapshot, path)
     confirm_json(snapshots, json.loads(test_snapshot.to_json()))
-
-    print(test_snapshot)
-    assert False
