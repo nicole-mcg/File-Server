@@ -23,8 +23,7 @@
       * Tests: `web/src/page/test/*.test.jsx` Where `*` is the name of file being tested
     * Widgets: `web/src/widgets/`
       * Tests: `web/src/widgets/*/index.test.jsx`
-      * Each widget folder contains two files `index.jsx` and `index.less`
-      * `index.jsx` is the JavaScript structure for the widget, `index.less` is the styling
+      * Each widget folder contains two files `index.jsx` and `index.less` which contain the structure and styling respectively, for the widget
     * Less functions and variables (Use these!): `web/src/less/`
       * Functions ensure styling shows properly on all compatible browsers
       * Most functions are setup to be run without parameters. E.g `.user-select();` would make text non-selectable and `.border-radius();` will give a standard border-radius for the site
