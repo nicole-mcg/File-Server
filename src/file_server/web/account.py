@@ -10,7 +10,13 @@ from time import time
 class Account:
     TWO_DAYS = 172800
     sessions = {}
-    directory = "../bin/" #This can be changed in tests
+
+    #This can be changed in tests to avoid changing or loading real accounts
+    #To get current python file directory:
+    #   import os, inspect
+    #   curr_path = os.path.split(inspect.stack()[0][1])[0]
+    directory = "../bin/" 
+    
 
     def end_session(session):
         if session in Account.sessions.keys():
