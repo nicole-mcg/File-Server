@@ -1,7 +1,7 @@
 # Coding conventions
 
 ## Whole project
-  * Indent 4 tabs
+  * Indent 4 spaces
   * Space out blocks of code and group lines with similar functionality
   * Attempt to write a short comment on each block of code
   * A good example of this can be found at `src/file_server/file/__test__/test_snapshot.py`
