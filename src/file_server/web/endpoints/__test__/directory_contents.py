@@ -27,3 +27,5 @@ def test_directory_contents():
     })
 
     DirectoryContentsEndpoint().handle_request(None, server, None, data)
+
+    assert True

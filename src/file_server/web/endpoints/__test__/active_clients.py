@@ -18,5 +18,6 @@ def test_active_clients(path, parts):
         createConnectionObj("client host", "account name", True)
     ]
 
-    #Create an ActiveClientsEndpoint object call handle_request
-    #handle_request(None, createObject({"connections": connections}), None, None)
+    ActiveClientsEndpoint().handle_request(None, createObject({"connections": connections}), None, None)
+    
+    assert True
