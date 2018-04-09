@@ -2,7 +2,7 @@
 
 ### Whole project
   * Developer scripts: `scripts/src/`
-    * These scripts make it easier and quicker to do repetative things while working on the project
+    * These scripts make it quicker and easier to do repetative things while working on the project
   * Test directories: `test/`
     * These are created with the `create_test_dirs` script
     * There should be three folders `client_dir`, `serv_dir` and `test_files`
