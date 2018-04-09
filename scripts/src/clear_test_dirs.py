@@ -8,6 +8,6 @@ def clear_dir(file_path):
 if __name__ == "__main__":
     os.chdir("..")
     
-    directory = "./test/"
+    directory = "./test_directories/"
     clear_dir(directory + "serv_dir/")
     clear_dir(directory + "client_dir/")
