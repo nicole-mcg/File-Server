@@ -14,6 +14,15 @@
 
 # Project Structure
 
+### Whole project
+  * Developer scripts: `scripts/src/`
+    * These scripts make it easier and quicker to do repetative things while working on the project
+  * Test directories: `test/`
+    * These are created with the `create_test_dirs` script
+    * There should be three folders `client_dir`, `serv_dir` and `test_files`
+      * `client_dir` and `serv_dir` are the folders to be watched when running with `run_server`, `run_client` or `run_both`
+      * The `test_files` folder is populated by the `create_test_files` script. The files created by this script are free to be modified at any times if you require more/fewer/small/bigger files
+
 ### Front End (ReactJS and Less)
   * Less functions and variables (Use these!): `web/src/less/`
     * Functions ensure styling shows properly on all compatible browsers
