@@ -3,14 +3,14 @@ import pytest
 
 from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
 
-import file_server.util
+from file_server.util import create_object
 
-def test_active_clients(path, parts):
+def test_active_clients():
 
     def createConnectionObj(client_host, account_name, transferring=False):
-        return createObject({
+        return create_object({
             "client_host": client_host,
-            "account": createObject({"name": account_name}),
+            "account": create_object({"name": account_name}),
             "transferring": transferring,
         })
 
@@ -18,6 +18,6 @@ def test_active_clients(path, parts):
         createConnectionObj("client host", "account name", True)
     ]
 
-    ActiveClientsEndpoint().handle_request(None, createObject({"connections": connections}), None, None)
+    ActiveClientsEndpoint().handle_request(None, create_object({"connections": connections}), None, None)
     
     assert True

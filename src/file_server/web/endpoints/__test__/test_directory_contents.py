@@ -3,7 +3,7 @@ import pytest
 
 from file_server.web.endpoints.directory_contents import DirectoryContentsEndpoint
 
-import file_server.util
+from file_server.util import create_object
 
 def test_directory_contents():
 
@@ -18,9 +18,9 @@ def test_directory_contents():
         "path": "./"
     }
 
-    server = createObject({
-        "hub_processor": createObject({
-            "snapshot": createObject({
+    server = create_object({
+        "hub_processor": create_object({
+            "snapshot": create_object({
                 "to_json": to_json
             })
         })
