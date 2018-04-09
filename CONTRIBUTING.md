@@ -24,6 +24,7 @@
     * Widgets: `web/src/widgets/`
       * Tests: `web/src/widgets/*/index.test.jsx`
       * Each widget folder contains two files `index.jsx` and `index.less` which contain the structure and styling respectively, for the widget
+      * Widgets should contain definitions for `defaultProps` and `propTypes`, marking required props in `propTypes`
     * Less functions and variables (Use these!): `web/src/less/`
       * Functions ensure styling shows properly on all compatible browsers
       * Most functions are setup to be run without parameters. E.g `.user-select();` would make text non-selectable and `.border-radius();` will give a standard border-radius for the site
@@ -37,7 +38,8 @@
     * Attempt to write a short comment on each block of code
     * A good example of this can be found at `src/file_server/file/__test__/test_snapshot.py`
   * ### Front End (ReactJS)
-    * ...
+    * Variables, functions, and methods should be named with camel case. E.g `exampleVar`
+    * Calles should be named with upper camel case. E.g `ExampleClass`
   * ### Back End (Python)
     * Variables, functions, and methods should be named with underscores between words. E.g `example_var`
     * Classes should be named with upper camel case. E.g `ExampleClass`
