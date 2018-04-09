@@ -9,6 +9,9 @@ from time import time
 #Methods should not be used in the client
 class Account:
     TWO_DAYS = 172800
+    DEFAULT_SETTINGS = {
+        "refresh_rate": 0
+    }
     sessions = {}
 
     #This can be changed in tests to avoid changing or loading real accounts
@@ -122,50 +125,57 @@ class Account:
         if auth_code == "":
             auth_code = create_auth()
 
-        settings = {
-            "refresh_rate": 0,
-        }
 
-        account = Account(name, auth_code, settings)
+        account = Account(name, auth_code, {})
 
         os.makedirs(directory + "accounts/", exist_ok=True)
         file = open(file_name, "w")
         file.write(json.dumps({
             "password": sha512_crypt.hash(password),
             "auth_code": auth_code,
-            "settings": settings,
+            "settings": {},
         }))
         file.close()
 
         return Account._create_session(Account(name, auth_code, settings))
 
-    def save_settings(account):
-        directory = Account.directory
-        file_name = directory + "accounts/" + account.name.lower() + ".json"
+    def __init__(self, name, auth_code, settings):
+        self.name = name.title()
+        self.auth_code = auth_code
+        self._settings = settings
 
-        os.makedirs(directory + "accounts/", exist_ok=True)
+    def update_settings(self, settings):
+        file_name = Account.directory + "accounts/" + self.name.lower() + ".json"
 
         if not os.path.isfile(file_name):
-            raise Exception("WTF")
+            raise Exception("Tried to update settings on account that was not created through Account.create_account or loaded with Account.load_account")
 
+        # Remove invalid keys
+        for key in settings:
+            if not key in Account.DEFAULT_SETTINGS:
+                del settings[key]
+
+        # Load account data for file rewrite
         file = open(file_name, "r")
         contents = file.read()
         file.close()
 
         data = json.loads(contents)
 
+        # Rewrite account file with new settings
         file = open(file_name, "w")
         file.write(json.dumps({
             "password": data["password"],
             "auth_code": data["auth_code"],
-            "settings": account.settings,
+            "settings": settings,
         }))
         file.close()
 
-    def __init__(self, name, auth_code, settings):
-        self.name = name.title()
-        self.auth_code = auth_code
-        self.settings = settings
+        self._settings = settings
+
+    @property
+    def settings(self):
+        return dict(Account.DEFAULT_SETTINGS.items() + self._settings.items())
 
     def __eq__(self, other):
         return other.name == self.name and other.auth_code == self.auth_code
