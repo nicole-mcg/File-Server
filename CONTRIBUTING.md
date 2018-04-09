@@ -13,21 +13,23 @@
     * Developer scripts: `scripts/src/`
       * These scripts make it quicker and easier to do repetative things while working on the project
       * These scripts are designed to be run together in another command (without pausing) to create useful commands (E.g `setup.bat`)
-    * Test directories: `test/`
+    * Test directories: `test_directories/`
       * These are created with the `create_test_dirs` script
       * There should be three folders `client_dir`, `serv_dir` and `test_files`
         * `client_dir` and `serv_dir` are the folders to be watched when running with `run_server`, `run_client` or `run_both`
         * The `test_files` folder is populated by the `create_test_files` script. The files created by this script are free to be modified at any times if you require more/fewer/small/bigger files
   * ### Front End (ReactJS and Less) 
     * Pages: `web/src/page/`
+      * Tests: `web/src/page/test/*.test.jsx` Where `*` is the name of file being tested
     * Widgets: `web/src/widgets/`
+      * Tests: `web/src/widgets/*/index.test.jsx`
       * Each widget folder contains two files `index.jsx` and `index.less`
       * `index.jsx` is the JavaScript structure for the widget, `index.less` is the styling
     * Less functions and variables (Use these!): `web/src/less/`
       * Functions ensure styling shows properly on all compatible browsers
       * Most functions are setup to be run without parameters. E.g `.user-select();` would make text non-selectable and `.border-radius();` will give a standard border-radius for the site
   * ### Back End (Python)
-    * ...
+    * Tests: Should be `./__tests__/test_*.py` where `.` is the directory of the Python file being tested and `*` is the name of the Python file
   
 # Coding Conventions
   * ### Whole project
