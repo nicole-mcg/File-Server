@@ -5,8 +5,6 @@ from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
 
 import file_server.util
 
-import inspect, os, json
-
 def test_active_clients(path, parts):
 
     def createConnectionObj(client_host, account_name, transferring=False):

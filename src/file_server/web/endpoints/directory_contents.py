@@ -9,7 +9,7 @@ class DirectoryContentsEndpoint(Endpoint):
 
     def handle_request(self, request_handler, server, account, data):
 
-        response = {"error": "Could not find path"}
+        response = {"error": "Could not load path"}
         try:
             response = json.loads(server.hub_processor.snapshot.to_json(data["path"], False))
         except KeyError as e:
