@@ -26,7 +26,7 @@
       * Each widget folder contains two files `index.jsx` and `index.less` which contain the structure and styling respectively, for the widget
       * Widgets should contain definitions for `defaultProps` and `propTypes`, marking required props in `propTypes`
     * **Less functions and variables (Use these!)**: `web/src/less/`
-      * Functions
+      * **Functions**
         * Functions ensure styling shows properly on all compatible browsers
         * Most functions are setup to be run without parameters. E.g `.user-select();` would make text non-selectable and `.border-radius();` will give a standard border-radius for the site
       * **Variables**
