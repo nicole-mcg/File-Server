@@ -5,6 +5,7 @@ bin/**
 **/node_modules
 build/
 .pytest_cache/
+**/bin
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

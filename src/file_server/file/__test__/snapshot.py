@@ -23,7 +23,7 @@ def test_split(path, parts):
 
 def test_directory_snapshot():
     curr_path = os.path.split(inspect.stack()[0][1])[0]
-    path = curr_path + "/bin/test_dir"
+    path = curr_path + "/test_dir"
 
     def confirm_snapshot(expected_snapshots, snapshot, root_path, path=""):
 
