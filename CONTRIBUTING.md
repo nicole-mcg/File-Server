@@ -23,14 +23,14 @@
       * `client_dir` and `serv_dir` are the folders to be watched when running with `run_server`, `run_client` or `run_both`
       * The `test_files` folder is populated by the `create_test_files` script. The files created by this script are free to be modified at any times if you require more/fewer/small/bigger files
 
-### Front End (ReactJS and Less)
-  * Less functions and variables (Use these!): `web/src/less/`
-    * Functions ensure styling shows properly on all compatible browsers
-    * Most functions are setup to be run without parameters. E.g `.user-select();` would make text non-selectable and `.border-radius();` will give a standard border-radius for the site 
+### Front End (ReactJS and Less) 
   * Pages: `web/src/page/`
   * Widgets: `web/src/widgets/`
     * Each widget folder contains two files `index.jsx` and `index.less`
     * `index.jsx` is the JavaScript structure for the widget, `index.less` is the styling
+  * Less functions and variables (Use these!): `web/src/less/`
+    * Functions ensure styling shows properly on all compatible browsers
+    * Most functions are setup to be run without parameters. E.g `.user-select();` would make text non-selectable and `.border-radius();` will give a standard border-radius for the site
 
 ### Back End (Python)
   * ...
