@@ -21,4 +21,4 @@
   * Run ```webpack.bat``` or ```webpack.sh```
 
     * Only required for building web
-  * Run ```test.bat```or ```test.sh```
+  * Run ```run_both.bat```or ```run_both.sh```
