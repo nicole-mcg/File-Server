@@ -61,6 +61,7 @@ def test_snapshot():
 
             confirm_json(expected_snapshots[key], snapshots[index])
 
+    #The expected snapshot dict to test against
     snapshots = {
         "test2": {
             "img2.bmp": {},
@@ -76,7 +77,11 @@ def test_snapshot():
         "txt1.txt": {}
     }
     
+    #Create the snapshot
     test_snapshot = DirectorySnapshot(path, "test_dir", path)
 
+    #Confirm Snapshot class structure is correct
     confirm_snapshot(snapshots, test_snapshot, path)
+
+    #Confirm snapshot to json is correct
     confirm_json(snapshots, json.loads(test_snapshot.to_json()))
