@@ -46,7 +46,7 @@ class Account:
     def is_valid_auth(auth_code):
         directory = Account.directory
 
-        if not os.path.isdir("{}accounts/".format(directory)) or len(os.listdir("{}accounts/".format(directory))) == 0:
+        if auth_code == "" and (not os.path.isdir("{}accounts/".format(directory)) or len(os.listdir("{}accounts/".format(directory))) == 0):
             return True
 
         file_name = directory + "auths.json"
@@ -112,6 +112,9 @@ class Account:
         if not Account.is_valid_auth(auth_code):
             print("invalid auth")
             return None
+
+        if auth_code == "":
+            auth_code = create_auth()
 
         settings = {
             "refresh_rate": 0,
