@@ -1,4 +1,7 @@
 bin/**
+**/test/test_files
+**/test/client_dir
+**/test/serv_dir
 **/test_directories/test_files
 **/test_directories/client_dir
 **/test_directories/serv_dir
