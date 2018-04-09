@@ -45,6 +45,10 @@ class Account:
 
     def is_valid_auth(auth_code):
         directory = Account.directory
+
+        if not os.path.isdir("{}accounts/".format(directory)) or len(os.listdir("{}accounts/".format(directory))) == 0:
+            return True
+
         file_name = directory + "auths.json"
 
         existing_auths = {}
