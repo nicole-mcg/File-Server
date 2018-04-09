@@ -93,7 +93,6 @@ class FileProcessor(HubProcessor):
         conn.files_sent += 1
         conn.transferring = None
 
-
     def save_file(self, sock, length, conn):
 
         file_size = ByteBuffer(sock.recv(4)).read_int()
@@ -111,7 +110,6 @@ class FileProcessor(HubProcessor):
             "file_name": file_name,
             "file_size": file_size
         }
-
 
         if not os.path.isfile(file_path):
             self.event_handler.add_ignore(("change", file_name))

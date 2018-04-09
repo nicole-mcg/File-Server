@@ -44,7 +44,8 @@ class DirectorySnapshot(Snapshot):
                 break
             else:
                 file_path = parts[0]
-                allparts.insert(0, parts[1])
+                if parts[1] != "":
+                    allparts.insert(0, parts[1])
         return allparts
 
 
@@ -60,10 +61,7 @@ class DirectorySnapshot(Snapshot):
             cls = FileSnapshot
 
             if os.path.isdir(file_path):
-                print("Added dir" + file_path)
                 cls = DirectorySnapshot
-            else:
-                print("Added file" + file_path)
 
             self.snapshots[file] = cls(file_path, file, root_path)
 
