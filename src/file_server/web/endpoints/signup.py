@@ -10,6 +10,9 @@ class SignupEndpoint(Endpoint):
         self.needs_auth = False
 
     def handle_request(self, request_handler, server, account, data):
+        if data["name"] == "" or data["password"] == "":
+            return {"error": "Invalid username or password"}
+
         name = data["name"]
         password = data["password"]
 
