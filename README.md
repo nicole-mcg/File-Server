@@ -24,3 +24,4 @@ Check out the [Contribution Guidelines](https://github.com/c-mcg/File-Server/blo
 
     * Only required for building web
   * Run ```run_both.bat```or ```run_both.sh```
+  * Test by moving files from `test_directories/test_files` to `test_directories/client_dir` or `test_directories/serv_dir`
