@@ -1,5 +1,7 @@
 ## A simple cross-platform file server that syncs files between two directories, or two computers.
 
+Check out the [Contribution Guidelines](https://github.com/c-mcg/File-Server/blob/master/CONTRIBUTING.md) for project structure and code formatting
+
 **Setup:**
 
 * Install [Python 3.6.3+](https://www.python.org/downloads/)
@@ -22,3 +24,4 @@
 
     * Only required for building web
   * Run ```run_both.bat```or ```run_both.sh```
+  * Test by moving files from `test_directories/test_files` to `test_directories/client_dir` or `test_directories/serv_dir`
