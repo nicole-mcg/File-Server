@@ -1,4 +1,4 @@
-import requests
+import requests, json
 
 # url should be a string
 # data_dict should be a dictionary of the data to send (should be json serializable)
@@ -6,5 +6,5 @@ import requests
 def send_post_request(url, data_dict):
     r = requests.post(url, data=json.dumps(data_dict))
     if r.status_code == 200:
-        return json.loads(r.text)
+        return r.text
     return None

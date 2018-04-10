@@ -1,6 +1,8 @@
 import socket, sys, time
 from collections import deque
 
+from file_server.util import send_post_request
+
 from file_server.packet.impl import IdlePacket
 from file_server.io import ByteBuffer
 
@@ -8,14 +10,13 @@ from .easy_socket import EasySocket
 
 from file_server.web.account import Account
 
-import requests
 import json
 
 class Client:
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
-    def __init__(self, hub_processor, host, user, password):
+    def __init__(self, hub_processor, host, username, password):
         self.hub_processor = hub_processor
         self.host = host if host != 'localhost' else socket.gethostname()
         self.packet_queue = deque()
@@ -29,18 +30,34 @@ class Client:
         self.data_sent = 0
         self.files_sent = 0
 
-        account = None
-        r = requests.post("http://" + host + ":8080/api/login", data=json.dumps({"name": user, "password": password}))
-        if r.status_code == 200:
-            data = json.loads(r.text)
-            account = Account(user, data["auth_code"], data["settings"]);
-            account.session = data["session"]
-        else:
-            raise LookupError("Could not find user")
+        self.username = username
+        self.password = password
+
+    def validate(self):
+        account = self.account = None
+
+        request = send_post_request("http://" + self.host + ":8080/api/login", {
+            "name": self.username,
+            "password": self.password
+        })
+
+        if (request is None):
+            print("Could not validate with current credentials.")
+            return False
+
+        data = json.loads(request)
+
+        account = Account(self.username, data["auth_code"], data["settings"]);
+        account.session = data["session"]
 
         self.account = account
+        return True
 
     def connect(self):
+
+        if not self.validate():
+            return
+
         try:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
