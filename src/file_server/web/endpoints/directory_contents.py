@@ -14,7 +14,5 @@ class DirectoryContentsEndpoint(Endpoint):
             response = json.loads(server.hub_processor.snapshot.to_json(data["path"], False))
         except KeyError as e:
             print("KeyError: " + str(e))
-        except:
-            print("Error trying to get directory contents: path=" + data["path"])
 
         return response

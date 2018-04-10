@@ -19,6 +19,7 @@ class Server:
         hub_processor.update_status = True
 
     def kill(self):
+        self.webserver.force_stop()
         self.sock.close()
         for conn in self.connections:
             conn.shutdown = True

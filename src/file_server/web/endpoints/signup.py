@@ -16,8 +16,12 @@ class SignupEndpoint(Endpoint):
         name = data["name"]
         password = data["password"]
 
-        if "auth_code" in data or Account.is_valid_auth(""):
-            account = Account.create_account(name, password, data["auth_code"])
+        auth = ""
+        if "auth_code" in data:
+            auth = data["auth_code"]
+
+        if Account.is_valid_auth(auth):
+            account = Account.create_account(name, password, auth)
             if (account is None):
                 return {"error": "Account already exists"}
             else:

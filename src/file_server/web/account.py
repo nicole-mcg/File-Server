@@ -123,10 +123,7 @@ class Account:
             return None
 
         if auth_code == "":
-            auth_code = create_auth()
-
-
-        account = Account(name, auth_code, {})
+            auth_code = Account.create_auth()
 
         os.makedirs(directory + "accounts/", exist_ok=True)
         file = open(file_name, "w")
@@ -137,7 +134,7 @@ class Account:
         }))
         file.close()
 
-        return Account._create_session(Account(name, auth_code, settings))
+        return Account._create_session(Account(name, auth_code, {}))
 
     def __init__(self, name, auth_code, settings):
         self.name = name.title()

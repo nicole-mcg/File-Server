@@ -1,7 +1,10 @@
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
-import xmlrpc
+
+import webbrowser
+import os
+import json
 
 from file_server.web.account import Account
 from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
@@ -14,11 +17,7 @@ from file_server.web.endpoints.createauth import CreateAuthEndpoint
 from file_server.web.endpoints.update_settings import UpdateSettingsEndpoint
 from file_server.web.endpoints.directory_contents import DirectoryContentsEndpoint
 
-import webbrowser
-
-import os
-
-import json
+from file_server.util import send_post_request
 
 class RequestHandler(BaseHTTPRequestHandler):
     server = None
@@ -92,7 +91,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                     #code = 403
                     content_type = "application/json"
-                    contents = endpoint.handle_request(self, RequestHandler.server, account, data)
+                    contents = endpoint.handle_request(self, self.server.server, account, data)
 
                     if hasattr(contents, "keys"):
                         if "session" in contents.keys():
@@ -164,8 +163,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
-    def __init__(self, server_address, requestHandler):
+    def __init__(self, server, server_address, requestHandler):
         HTTPServer.__init__(self, server_address, requestHandler)
+        self.server = server
         self.port = server_address[1]
         self.shutdown = False
 
@@ -177,21 +177,19 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
             self.handle_request()
 
     def force_stop(self):
-        self.server_close()
+        #self.server_close()
         self.shutdown = True
         self.create_dummy_request()
 
     def create_dummy_request(self):
-        server = xmlrpcs.erver.SimpleXMLRPCServer('http://%s:%s' % self.server_address)
-        server.ping()
+        print("http://127.0.0.1:{}".format(self.port))
+        send_post_request("http://127.0.0.1:{}/".format(self.port))
 
 def create_webserver(server, port=8080):
-    server_address = ('', port)
-    server = ThreadedHTTPServer(server_address, RequestHandler)
+    webserver = ThreadedHTTPServer(server, ('', port), RequestHandler)
 
     os.chdir("../web")
 
-    RequestHandler.server = server
     RequestHandler.endpoints = {
         "/activeclients": ActiveClientsEndpoint(),
         "/clientinfo": ClientInfoEndpoint(),
@@ -204,7 +202,5 @@ def create_webserver(server, port=8080):
         "/directorycontents": DirectoryContentsEndpoint(),
     }
 
-    
-
-    return server
+    return webserver
     
