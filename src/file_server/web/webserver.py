@@ -1,3 +1,4 @@
+from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
 
@@ -160,10 +161,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         self.handle_request(data)
 
-        
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+ 
 def start_webserver(server):
     server_address = ('', 8080)
-    httpd = HTTPServer(server_address, RequestHandler)
+    httpd = ThreadedHTTPServer(server_address, RequestHandler)
 
     os.chdir("../web")
 
@@ -182,16 +185,3 @@ def start_webserver(server):
 
     webbrowser.open('http://127.0.0.1:8080', new=2)
     httpd.serve_forever()
-
-if __name__ == "__main__":
-    from sys import argv
-
-    print("Starting webserver")
-
-    if len(argv) == 2:
-        run(port=int(argv[1]))
-    else:
-        run()
-
-
-#https://gist.github.com/bradmontgomery/2219997
