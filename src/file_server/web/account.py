@@ -175,7 +175,7 @@ class Account:
 
     @property
     def settings(self):
-        return dict(Account.DEFAULT_SETTINGS.items() + self._settings.items())
+        return dict(Account.DEFAULT_SETTINGS, **self._settings)
 
     def __eq__(self, other):
         return other.name == self.name and other.auth_code == self.auth_code
