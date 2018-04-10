@@ -1,7 +1,7 @@
 
 import os
 
-from .network_util import send_post_request
+from .network_util import send_post_request, send_api_request
 
 #Attributes should be a dict: {"attr_name": "attr_value"}
 def create_object(attributes):
@@ -9,6 +9,19 @@ def create_object(attributes):
     for key in attributes.keys():
         setattr(new_object, key, attributes[key])
     return new_object
+
+# https://stackoverflow.com/questions/13766513/how-to-do-force-remove-in-python-like-rm-rf-on-linux
+def nuke_dir(dir):
+    if dir[-1] == os.sep: dir = dir[:-1]
+    files = os.listdir(dir)
+    for file in files:
+        if file == '.' or file == '..': continue
+        path = dir + os.sep + file
+        if os.path.isdir(path):
+            nuke_dir(path)
+        else:
+            os.unlink(path)
+    os.rmdir(dir)
 
 def split_path(file_path):
     allparts = []

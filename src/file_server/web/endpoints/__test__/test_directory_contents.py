@@ -2,38 +2,30 @@
 import pytest
 
 from file_server.web.endpoints.directory_contents import DirectoryContentsEndpoint
-
-from file_server.util import create_object
-
+from file_server.util import create_object, send_api_request
 from file_server.util.test_util import start_test_server
+from file_server.web.account import Account
+
+import os, inspect, json
 
 def test_directory_contents():
 
-    def to_json(path, recursive):
-        snapshot_json = '{"type": 2, "file_name": "0", "full_path": "0", "last_modified": 0}'
-        if path == "./":
-            return '{"type": 1, file_name"="/" "full_path": ".", "last_modified": 0, "snapshots": [{}]'.format(snapshot_json)
-        if path == "./0": 
-            return snapshot_json
+    curr_path = os.path.split(inspect.stack()[0][1])[0]
 
-    data = {
-        "path": "./"
-    }
+    server = start_test_server(curr_path)
 
-    server = create_object({
-        "hub_processor": create_object({
-            "snapshot": create_object({
-                "to_json": to_json
-            })
-        })
-    })
+    print(1)
 
-    thread = start_test_server()
+    # Signup so we have authentication for directorycontents
+    response = send_api_request("signup", "", {"name": "test", "password": "test"}, 8081)
+    assert response is not None
+    response = json.loads(response)
+    assert "session" in response
 
-    import pdb; pdb.set_trace();
+    print(2)
 
-    print(thread)
+    # Get directory contents
+    response = send_api_request("directorycontents", response["session"], {"path": "./"}, 8081)
+    assert response is not None
 
-    DirectoryContentsEndpoint().handle_request(None, server, None, data)
-
-    assert False
+    assert response == str(server.hub_processor.snapshot)
