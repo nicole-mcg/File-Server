@@ -16,9 +16,10 @@ class Client:
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
-    def __init__(self, hub_processor, host, username, password):
+    def __init__(self, hub_processor, address, username, password):
         self.hub_processor = hub_processor
-        self.host = host if host != 'localhost' else socket.gethostname()
+        self.address = address
+        self.host = socket.gethostname()
         self.packet_queue = deque()
         self.connected = False
         self.timeout_count = 0
@@ -36,7 +37,7 @@ class Client:
     def validate(self):
         account = self.account = None
 
-        request = send_post_request("http://" + self.host + ":8080/api/login", {
+        request = send_post_request("http://" + self.address + ":8080/api/login", {
             "name": self.username,
             "password": self.password
         })
@@ -44,6 +45,8 @@ class Client:
         if (request is None):
             print("Could not validate with current credentials.")
             return False
+
+        print("Successfully created session")
 
         data = json.loads(request)
 
@@ -55,6 +58,8 @@ class Client:
 
     def connect(self):
 
+        print("Trying to connect to {}".format(self.address))
+
         if not self.validate():
             return
 
@@ -62,8 +67,6 @@ class Client:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
-
-            print("Trying to connect to {}".format(self.host))
             self.sock = EasySocket(self.hub_processor, None, self.account.session)
             self.sock.sock.connect((self.host, EasySocket.PORT))
 

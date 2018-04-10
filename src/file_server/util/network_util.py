@@ -12,12 +12,3 @@ def send_post_request(url, data_dict={}, cookie_dict = {}):
     print(r.status_code)
 
     return None
-
-# endpoint should be a string
-def send_api_request(endpoint, session, data={}, port=8080):
-    r = requests.post("http://127.0.0.1:{}/api/{}".format(port, endpoint), data=json.dumps(data), cookies={"session": session})
-
-    if r.status_code == 200:
-        return r.text
-
-    return None

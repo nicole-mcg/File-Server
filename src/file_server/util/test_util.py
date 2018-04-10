@@ -49,3 +49,12 @@ def start_test_server(curr_directory):
     thread.start()
 
     return packet_queue
+
+# endpoint should be a string
+def send_api_request(endpoint, data={}, session=""):
+    r = requests.post("http://127.0.0.1:8081/api/{}".format(endpoint), data=json.dumps(data), cookies={"session": session})
+
+    if r.status_code == 200:
+        return r.text
+
+    return None

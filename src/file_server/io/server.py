@@ -15,10 +15,12 @@ class Server:
         self.hub_processor = hub_processor
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []
+        self.shutdown = False
 
         hub_processor.update_status = True
 
     def kill(self):
+        self.shutdown = True
         self.webserver.force_stop()
         self.sock.close()
         for conn in self.connections:
@@ -28,7 +30,7 @@ class Server:
         self.sock.bind((socket.gethostname(), self.port))
         self.sock.listen(5)
         print("Waiting for connections on " + str(socket.gethostname()))
-        while not self.kill:
+        while not self.shutdown:
             clientsocket, address = self.sock.accept()
             print("Connection recieved: " + clientsocket.getpeername()[0])
 
@@ -52,6 +54,8 @@ class Server:
             )
             self.connections.append(connection)
             connection.start()
+            
+        print("Stopped recieving connections on file-server")
 
     def queue_packet(self, packet):
         for conn in self.connections:
