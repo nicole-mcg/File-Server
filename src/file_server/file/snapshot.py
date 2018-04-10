@@ -69,8 +69,7 @@ class DirectorySnapshot(Snapshot):
         for index, part in enumerate(path_parts):
             if part == "." or part == "":
                 continue
-            if part in snapshots:
-                return snapshots[part].to_json("/".join(path_parts[index:]))
+            return snapshots[part].to_json("/".join(path_parts[index:]))
 
         for index, key in enumerate(snapshots.keys()):
             snapshot = snapshots[key]
