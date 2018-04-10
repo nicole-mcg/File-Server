@@ -1,6 +1,7 @@
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
+import xmlrpc
 
 from file_server.web.account import Account
 from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
@@ -162,11 +163,31 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.handle_request(data)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    """Handle requests in a separate thread."""
- 
-def start_webserver(server):
-    server_address = ('', 8080)
-    httpd = ThreadedHTTPServer(server_address, RequestHandler)
+
+    def __init__(self, server_address, requestHandler):
+        HTTPServer.__init__(self, server_address, requestHandler)
+        self.port = server_address[1]
+        self.shutdown = False
+
+    def serve_forever(self):
+        if self.port == 8080:
+            webbrowser.open('http://127.0.0.1:8080', new=2)
+
+        while not self.shutdown:
+            self.handle_request()
+
+    def force_stop(self):
+        self.server_close()
+        self.shutdown = True
+        self.create_dummy_request()
+
+    def create_dummy_request(self):
+        server = xmlrpcs.erver.SimpleXMLRPCServer('http://%s:%s' % self.server_address)
+        server.ping()
+
+def create_webserver(server, port=8080):
+    server_address = ('', port)
+    server = ThreadedHTTPServer(server_address, RequestHandler)
 
     os.chdir("../web")
 
@@ -183,5 +204,7 @@ def start_webserver(server):
         "/directorycontents": DirectoryContentsEndpoint(),
     }
 
-    webbrowser.open('http://127.0.0.1:8080', new=2)
-    httpd.serve_forever()
+    
+
+    return server
+    

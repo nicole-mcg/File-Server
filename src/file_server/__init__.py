@@ -12,8 +12,11 @@ def start_hub(hub_type, hub_processor):
         packet_queue = Server(hub_processor)
 
         # Start webserver
-        from file_server.web.webserver import start_webserver
-        Thread(target = start_webserver, args = [packet_queue]).start()
+        from file_server.web.webserver import create_webserver
+
+        packet_queue.webserver = create_webserver(packet_queue)
+
+        Thread(target = packet_queue.webserver.serve_forever).start()
 
     elif (hub_type is "client"): # Client
 

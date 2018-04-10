@@ -10,18 +10,24 @@ from file_server.web.account import Account
 from time import time
 
 class Server:
-    def __init__(self, hub_processor):
+    def __init__(self, hub_processor, port=EasySocket.PORT):
+        self.port = port
         self.hub_processor = hub_processor
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []
 
         hub_processor.update_status = True
 
+    def kill(self):
+        self.sock.close()
+        for conn in self.connections:
+            conn.shutdown = True
+
     def start(self):
-        self.sock.bind((socket.gethostname(), EasySocket.PORT))
+        self.sock.bind((socket.gethostname(), self.port))
         self.sock.listen(5)
         print("Waiting for connections on " + str(socket.gethostname()))
-        while 1:
+        while not self.kill:
             clientsocket, address = self.sock.accept()
             print("Connection recieved: " + clientsocket.getpeername()[0])
 
