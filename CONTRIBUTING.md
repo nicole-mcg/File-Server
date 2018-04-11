@@ -49,7 +49,7 @@
     * A good example of this can be found at `src/file_server/file/__test__/test_snapshot.py`
   * ### Front End (ReactJS)
     * Variables, functions, and methods should be named with camel case. E.g `exampleVar`
-    * Calles should be named with upper camel case. E.g `ExampleClass`
+    * Classes should be named with upper camel case. E.g `ExampleClass`
   * ### Back End (Python)
     * Variables, functions, and methods should be named with underscores between words. E.g `example_var`
     * Classes should be named with upper camel case. E.g `ExampleClass`
