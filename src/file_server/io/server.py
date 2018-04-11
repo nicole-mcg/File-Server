@@ -20,6 +20,7 @@ class Server:
         hub_processor.update_status = True
 
     def kill(self):
+        self.hub_processor.observer.stop()
         self.shutdown = True
         self.webserver.force_stop()
         self.sock.close()
@@ -31,7 +32,10 @@ class Server:
         self.sock.listen(5)
         print("Waiting for connections on " + str(socket.gethostname()))
         while not self.shutdown:
-            clientsocket, address = self.sock.accept()
+            try:
+                clientsocket, address = self.sock.accept()
+            except OSError:
+                continue
             print("Connection recieved: " + clientsocket.getpeername()[0])
 
             session_length = ByteBuffer(clientsocket.recv(4)).read_int()

@@ -10,9 +10,7 @@ import os, inspect, json
 
 def test_directory_contents():
 
-    curr_path = os.path.split(inspect.stack()[0][1])[0]
-
-    server = start_test_server(curr_path)
+    server = start_test_server()
 
     # Signup so we have authentication for directorycontents
     response = send_api_request("signup", {"name": "test", "password": "test"})
@@ -34,3 +32,5 @@ def test_directory_contents():
     response = json.loads(response)
     assert "error" in response
     assert response["error"] == "Could not load path"
+
+    server.kill()

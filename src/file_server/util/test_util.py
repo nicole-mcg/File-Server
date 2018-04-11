@@ -1,6 +1,6 @@
 
 from threading import Thread
-import os, shutil
+import os, shutil, requests, json, time, inspect
 
 from file_server.file.file_processor import FileProcessor
 from file_server.io.server import Server
@@ -9,12 +9,20 @@ from file_server.web.account import Account
 
 from file_server.util import nuke_dir
 
+
+#FIXME remove this
+import webbrowser
+
 # curr_directory should be the current directory for the python test file
 #
 # Get this with:
 #   import os, inspect
 #   curr_path = os.path.split(inspect.stack()[0][1])[0]
-def start_test_server(curr_directory):
+def start_test_server(auto_shutdown=5):
+
+    test_path = os.path.split(inspect.stack()[1][1])
+    curr_directory = test_path[0]
+    test_name = test_path[1]
 
     bin_path = curr_directory + "/bin"
     if os.path.isdir(bin_path):
@@ -34,7 +42,7 @@ def start_test_server(curr_directory):
         packet_queue.webserver = create_webserver(packet_queue, 8081)
 
         # Start webserver
-        Thread(target = packet_queue.webserver.serve_forever).start()
+        Thread(target=packet_queue.webserver.serve_forever).start()
 
         hub_processor.initialize(packet_queue)
 
@@ -44,9 +52,18 @@ def start_test_server(curr_directory):
 
         return packet_queue
 
-    thread = Thread(target = start_server)
+    def kill_server(server, wait_time, test_name):
+        start = time.time()
+        while(time.time() < start + wait_time):
+            time.sleep(0.5)
+        server.kill()
+        raise Exception("TEST \"{}\" DID NOT PROPERLY KILL SERVER. FAILSAFE TEST SERVER SHUTDOWN USED.".format(test_name))
+
+    thread = Thread(target=start_server)
 
     thread.start()
+
+    Thread(target=kill_server, args=[packet_queue, auto_shutdown, test_name]).start()
 
     return packet_queue
 

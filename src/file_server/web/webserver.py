@@ -177,12 +177,11 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
             self.handle_request()
 
     def force_stop(self):
-        #self.server_close()
+        self.server_close()
         self.shutdown = True
         self.create_dummy_request()
 
     def create_dummy_request(self):
-        print("http://127.0.0.1:{}".format(self.port))
         send_post_request("http://127.0.0.1:{}/".format(self.port))
 
 def create_webserver(server, port=8080):
