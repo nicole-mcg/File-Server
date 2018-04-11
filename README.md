@@ -1,3 +1,5 @@
+**This project is undergoing large structural changes for the next few days so please bear with me** - c-mcg
+
 ## A simple cross-platform file server that syncs files between two directories, or two computers.
 
 Check out the [Contribution Guidelines](https://github.com/c-mcg/File-Server/blob/master/CONTRIBUTING.md) for project structure and code formatting
