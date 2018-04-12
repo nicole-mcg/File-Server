@@ -16,20 +16,36 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []
         self.shutdown = False
+        self.webserver = None
 
         hub_processor.update_status = True
 
     def kill(self):
-        self.hub_processor.observer.stop()
+
+        # Shut down file watch
+        if self.hub_processor.observer is not None:
+            self.hub_processor.observer.stop()
+
+        # Shut down webserver
+        if self.webserver is not None:
+            self.webserver.force_stop()
+
+        # Stop file server listening
         self.shutdown = True
-        self.webserver.force_stop()
         self.sock.close()
+
+        # Shut down file server connections
         for conn in self.connections:
             conn.shutdown = True
 
-    def start(self):
+    def start(self, serve=True):
         self.sock.bind((socket.gethostname(), self.port))
         self.sock.listen(5)
+
+        if serve:
+            self.serve()
+
+    def serve(self):
         print("Waiting for connections on " + str(socket.gethostname()))
         while not self.shutdown:
             try:

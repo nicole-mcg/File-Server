@@ -13,59 +13,79 @@ from file_server.util import nuke_dir
 #FIXME remove this
 import webbrowser
 
-# curr_directory should be the current directory for the python test file
-#
-# Get this with:
-#   import os, inspect
-#   curr_path = os.path.split(inspect.stack()[0][1])[0]
+# Starts a server on different ports using test directories
 def start_test_server(auto_shutdown=5):
 
+    # Get info for test being run
     test_path = os.path.split(inspect.stack()[1][1])
     curr_directory = test_path[0]
     test_name = test_path[1]
 
+    # Create a temp "bin" folder and delete old one if it exists
     bin_path = curr_directory + "/bin"
     if os.path.isdir(bin_path):
-        nuke_dir(bin_path)
+        try:
+            nuke_dir(bin_path)
+        except OSError:
+            assert False, "Another test is currently using this directory. {}".format(test_name)
 
+    # Create a directory for the file server
     serv_dir = bin_path + "/serv_dir/"
-
     os.makedirs(serv_dir, exist_ok=True)
 
+    # Mark the directory for storing account info
     Account.directory = bin_path + "/"
 
+    # Create test server
     hub_processor = FileProcessor(serv_dir)
-    packet_queue = Server(hub_processor, 8888)
+    server = Server(hub_processor, 8888)
 
+    # Starts the server on a new thread
     def start_server():
 
-        packet_queue.webserver = create_webserver(packet_queue, 8081)
+        server.webserver = create_webserver(server, 8081)
 
         # Start webserver
-        Thread(target=packet_queue.webserver.serve_forever).start()
+        Thread(target=server.webserver.serve_forever).start()
 
-        hub_processor.initialize(packet_queue)
+        # Initialize file watch
+        hub_processor.initialize(server)
 
-        packet_queue.start()
+        # Start file server
+        server.serve()
 
+        # Shutdown file watch after server is shut down
         hub_processor.shutdown()
 
-        return packet_queue
+        return server
 
-    def kill_server(server, wait_time, test_name):
+    # Used to kill the test server automatically if it's left running
+    def kill_server():
         start = time.time()
-        while(time.time() < start + wait_time):
+
+        while(time.time() < start + auto_shutdown):
+            if server.shutdown:
+                return
             time.sleep(0.5)
+
+        if not server.shutdown:
+            server.kill()
+            raise Exception("TEST \"{}\" DID NOT PROPERLY KILL SERVER. FAILSAFE TEST SERVER SHUTDOWN USED.".format(test_name))
+
+    # Open the file server connection
+    try:
+        server.start(False)
+    except OSError:
         server.kill()
-        raise Exception("TEST \"{}\" DID NOT PROPERLY KILL SERVER. FAILSAFE TEST SERVER SHUTDOWN USED.".format(test_name))
+        assert False, "Another test server is already running."
 
     thread = Thread(target=start_server)
 
     thread.start()
 
-    Thread(target=kill_server, args=[packet_queue, auto_shutdown, test_name]).start()
+    Thread(target=kill_server, args=[server, auto_shutdown, test_name]).start()
 
-    return packet_queue
+    return server
 
 # endpoint should be a string
 def send_api_request(endpoint, data={}, session=""):
