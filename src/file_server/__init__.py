@@ -1,15 +1,13 @@
 import os, sys, socket, time
 from threading import Thread
 
-from .hub_processor import HubProcessor
-
 # Starts a client/server
-def start_hub(hub_type, hub_processor):
+def start_hub(hub_type, file_processor):
 
     if (hub_type is "server"): # Server
 
         from file_server.io.server import Server
-        packet_queue = Server(hub_processor)
+        packet_queue = Server(file_processor)
 
         # Start webserver
         from file_server.web.webserver import create_webserver
@@ -22,7 +20,7 @@ def start_hub(hub_type, hub_processor):
 
         try:
             from file_server.io.client import Client
-            packet_queue = Client(hub_processor, sys.argv[2], sys.argv[3], sys.argv[4])
+            packet_queue = Client(file_processor, sys.argv[2], sys.argv[3], sys.argv[4])
         except LookupError: 
             print(username + " " + password)
             print("Invalid username or password")
@@ -33,8 +31,8 @@ def start_hub(hub_type, hub_processor):
         print("Invalid hub type specified: '{}'. Should be 'server' or 'client'.")
         return #FIXME should throw error
 
-    hub_processor.initialize(packet_queue)
+    file_processor.initialize(packet_queue)
 
     packet_queue.start()
 
-    hub_processor.shutdown()
+    file_processor.shutdown()

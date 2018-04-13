@@ -88,7 +88,7 @@ def start_test_server(auto_shutdown=5):
     return server
 
 # endpoint should be a string
-def send_api_request(endpoint, data={}, session=""):
+def test_api_request(endpoint, data={}, session=""):
     r = requests.post("http://127.0.0.1:8081/api/{}".format(endpoint), data=json.dumps(data), cookies={"session": session})
 
     if r.status_code == 200:

@@ -14,7 +14,6 @@ from watchdog.events import (
 )
 
 
-from file_server import HubProcessor
 from file_server.io import ByteBuffer
 
 #from .file_observer import FileObserver
@@ -30,7 +29,7 @@ from file_server.packet.impl import FileChangePacket, FileAddPacket
 
 KILOBYTE = 1024
 
-class FileProcessor(HubProcessor):
+class FileProcessor():
     def __init__(self, directory):
         self.directory = directory
         self.buffer_queue = {};
@@ -58,7 +57,6 @@ class FileProcessor(HubProcessor):
     def shutdown(self):
         self.observer.join();
 
-    #FIXME abstract this into HubProcessor
     def queue_packet(self, packet, data):
         packet.time = time()
         self.buffer_queue[data] = packet
