@@ -1,38 +1,59 @@
 import os, sys, socket, time
 from threading import Thread
+from file_server.file.file_processor import FileProcessor
 
-# Starts a client/server
-def start_hub(hub_type, file_processor):
+def start_hub():
 
-    if (hub_type is "server"): # Server
+    # Check if this is supposed to be a server or client based on number of args entered
+    isServer = len(sys.argv) <= 2
+
+    # Get directory to sync and create a file_processor instance
+    directory = sys.argv[1]
+    file_processor = FileProcessor(directory)
+
+    # Create the hub
+    if isServer:
 
         from file_server.io.server import Server
-        packet_queue = Server(file_processor)
-
-        # Start webserver
         from file_server.web.webserver import create_webserver
 
-        packet_queue.webserver = create_webserver(packet_queue)
+        # Use Server class for hub
+        try: 
+            hub = Server(file_processor)
+        except OSError:
+            print("File server could not be started")
+            return
 
-        Thread(target = packet_queue.webserver.serve_forever).start()
-
-    elif (hub_type is "client"): # Client
-
+        # Start the webserver
         try:
-            from file_server.io.client import Client
-            packet_queue = Client(file_processor, sys.argv[2], sys.argv[3], sys.argv[4])
-        except LookupError: 
-            print(username + " " + password)
-            print("Invalid username or password")
+            hub.webserver = create_webserver(hub)
+            Thread(target = hub.webserver.serve_forever).start()
+        except OSError:
+            print("File server could not be started")
+            server.kill()
             return
 
     else:
 
-        print("Invalid hub type specified: '{}'. Should be 'server' or 'client'.")
-        return #FIXME should throw error
+        # Use Client class for hub
+        from file_server.io.client import Client
+        try:
+            hub = Client(file_processor, sys.argv[2], sys.argv[3], sys.argv[4])
+        except LookupError: # Couldn't authenticate 
+            print("Invalid username or password")
+            return
 
-    file_processor.initialize(packet_queue)
+    file_processor.initialize(hub)
 
-    packet_queue.start()
+    hub.start()
 
-    file_processor.shutdown()
+    file_process
+
+if __name__ == "__main__":
+
+    # Make sure args length is correct
+    if (len(sys.argv) <= 1):
+        print("Command arguments should be in the form \"directory hostname user password\". Only directory is needed for server")
+        sys.exit()
+
+    start_hub()
