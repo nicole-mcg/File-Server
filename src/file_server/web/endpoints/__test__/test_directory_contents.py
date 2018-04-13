@@ -26,7 +26,7 @@ def test_directory_contents():
     assert response is not None
 
     # Verify the server respose is the same as the json generated directly from the server
-    assert response == str(server.hub_processor.snapshot)
+    assert response == str(server.file_processor.snapshot)
 
     # Send request with invalid path
     response = test_api_request("directorycontents", {"path": "./hello"}, session)

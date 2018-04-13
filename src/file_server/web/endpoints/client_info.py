@@ -24,8 +24,8 @@ class ClientInfoEndpoint(Endpoint):
                 "data_recieved": conn.data_recieved,
                 "transferring": conn.transferring,
                 "transfer_progress": conn.transfer_progress,
-                "queued_packets": len(conn.packet_queue) + len(conn.hub_processor.buffer_queue),
-                "events_to_ignore": len(conn.hub_processor.event_handler.events_to_ignore),
+                "queued_packets": len(conn.packet_queue) + len(conn.file_processor.buffer_queue),
+                "events_to_ignore": len(conn.file_processor.event_handler.events_to_ignore),
             }
 
         except KeyError:

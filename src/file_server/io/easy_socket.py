@@ -9,8 +9,8 @@ from file_server.web.account import Account
 class EasySocket:
     PORT = 1234
 
-    def __init__(self, hub_processor, sock, session=None):
-        self.hub_processor = hub_processor
+    def __init__(self, file_processor, sock, session=None):
+        self.file_processor = file_processor
         self.session = session
         self.needs_auth = self.session is None
 
@@ -31,7 +31,7 @@ class EasySocket:
     def send_packet(self, packet=None, conn=None):
 
         if packet is None:
-            packet = IdlePacket(self.hub_processor)
+            packet = IdlePacket(self.file_processor)
 
         if not hasattr(packet.__class__, "name"):
             import pdb; pdb.set_trace();
@@ -94,7 +94,7 @@ class EasySocket:
         self.sock.send(auth_response.bytes())
 
         # Generate response
-        response = handle_incoming_packet(id, self.sock, length, self.hub_processor, conn)
+        response = handle_incoming_packet(id, self.sock, length, self.file_processor, conn)
 
         # Send response if exists
         buff = ByteBuffer()

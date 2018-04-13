@@ -16,8 +16,8 @@ class EventHandler(FileSystemEventHandler):
         else:
             EventHandler.events_to_ignore[data] = 1
 
-    def __init__(self, hub_processor, directory):
-        self.hub_processor = hub_processor
+    def __init__(self, file_processor, directory):
+        self.file_processor = file_processor
         self.directory = directory
 
     def send_file_contents(self, file_name, packet_class, data, count=0):
@@ -25,9 +25,9 @@ class EventHandler(FileSystemEventHandler):
             with open(self.directory + file_name, mode='rb') as file:
                 pass
 
-            self.hub_processor.queue_packet(
+            self.file_processor.queue_packet(
                 packet_class(
-                    self.hub_processor,
+                    self.file_processor,
                     file_name=file_name
                 ), data
             )
@@ -86,9 +86,9 @@ class EventHandler(FileSystemEventHandler):
         data = ("delete", file_name)
 
         if not self.check_ignore(data):
-            self.hub_processor.queue_packet(
+            self.file_processor.queue_packet(
                 FileDeletePacket(
-                    self.hub_processor,
+                    self.file_processor,
                     file_name=file_name
                 ), data
             )
@@ -106,9 +106,9 @@ class EventHandler(FileSystemEventHandler):
         data = ("move", file_name, new_name)
 
         if not self.check_ignore(data):
-            self.hub_processor.queue_packet(
+            self.file_processor.queue_packet(
                 FileMovePacket(
-                    self.hub_processor,
+                    self.file_processor,
                     file_name=file_name,
                     new_name=new_name
                 ), data

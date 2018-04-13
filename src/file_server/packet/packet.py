@@ -4,10 +4,10 @@ class Packet:
     name = "Packet"
     packet_handlers = {}
 
-    def __init__(self, hub_processor, sock=None, length=0, conn=None):
+    def __init__(self, file_processor, sock=None, length=0, conn=None):
         self._sock = sock
         self.length = length
-        self.hub_processor = hub_processor
+        self.file_processor = file_processor
         self.conn = conn
 
     def size(self):

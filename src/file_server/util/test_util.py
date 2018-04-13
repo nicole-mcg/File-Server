@@ -37,8 +37,8 @@ def start_test_server(auto_shutdown=5):
     Account.directory = bin_path + "/"
 
     # Create test server
-    hub_processor = FileProcessor(serv_dir)
-    server = Server(hub_processor, 8888)
+    file_processor = FileProcessor(serv_dir)
+    server = Server(file_processor, 8888)
 
     # Starts the server on a new thread
     def start_server():
@@ -49,13 +49,13 @@ def start_test_server(auto_shutdown=5):
         Thread(target=server.webserver.serve_forever).start()
 
         # Initialize file watch
-        hub_processor.initialize(server)
+        file_processor.initialize(server)
 
         # Start file server
         server.serve()
 
         # Shutdown file watch after server is shut down
-        hub_processor.shutdown()
+        file_processor.shutdown()
 
         return server
 

@@ -4,12 +4,12 @@ from file_server.io import ByteBuffer
 class FileMovePacket(Packet):
     name = "FileMovePacket"
     id = 4
-    def __init__(self, hub_processor, sock=None, length=0, conn=None, **kwargs):
+    def __init__(self, file_processor, sock=None, length=0, conn=None, **kwargs):
         if "file_name" in kwargs:
             self.file_name = kwargs["file_name"]
             self.new_name = kwargs["new_name"]
         super(self.__class__, self).__init__(sock, length)
-        self.hub_processor = hub_processor
+        self.file_processor = file_processor
         self.sock = sock
         self.length = length
         self.conn = None
@@ -32,9 +32,9 @@ class FileMovePacket(Packet):
         file_name = buff.read_string()
         new_name = buff.read_string()
 
-        self.hub_processor.event_handler.add_ignore(("move", file_name, new_name))
+        self.file_processor.event_handler.add_ignore(("move", file_name, new_name))
 
-        self.hub_processor.move_file(file_name, new_name)
+        self.file_processor.move_file(file_name, new_name)
 
     def handle_response(self, payload):
         pass

@@ -16,8 +16,8 @@ class Client:
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
-    def __init__(self, hub_processor, address, username, password):
-        self.hub_processor = hub_processor
+    def __init__(self, file_processor, address, username, password):
+        self.file_processor = file_processor
         self.address = address
         self.host = socket.gethostname()
         self.packet_queue = deque()
@@ -67,7 +67,7 @@ class Client:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
-            self.sock = EasySocket(self.hub_processor, None, self.account.session)
+            self.sock = EasySocket(self.file_processor, None, self.account.session)
             self.sock.sock.connect((self.host, EasySocket.PORT))
 
             self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
@@ -95,7 +95,7 @@ class Client:
         while self.connected:#This should listen for file and server changes
 
             try:
-                self.hub_processor.pre(self)
+                self.file_processor.pre(self)
 
                 # Send an idle packet if queue is empty and enough time has passed
                 if (len(self.packet_queue) == 0 and time.time() - last_ping >= Client.IDLE_TIME):
@@ -113,10 +113,10 @@ class Client:
                 if (has_packet):
                     while (self.sock.read().read_bool()):
                         with self.sock.read_packet(self): pass
-                    self.hub_processor.process(self)
+                    self.file_processor.process(self)
                     last_ping = time.time()
 
-                self.hub_processor.post(self)
+                self.file_processor.post(self)
             except ConnectionResetError as e:
                 print(e)
                 break
@@ -128,7 +128,7 @@ class Client:
 
         self.connect()
 
-        self.hub_processor.event_handler.sock = self.sock.sock
+        self.file_processor.event_handler.sock = self.sock.sock
 
         while 1:
             if (self.connected):

@@ -10,21 +10,21 @@ from file_server.web.account import Account
 from time import time
 
 class Server:
-    def __init__(self, hub_processor, port=EasySocket.PORT):
+    def __init__(self, file_processor, port=EasySocket.PORT):
         self.port = port
-        self.hub_processor = hub_processor
+        self.file_processor = file_processor
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []
         self.shutdown = False
         self.webserver = None
 
-        hub_processor.update_status = True
+        file_processor.update_status = True
 
     def kill(self):
 
         # Shut down file watch
-        if self.hub_processor.observer is not None:
-            self.hub_processor.observer.stop()
+        if self.file_processor.observer is not None:
+            self.file_processor.observer.stop()
 
         # Shut down webserver
         if self.webserver is not None:
@@ -68,8 +68,8 @@ class Server:
             connection = ServerConnection(
                 account,
                 clientsocket.getpeername()[0],
-                EasySocket(self.hub_processor, clientsocket),
-                self.hub_processor,
+                EasySocket(self.file_processor, clientsocket),
+                self.file_processor,
                 self
             )
             self.connections.append(connection)
@@ -82,12 +82,12 @@ class Server:
             conn.queue_packet(packet)
 
 class ServerConnection(Thread):
-    def __init__(self, account, name, socket, hub_processor, server):
+    def __init__(self, account, name, socket, file_processor, server):
         super().__init__()
         self.account = account
         self.client_host = name
         self.sock = socket
-        self.hub_processor = hub_processor
+        self.file_processor = file_processor
         self.server = server
         self.packet_queue = deque()
         self.shutdown = False
@@ -104,20 +104,20 @@ class ServerConnection(Thread):
             try: 
                 # Wait for a packet
                 with self.sock.read_packet(self):
-                    self.hub_processor.pre(self)
+                    self.file_processor.pre(self)
                 
                 while self.sock.read().read_bool(): # Handle the rest of the packets
                     with self.sock.read_packet(self):
                         pass
 
-                self.hub_processor.process(self)
+                self.file_processor.process(self)
 
                 self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
                 while not len(self.packet_queue) == 0:
                     self.sock.send_packet(self.packet_queue.pop(), self)
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
-                self.hub_processor.post(self)
+                self.file_processor.post(self)
             except ConnectionResetError as e:
                 print(e)
                 break
