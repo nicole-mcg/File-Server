@@ -68,7 +68,7 @@ class Client:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
-            self.sock = EasySocket(self.file_processor, None, self.account.session)
+            self.sock = EasySocket(self, self.file_processor, None, self.account.session)
             self.sock.sock.connect((self.host, EasySocket.PORT))
 
             self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
@@ -107,13 +107,13 @@ class Client:
             
                 # Send all packets in queue
                 while (not len(self.packet_queue) == 0):
-                    self.sock.send_packet(self.packet_queue.pop(), self)
+                    self.sock.send_packet(self.packet_queue.pop())
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 # Read all incoming packets
                 if (has_packet):
                     while (self.sock.read().read_bool()):
-                        with self.sock.read_packet(self): pass
+                        with self.sock.read_packet(): pass
                     self.file_processor.process(self)
                     last_ping = time.time()
 

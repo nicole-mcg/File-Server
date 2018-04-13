@@ -68,7 +68,7 @@ class Server:
             connection = ServerConnection(
                 account,
                 clientsocket.getpeername()[0],
-                EasySocket(self.file_processor, clientsocket),
+                clientsocket,
                 self.file_processor,
                 self
             )
@@ -84,7 +84,7 @@ class ServerConnection(Thread):
         super().__init__()
         self.account = account
         self.client_host = name
-        self.sock = socket
+        self.sock = EasySocket(self, server.file_processor, socket)
         self.file_processor = file_processor
         self.server = server
         self.packet_queue = deque()
@@ -101,18 +101,18 @@ class ServerConnection(Thread):
         while (not self.shutdown):
             try: 
                 # Wait for a packet
-                with self.sock.read_packet(self):
+                with self.sock.read_packet():
                     self.file_processor.pre(self)
                 
                 while self.sock.read().read_bool(): # Handle the rest of the packets
-                    with self.sock.read_packet(self):
+                    with self.sock.read_packet():
                         pass
 
                 self.file_processor.process(self)
 
                 self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
                 while not len(self.packet_queue) == 0:
-                    self.sock.send_packet(self.packet_queue.pop(), self)
+                    self.sock.send_packet(self.packet_queue.pop())
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 self.file_processor.post(self)

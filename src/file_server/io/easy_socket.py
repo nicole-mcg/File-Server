@@ -6,10 +6,18 @@ from file_server.packet.impl import IdlePacket
 
 from file_server.web.account import Account
 
+from file_server.util import get_file_size
+
+import os
+
+
+
 class EasySocket:
+    KILOBYTE = 1024
     PORT = 1234
 
-    def __init__(self, file_processor, sock, session=None):
+    def __init__(self, hub, file_processor, sock, session=None):
+        self.hub = hub
         self.file_processor = file_processor
         self.session = session
         self.needs_auth = self.session is None
@@ -28,7 +36,7 @@ class EasySocket:
         length = ByteBuffer(b).read_int()
         return ByteBuffer(self.sock.recv(length))
 
-    def send_packet(self, packet=None, conn=None):
+    def send_packet(self, packet=None):
 
         if packet is None:
             packet = IdlePacket(self.file_processor)
@@ -60,7 +68,7 @@ class EasySocket:
             return
 
         #packet sock is not set at the time of writing this
-        packet.handle_outgoing(self.sock, conn)
+        packet.handle_outgoing(self, self.hub)
 
         # Handle response
         buff = ByteBuffer(self.sock.recv(4))
@@ -68,7 +76,7 @@ class EasySocket:
         packet.handle_response(ByteBuffer(self.sock.recv(length)))
 
     @contextlib.contextmanager
-    def read_packet(self, conn=None):
+    def read_packet(self):
         b = self.sock.recv(5)
         buff = ByteBuffer(b)
 
@@ -94,7 +102,7 @@ class EasySocket:
         self.sock.send(auth_response.bytes())
 
         # Generate response
-        response = handle_incoming_packet(id, self.sock, length, self.file_processor, conn)
+        response = handle_incoming_packet(id, self, length, self.file_processor, self.hub)
 
         # Send response if exists
         buff = ByteBuffer()
@@ -104,3 +112,76 @@ class EasySocket:
         else:
             buff.write_int(0)
         self.sock.send(buff.bytes())
+
+    def send_file(self, file_name):
+        sock = self.sock
+        hub = self.hub
+        directory = self.file_processor.directory
+
+        file_size = get_file_size(self.file_processor.directory + file_name)
+
+        sock.send(ByteBuffer.from_int(file_size).bytes())
+        sock.send(ByteBuffer.from_string(file_name).bytes())
+
+        hub.transferring = {
+            "direction": "send",
+            "file_name": file_name,
+            "file_size": file_size
+        }
+
+        hub.transfer_progress = 0
+        with open(directory + file_name, mode='rb') as file:
+
+            while(file_size > 0):
+                chunk_size = EasySocket.KILOBYTE if file_size > EasySocket.KILOBYTE else file_size
+                chunk = file.read(chunk_size)
+                sock.send(chunk)
+                hub.data_sent += chunk_size
+                hub.transfer_progress += chunk_size
+                file_size -= chunk_size
+
+        hub.files_sent += 1
+        hub.transferring = None
+
+    def save_file(self, packet_length):
+        sock = self.sock
+        hub = self.hub
+        directory = self.file_processor.directory
+        event_handler = self.file_processor.event_handler
+
+        file_size = ByteBuffer(sock.recv(4)).read_int()
+        packet_length -= 4
+
+        name_length = packet_length - file_size
+        file_name = ByteBuffer(sock.recv(name_length)).read_string()
+        packet_length -= name_length
+
+        file_path = directory + file_name
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        hub.transferring = {
+            "direction": "recieve",
+            "file_name": file_name,
+            "file_size": file_size
+        }
+
+        if not os.path.isfile(file_path):
+            event_handler.add_ignore(("change", file_name))
+                
+        file = open(file_path,'wb')
+
+        hub.transfer_progress = 0
+        while(packet_length > 0):
+            event_handler.add_ignore(("change", file_name))
+            chunk_size = EasySocket.KILOBYTE if packet_length > EasySocket.KILOBYTE else packet_length
+            file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
+            file.flush()
+            hub.transfer_progress += chunk_size
+            hub.data_recieved += chunk_size
+            packet_length -= chunk_size
+
+        hub.files_recieved += 1
+        hub.transferring = None
+
+        event_handler.add_ignore(("change", file_name))
+        file.close()

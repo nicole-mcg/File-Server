@@ -27,8 +27,6 @@ from file_server.packet.impl import FileChangePacket, FileAddPacket
 
 from file_server.util import get_file_size
 
-KILOBYTE = 1024
-
 class FileProcessor():
     def __init__(self, directory):
         self.directory = directory
@@ -60,74 +58,6 @@ class FileProcessor():
     def queue_packet(self, packet, data):
         packet.time = time()
         self.buffer_queue[data] = packet
-
-    
-
-    def send_file(self, file_name, sock, conn):
-
-        file_size = self.get_file_size(file_name)
-
-        sock.send(ByteBuffer.from_int(file_size).bytes())
-        sock.send(ByteBuffer.from_string(file_name).bytes())
-
-        conn.transferring = {
-            "direction": "send",
-            "file_name": file_name,
-            "file_size": file_size
-        }
-
-        conn.transfer_progress = 0
-        with open(self.directory + file_name, mode='rb') as file:
-
-            while(file_size > 0):
-                chunk_size = KILOBYTE if file_size > KILOBYTE else file_size
-                chunk = file.read(chunk_size)
-                sock.send(chunk)
-                conn.data_sent += chunk_size
-                conn.transfer_progress += chunk_size
-                file_size -= chunk_size
-
-        conn.files_sent += 1
-        conn.transferring = None
-
-    def save_file(self, sock, length, conn):
-
-        file_size = ByteBuffer(sock.recv(4)).read_int()
-        length -= 4
-
-        name_length = length - file_size
-        file_name = ByteBuffer(sock.recv(name_length)).read_string()
-        length -= name_length
-
-        file_path = self.directory + file_name
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-        conn.transferring = {
-            "direction": "recieve",
-            "file_name": file_name,
-            "file_size": file_size
-        }
-
-        if not os.path.isfile(file_path):
-            self.event_handler.add_ignore(("change", file_name))
-                
-        file = open(file_path,'wb')
-
-        conn.transfer_progress = 0
-        while(length > 0):
-            self.event_handler.add_ignore(("change", file_name))
-            chunk_size = KILOBYTE if length > KILOBYTE else length
-            file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
-            file.flush()
-            conn.transfer_progress += chunk_size
-            conn.data_recieved += chunk_size
-            length -= chunk_size
-
-        conn.files_recieved += 1
-        conn.transferring = None
-
-        self.event_handler.add_ignore(("change", file_name))
-        file.close()
 
     def pre(self, packet_queue):
 
