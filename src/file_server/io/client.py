@@ -16,7 +16,8 @@ class Client:
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
-    def __init__(self, file_processor, address, username, password):
+    def __init__(self, directory, file_processor, address, username, password):
+        self.directory = directory
         self.file_processor = file_processor
         self.address = address
         self.host = socket.gethostname()

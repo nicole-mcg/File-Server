@@ -3,7 +3,7 @@ import pytest
 import shutil, requests, json, time, inspect
 
 from file_server.file.file_processor import FileProcessor
-from file_server.io.server import Server
+from file_server.io.server import FileServer
 from file_server.web.webserver import create_webserver
 from file_server.web.account import Account
 
@@ -50,7 +50,7 @@ def start_test_server(auto_shutdown=5):
 
     server = None
     try:
-        server = Server(file_processor, 8088)
+        server = FileServer(file_processor, 8088)
     except OSError:
         assert False, "Another test server is already running"
         return

@@ -9,8 +9,11 @@ from file_server.web.account import Account
 
 from time import time
 
-class Server:
-    def __init__(self, file_processor, port=EasySocket.PORT):
+class FileServer:
+    def __init__(self, directory, file_processor, port=EasySocket.PORT):
+
+        # port for the server
+
         self.port = port
         self.file_processor = file_processor
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

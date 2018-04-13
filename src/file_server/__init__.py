@@ -14,12 +14,12 @@ def start_hub():
     # Create the hub
     if isServer:
 
-        from file_server.io.server import Server
+        from file_server.io.server import FileServer
         from file_server.web.webserver import create_webserver
 
-        # Use Server class for hub
+        # Use FileServer class for hub
         try: 
-            hub = Server(file_processor)
+            hub = FileServer(directory, file_processor)
         except OSError:
             print("File server could not be started")
             return
@@ -35,10 +35,11 @@ def start_hub():
 
     else:
 
-        # Use Client class for hub
         from file_server.io.client import Client
+
+        # Use Client class for hub
         try:
-            hub = Client(file_processor, sys.argv[2], sys.argv[3], sys.argv[4])
+            hub = Client(directory, file_processor, sys.argv[2], sys.argv[3], sys.argv[4])
         except LookupError: # Couldn't authenticate 
             print("Invalid username or password")
             return
