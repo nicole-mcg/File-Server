@@ -16,16 +16,16 @@ from watchdog.events import (
 
 from file_server.io import ByteBuffer
 
-#from .file_observer import FileObserver
 from watchdog.observers import Observer
 
 from .event_handler import EventHandler
 from .snapshot import DirectorySnapshot
 
 from time import time
-#from .file_observer import AsynchronousObserver
 
 from file_server.packet.impl import FileChangePacket, FileAddPacket
+
+from file_server.util import get_file_size
 
 KILOBYTE = 1024
 
@@ -61,8 +61,7 @@ class FileProcessor():
         packet.time = time()
         self.buffer_queue[data] = packet
 
-    def get_file_size(self, file_name):
-        return os.path.getsize(self.directory + file_name)
+    
 
     def send_file(self, file_name, sock, conn):
 
@@ -129,27 +128,6 @@ class FileProcessor():
 
         self.event_handler.add_ignore(("change", file_name))
         file.close()
-
-    def delete_file(self, file_name):
-        print("Deleting File: " + file_name)
-        file_path = self.directory + file_name
-        try:
-            if (os.path.isdir(file_path)):
-                shutil.rmtree(file_path)
-            else:
-                os.remove(file_path)
-        except OSError as e:
-            pass
-
-    def move_file(self, file_name, new_name):
-
-        print("Moving File '{}' to '{}'".format(file_name, new_name))
-
-        try:
-            os.rename(self.directory + file_name, self.directory + new_name)
-        except OSError as e:
-            print(e)
-            pass
 
     def pre(self, packet_queue):
 

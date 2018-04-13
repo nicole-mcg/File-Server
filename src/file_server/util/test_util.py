@@ -1,20 +1,29 @@
+import pytest
 
-from threading import Thread
-import os, shutil, requests, json, time, inspect
+import shutil, requests, json, time, inspect
 
 from file_server.file.file_processor import FileProcessor
 from file_server.io.server import Server
 from file_server.web.webserver import create_webserver
 from file_server.web.account import Account
 
-from file_server.util import nuke_dir
+from file_server.util import delete_file
 
 
 #FIXME remove this
 import webbrowser
 
+
+import os, sys, socket, time
+from threading import Thread
+from file_server.file.file_processor import FileProcessor
+from file_server.io.easy_socket import EasySocket
+
 # Starts a server on different ports using test directories
+@pytest.mark.skip(reason="This isn't a test")
 def start_test_server(auto_shutdown=5):
+
+    # webbrowser.open("http://test server started.com", new=2)
 
     # Get info for test being run
     test_path = os.path.split(inspect.stack()[1][1])
@@ -25,9 +34,11 @@ def start_test_server(auto_shutdown=5):
     bin_path = curr_directory + "/bin"
     if os.path.isdir(bin_path):
         try:
-            nuke_dir(bin_path)
-        except OSError:
+            delete_file(bin_path)
+        except OSError as e:
+            print(e)
             assert False, "Another test is currently using this directory. {}".format(test_name)
+            return
 
     # Create a directory for the file server
     serv_dir = bin_path + "/serv_dir/"
@@ -38,7 +49,13 @@ def start_test_server(auto_shutdown=5):
 
     # Create test server
     file_processor = FileProcessor(serv_dir)
-    server = Server(file_processor, 8888)
+
+    server = None
+    try:
+        server = Server(file_processor, 8088)
+    except OSError:
+        assert False, "Another test server is already running"
+        return
 
     # Starts the server on a new thread
     def start_server():
@@ -70,14 +87,16 @@ def start_test_server(auto_shutdown=5):
 
         if not server.shutdown:
             server.kill()
-            raise Exception("TEST \"{}\" DID NOT PROPERLY KILL SERVER. FAILSAFE TEST SERVER SHUTDOWN USED.".format(test_name))
+            assert False, "TEST \"{}\" DID NOT PROPERLY KILL SERVER. FAILSAFE TEST SERVER SHUTDOWN USED.".format(test_name)
 
     # Open the file server connection
     try:
         server.start(False)
-    except OSError:
+    except OSError as e:
+        # print(e)
         server.kill()
         assert False, "Another test server is already running."
+        return
 
     thread = Thread(target=start_server)
 
@@ -88,7 +107,7 @@ def start_test_server(auto_shutdown=5):
     return server
 
 # endpoint should be a string
-def test_api_request(endpoint, data={}, session=""):
+def send_test_api_request(endpoint, data={}, session=""):
     r = requests.post("http://127.0.0.1:8081/api/{}".format(endpoint), data=json.dumps(data), cookies={"session": session})
 
     if r.status_code == 200:

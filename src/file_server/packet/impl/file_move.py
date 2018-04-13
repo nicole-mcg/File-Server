@@ -1,6 +1,8 @@
 from file_server.packet import Packet
 from file_server.io import ByteBuffer
 
+from file_server.util import move_file
+
 class FileMovePacket(Packet):
     name = "FileMovePacket"
     id = 4
@@ -34,7 +36,7 @@ class FileMovePacket(Packet):
 
         self.file_processor.event_handler.add_ignore(("move", file_name, new_name))
 
-        self.file_processor.move_file(file_name, new_name)
+        move_file(self.file_processor.directory + file_name, self.file_processor.directory + new_name)
 
     def handle_response(self, payload):
         pass

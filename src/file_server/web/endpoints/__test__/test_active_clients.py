@@ -5,6 +5,7 @@ from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
 
 from file_server.util import create_object
 
+@pytest.mark.skip(reason="This is just a start to the test atm")
 def test_active_clients():
 
     def createConnectionObj(client_host, account_name, transferring=False):
@@ -19,5 +20,3 @@ def test_active_clients():
     ]
 
     ActiveClientsEndpoint().handle_request(None, create_object({"connections": connections}), None, None)
-    
-    assert True

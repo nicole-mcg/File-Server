@@ -47,7 +47,7 @@ def start_hub():
 
     hub.start()
 
-    file_process
+    file_processor.shutdown()
 
 if __name__ == "__main__":
 

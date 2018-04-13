@@ -24,6 +24,7 @@ class Client:
         self.connected = False
         self.timeout_count = 0
         self.last_attempt = time.time()
+        self.sock = None
 
         # Unused but collected because of client/server code mix...
         self.data_recieved = 0
@@ -126,7 +127,11 @@ class Client:
 
     def start(self):
 
-        self.connect()
+        self.file_processor.event_handler.sock = None
+
+        while self.sock == None:
+            self.connect()
+            time.sleep(0.1)
 
         self.file_processor.event_handler.sock = self.sock.sock
 

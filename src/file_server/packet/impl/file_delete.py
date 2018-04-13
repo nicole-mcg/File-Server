@@ -1,6 +1,8 @@
 from file_server.packet import Packet
 from file_server.io import ByteBuffer
 
+from file_server.util import delete_file
+
 class FileDeletePacket(Packet):
     name = "FileDeletePacket"
     id = 3
@@ -26,7 +28,7 @@ class FileDeletePacket(Packet):
 
         self.file_processor.event_handler.add_ignore(("delete", file_name))
 
-        self.file_processor.delete_file(file_name)
+        delete_file(self.file_processor.directory + file_name)
 
     def handle_response(self, payload):
         pass
