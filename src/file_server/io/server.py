@@ -74,8 +74,6 @@ class Server:
             )
             self.connections.append(connection)
             connection.start()
-            
-        print("Stopped recieving connections on file-server")
 
     def queue_packet(self, packet):
         for conn in self.connections:

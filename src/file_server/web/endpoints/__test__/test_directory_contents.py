@@ -1,7 +1,7 @@
 # Author: Connor McGrogan
 
 # Import test utilities
-from file_server.util.test_util import start_test_server, send_test_api_request
+from file_server.util._test_util import start_test_server, send_test_api_request
 
 # json.loads is used to turn a JSON string into a Python dict
 import json

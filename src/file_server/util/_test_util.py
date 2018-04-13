@@ -13,14 +13,12 @@ from file_server.util import delete_file
 #FIXME remove this
 import webbrowser
 
-
 import os, sys, socket, time
 from threading import Thread
 from file_server.file.file_processor import FileProcessor
 from file_server.io.easy_socket import EasySocket
 
 # Starts a server on different ports using test directories
-@pytest.mark.skip(reason="This isn't a test")
 def start_test_server(auto_shutdown=5):
 
     # webbrowser.open("http://test server started.com", new=2)
