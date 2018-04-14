@@ -16,6 +16,8 @@ import os, sys, socket, time
 from threading import Thread
 from file_server.io.easy_socket import EasySocket
 
+from file_server.packet import initialize_packet_manager
+
 # Starts a server on different ports using test directories
 def start_test_server(auto_shutdown=5):
 
@@ -58,6 +60,8 @@ def start_test_server(auto_shutdown=5):
 
         # Start webserver
         Thread(target=server.webserver.serve_forever).start()
+
+        initialize_packet_manager()
 
         # Initialize file watch
         server.initialize()

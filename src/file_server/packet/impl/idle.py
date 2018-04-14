@@ -1,4 +1,4 @@
-from file_server.packet import Packet
+from file_server.packet.packet import Packet
 
 class IdlePacket(Packet):
     name = "IdlePacket"

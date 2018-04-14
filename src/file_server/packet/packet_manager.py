@@ -1,7 +1,14 @@
 
-# from file_server.packet.impl import IdlePacket
+from file_server.packet.impl import IdlePacket, FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
 
 packet_handlers = {}
+
+def initialize_packet_manager():
+    register_packet(IdlePacket) # 0
+    register_packet(FileChangePacket) # 1
+    register_packet(FileAddPacket) # 2
+    register_packet(FileDeletePacket) # 3
+    register_packet(FileMovePacket) # 4
 
 def register_packet(cls):
     packet_handlers[cls.id] = cls

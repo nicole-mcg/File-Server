@@ -2,9 +2,8 @@ from time import time
 
 from watchdog.observers import Observer
 
+from file_server.file import FileEventHandler, DirectorySnapshot
 from file_server.io.easy_socket import EasySocket
-from file_server.file.event_handler import FileEventHandler
-from file_server.file.snapshot import DirectorySnapshot
 
 class Hub:
     def __init__(self, directory, port=EasySocket.PORT):
@@ -19,6 +18,7 @@ class Hub:
         self.directory_snapshot = None
 
     def initialize(self):
+
         self.directory_snapshot = DirectorySnapshot(self.directory, "/", self.directory)
 
         self.file_event_handler = FileEventHandler(self, self.directory)

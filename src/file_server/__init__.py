@@ -1,6 +1,8 @@
 import sys
 from threading import Thread
 
+from file_server.packet import initialize_packet_manager
+
 def start_hub():
 
     # Check if this is supposed to be a server or client based on number of args entered
@@ -41,6 +43,8 @@ def start_hub():
         except LookupError: # Couldn't authenticate 
             print("Invalid username or password")
             return
+
+    initialize_packet_manager()
 
     hub.initialize()
 

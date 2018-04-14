@@ -1,4 +1,4 @@
-from file_server.io import ByteBuffer
+from file_server.io.byte_buffer import ByteBuffer
 
 class Packet:
     name = "Packet"
