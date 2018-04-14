@@ -19,15 +19,15 @@ class FileHub:
         # It's used to check for duplicate packets
         self.buffer_queue = {}
 
-        # FileEventHandler
+        # type: FileEventHandler
         # The file watch event handler
         self.file_event_handler = None
 
-        # Observer
+        # type: Observer
         # The which watches the files
         self.file_observer = None
 
-        # DirectorySnapshot
+        # type: DirectorySnapshot
         # Metadata for the directory being watched
         self.directory_snapshot = None
 
