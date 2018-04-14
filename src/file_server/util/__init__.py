@@ -4,6 +4,7 @@ import os
 
 from .network_util import send_post_request
 from .file_util import get_file_size, move_file, delete_file
+from .byte_buffer import ByteBuffer
 
 # Attributes should be a dict: {"attr_name": "attr_value"}
 def create_object(attributes):

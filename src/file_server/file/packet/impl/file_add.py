@@ -1,5 +1,5 @@
 from file_server.file.packet.packet import Packet
-from file_server.file.io.byte_buffer import ByteBuffer
+from file_server.util.byte_buffer import ByteBuffer
 
 from file_server.util import get_file_size
 
