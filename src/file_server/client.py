@@ -7,9 +7,9 @@ from file_server.file.packet.impl.idle import IdlePacket
 from file_server.util import send_post_request
 from file_server.web.account import Account
 
-from .hub import Hub
+from .hub import FileHub
 
-class FileClient(Hub):
+class FileClient(FileHub):
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 

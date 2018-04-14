@@ -8,9 +8,9 @@ from file_server.web.account import Account
 
 from time import time
 
-from .hub import Hub
+from .hub import FileHub
 
-class FileServer(Hub):
+class FileServer(FileHub):
     def __init__(self, directory, port=FileSocket.PORT):
 
         super(self.__class__, self).__init__(directory, port)

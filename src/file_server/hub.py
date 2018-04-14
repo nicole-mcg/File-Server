@@ -6,11 +6,16 @@ from file_server.file.event_handler import FileEventHandler
 from file_server.file.file_snapshot import DirectorySnapshot
 from file_server.file.file_socket import FileSocket
 
-class Hub:
+# This class contains code common for the FileServer and FileClient class
+class FileHub:
+
+    # directory: the directory to watch
+    # port: the port for the connection
     def __init__(self, directory, port=FileSocket.PORT):
         self.directory = directory
         self.port = port
 
+        #
         self.buffer_queue = {}
 
         self.file_event_handler = None
