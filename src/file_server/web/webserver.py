@@ -8,9 +8,15 @@ from http.cookies import SimpleCookie
 from file_server.web.account import Account
 
 
-from .endpoints import ActiveClientsEndpoint, ClientInfoEndpoint, \
-    LoginEndpoint, LogoutEndpoint, SignupEndpoint, UserEndpoint, CreateAuthEndpoint, \
-    UpdateSettingsEndpoint, DirectoryContentsEndpoint
+from .endpoints.active_clients import ActiveClientsEndpoint
+from .endpoints.client_info import ClientInfoEndpoint
+from .endpoints.login import LoginEndpoint
+from .endpoints.logout import LogoutEndpoint
+from .endpoints.signup import SignupEndpoint
+from .endpoints.user import UserEndpoint
+from .endpoints.createauth import CreateAuthEndpoint
+from .endpoints.update_settings import UpdateSettingsEndpoint
+from .endpoints.directory_contents import DirectoryContentsEndpoint
 
 from file_server.util import send_post_request
 
