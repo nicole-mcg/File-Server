@@ -1,21 +1,16 @@
+import os, json, webbrowser
+
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
 
-import webbrowser
-import os
-import json
 
 from file_server.web.account import Account
-from file_server.web.endpoints.active_clients import ActiveClientsEndpoint
-from file_server.web.endpoints.client_info import ClientInfoEndpoint
-from file_server.web.endpoints.login import LoginEndpoint
-from file_server.web.endpoints.logout import LogoutEndpoint
-from file_server.web.endpoints.signup import SignupEndpoint
-from file_server.web.endpoints.user import UserEndpoint
-from file_server.web.endpoints.createauth import CreateAuthEndpoint
-from file_server.web.endpoints.update_settings import UpdateSettingsEndpoint
-from file_server.web.endpoints.directory_contents import DirectoryContentsEndpoint
+
+
+from .endpoints import ActiveClientsEndpoint, ClientInfoEndpoint, \
+    LoginEndpoint, LogoutEndpoint, SignupEndpoint, UserEndpoint, CreateAuthEndpoint, \
+    UpdateSettingsEndpoint, DirectoryContentsEndpoint
 
 from file_server.util import send_post_request
 

@@ -1,10 +1,9 @@
+import time
+from threading import Thread
+
 from watchdog.events import FileSystemEventHandler
 
 from file_server.packet.impl import FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
-
-from time import sleep
-from threading import Thread
-
 
 class FileEventHandler(FileSystemEventHandler):
 
@@ -33,7 +32,7 @@ class FileEventHandler(FileSystemEventHandler):
             )
         except PermissionError:
             # Wait until we can actually read the file
-            sleep(500)
+            time.sleep(500)
             self.send_file_contents(file_name, packet_class, data, count + 1)
 
     def check_ignore(self, data):

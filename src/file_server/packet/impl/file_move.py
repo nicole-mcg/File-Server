@@ -1,6 +1,5 @@
 from file_server.packet import Packet
 from file_server.io import ByteBuffer
-
 from file_server.util import move_file
 
 class FileMovePacket(Packet):

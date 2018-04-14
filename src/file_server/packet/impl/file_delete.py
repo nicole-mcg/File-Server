@@ -1,6 +1,5 @@
 from file_server.packet import Packet
 from file_server.io import ByteBuffer
-
 from file_server.util import delete_file
 
 class FileDeletePacket(Packet):
