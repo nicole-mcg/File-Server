@@ -2,7 +2,7 @@ import pytest
 
 import shutil, requests, json, time, inspect
 
-from file_server.file.io.server import FileServer
+from file_server.server import FileServer
 from file_server.web.webserver import create_webserver
 from file_server.web.account import Account
 
@@ -14,7 +14,7 @@ import webbrowser
 
 import os, sys, socket, time
 from threading import Thread
-from file_server.file.io.easy_socket import EasySocket
+from file_server.easy_socket import EasySocket
 
 from file_server.file.packet.packet_manager import initialize_packet_manager
 
