@@ -106,6 +106,7 @@ class FileServer(FileHub):
             connection.start()
 
     # Used to send a packet to all active clients
+    # packet: the packet to send
     def send_packet(self, packet):
         for conn in self.connections:
             conn.queue_packet(packet)
@@ -195,5 +196,6 @@ class ServerConnection(Thread):
                 del connections[i]
 
     # Queues a packet to be sent on the connection
+    # packet: the Packet to queue
     def queue_packet(self, packet):
         self.packet_queue.append(packet)

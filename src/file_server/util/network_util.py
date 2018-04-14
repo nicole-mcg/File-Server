@@ -12,6 +12,4 @@ def send_post_request(url, data_dict={}, cookie_dict = {}):
     if r.status_code == 200:
         return r.text
 
-    print(r.status_code)
-
     return None
