@@ -5,7 +5,7 @@ import uuid
 from passlib.hash import sha512_crypt
 from time import time
 
-#This class is available for use in Client simply for data purposes
+#This class is available for use in FileClient simply for data purposes
 #Methods should not be used in the client
 class Account:
     TWO_DAYS = 172800

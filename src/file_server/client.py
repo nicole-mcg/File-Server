@@ -9,7 +9,7 @@ from file_server.web.account import Account
 
 from .hub import Hub
 
-class Client(Hub):
+class FileClient(Hub):
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
@@ -65,7 +65,7 @@ class Client(Hub):
             return
 
         try:
-            timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
+            timeout = FileClient.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
             self.sock = FileSocket(self, None, self.account.session)
@@ -86,9 +86,9 @@ class Client(Hub):
             print("Successfully connected")
         except (ConnectionRefusedError, socket.timeout):
             self.last_attempt = time.time()
-            timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
+            timeout = FileClient.TIMEOUT_INTERVALS[self.timeout_count]
             print("Could not connect to server. Trying again in {} seconds".format(timeout))
-            if self.timeout_count < len(Client.TIMEOUT_INTERVALS) - 1:
+            if self.timeout_count < len(FileClient.TIMEOUT_INTERVALS) - 1:
                 self.timeout_count += 1
 
     def process(self):
@@ -99,7 +99,7 @@ class Client(Hub):
                 self.prepare_packets(self)
 
                 # Send an idle packet if queue is empty and enough time has passed
-                if (len(self.packet_queue) == 0 and time.time() - last_ping >= Client.IDLE_TIME):
+                if (len(self.packet_queue) == 0 and time.time() - last_ping >= FileClient.IDLE_TIME):
                     self.packet_queue.append(IdlePacket())
 
                 has_packet = not len(self.packet_queue) == 0
@@ -121,7 +121,7 @@ class Client(Hub):
                 print(e)
                 break
 
-            time.sleep(Client.IDLE_TIME)
+            time.sleep(FileClient.IDLE_TIME)
             
 
     def start(self):

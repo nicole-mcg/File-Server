@@ -35,11 +35,11 @@ def start_hub():
 
     else:
 
-        from .client import Client
+        from .client import FileClient
 
-        # Use Client class for hub
+        # Use FileClient class for hub
         try:
-            hub = Client(directory, sys.argv[2], sys.argv[3], sys.argv[4])
+            hub = FileClient(directory, sys.argv[2], sys.argv[3], sys.argv[4])
         except LookupError: # Couldn't authenticate 
             print("Invalid username or password")
             return

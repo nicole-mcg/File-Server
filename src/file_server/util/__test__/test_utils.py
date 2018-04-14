@@ -1,6 +1,6 @@
 import pytest
 
-from file_server.util import split_path, create_object
+from file_server.util import split_path
 
 @pytest.mark.parametrize("path,parts", [
     ("C:/test1", ["C:/", "test1"]),
@@ -16,56 +16,3 @@ def test_split(path, parts):
 
     for index, part in enumerate(parts):
         assert split[index] == part
-
-@pytest.mark.parametrize("obj_dict", [
-    ({
-        "test": "test2",
-        "dict": {
-            "nested": "works",
-            "again": {
-                "working": "yes"
-            }
-        }
-    }),
-    ({
-        "test": "test2",
-        "dict": {
-            "nested": "works",
-            "again": {
-                "working": "yes",
-                "dict": {
-                    "nested": "works",
-                    "again": {
-                        "working": {
-                            "test": "test2",
-                            "dict": {
-                                "nested": "works",
-                                "again": {
-                                    "working": "yes",
-                                    "dict": {
-                                        "nested": "works",
-                                        "again": {
-                                            "working": "yes"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }),
-])
-def test_create_object(obj_dict):
-
-    test_obj = create_object(obj_dict)
-
-    for key in obj_dict.keys():
-
-        #Verify all dict entries were turned into attributes
-        assert hasattr(test_obj, key)
-
-        #Test this one too
-        if (hasattr(obj_dict[key], "keys")):
-            test_create_object(obj_dict[key])
