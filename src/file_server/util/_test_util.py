@@ -14,7 +14,7 @@ import webbrowser
 
 import os, sys, socket, time
 from threading import Thread
-from file_server.easy_socket import FileSocket
+from file_server.file.file_socket import FileSocket
 
 from file_server.file.packet.packet_manager import initialize_packet_manager
 

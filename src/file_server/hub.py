@@ -4,7 +4,7 @@ from watchdog.observers import Observer
 
 from file_server.file.event_handler import FileEventHandler
 from file_server.file.file_snapshot import DirectorySnapshot
-from file_server.easy_socket import FileSocket
+from file_server.file.file_socket import FileSocket
 
 class Hub:
     def __init__(self, directory, port=FileSocket.PORT):
