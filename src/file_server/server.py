@@ -2,9 +2,8 @@ import socket
 from collections import deque
 from threading import Thread
 
-from file_server.file.io import ByteBuffer
-
-from .easy_socket import EasySocket 
+from file_server.file.io.byte_buffer import ByteBuffer
+from file_server.file.io.easy_socket import EasySocket 
 from file_server.web.account import Account
 
 from time import time

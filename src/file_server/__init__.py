@@ -14,8 +14,8 @@ def start_hub():
     # Create the hub
     if isServer:
 
-        from file_server.file.io.server import FileServer
-        from file_server.web.webserver import create_webserver
+        from .server import FileServer
+        from .web.webserver import create_webserver
 
         # Use FileServer class for hub
         try: 
@@ -35,7 +35,7 @@ def start_hub():
 
     else:
 
-        from file_server.file.io.client import Client
+        from .client import Client
 
         # Use Client class for hub
         try:

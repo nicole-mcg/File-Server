@@ -1,6 +1,6 @@
 import socket, contextlib, os
 
-from file_server.file.io import ByteBuffer
+from file_server.file.io.byte_buffer import ByteBuffer
 from file_server.file.packet import handle_incoming_packet
 from file_server.file.packet.impl.idle import IdlePacket
 from file_server.web.account import Account

@@ -1,6 +1,6 @@
 # content of test_sample.py
 
-from file_server.file import DirectorySnapshot
+from file_server.file.file_snapshot import DirectorySnapshot
 
 import inspect, os, json
 
