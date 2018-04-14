@@ -1,8 +1,6 @@
 # content of test_sample.py
 
-import pytest
-
-from file_server.file.snapshot import Snapshot, FileSnapshot, DirectorySnapshot
+from file_server.file.snapshot import DirectorySnapshot
 
 import inspect, os, json
 
@@ -10,6 +8,7 @@ def test_snapshot():
     curr_path = os.path.split(inspect.stack()[0][1])[0]
     path = curr_path + "/test_dir"
 
+    # Used to confirm the DirectorySnapshot class tree
     def confirm_snapshot(expected_snapshots, snapshot, root_path, path=""):
 
         if hasattr(snapshot, "snapshots"):
@@ -35,6 +34,7 @@ def test_snapshot():
             #Confirm that snapshot too
             confirm_snapshot(expected_snapshots[key], tmp_snap, root_path, tmp_path + "/")
 
+    # Used to confirm generated JSON tree from DirectorySnapshot
     def confirm_json(expected_snapshots, snapshot_dict):
 
         if not "snapshots" in snapshot_dict:

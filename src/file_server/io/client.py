@@ -1,17 +1,12 @@
-import socket, sys, time
+import socket, time, json
 from collections import deque
 
-from file_server.util import send_post_request
-
-from file_server.packet.impl import IdlePacket
 from file_server.io import ByteBuffer
-
-from .easy_socket import EasySocket
-
+from file_server.packet.impl import IdlePacket
+from file_server.util import send_post_request
 from file_server.web.account import Account
 
-import json
-
+from .easy_socket import EasySocket
 from .hub import Hub
 
 class Client(Hub):
@@ -105,7 +100,7 @@ class Client(Hub):
 
                 # Send an idle packet if queue is empty and enough time has passed
                 if (len(self.packet_queue) == 0 and time.time() - last_ping >= Client.IDLE_TIME):
-                    self.packet_queue.append(IdlePacket(None))
+                    self.packet_queue.append(IdlePacket())
 
                 has_packet = not len(self.packet_queue) == 0
 

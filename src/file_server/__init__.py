@@ -1,4 +1,4 @@
-import os, sys, socket, time
+import sys
 from threading import Thread
 
 def start_hub():

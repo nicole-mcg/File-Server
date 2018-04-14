@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+
 from file_server.util import split_path
 
 class Snapshot:
