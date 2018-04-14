@@ -6,7 +6,7 @@ from file_server.file.packet.impl.idle import IdlePacket
 from file_server.web.account import Account
 from file_server.util import get_file_size
 
-class EasySocket:
+class FileSocket:
     KILOBYTE = 1024
     PORT = 1234
 
@@ -126,7 +126,7 @@ class EasySocket:
         with open(directory + file_name, mode='rb') as file:
 
             while(file_size > 0):
-                chunk_size = EasySocket.KILOBYTE if file_size > EasySocket.KILOBYTE else file_size
+                chunk_size = FileSocket.KILOBYTE if file_size > FileSocket.KILOBYTE else file_size
                 chunk = file.read(chunk_size)
                 sock.send(chunk)
                 hub.data_sent += chunk_size
@@ -166,7 +166,7 @@ class EasySocket:
         hub.transfer_progress = 0
         while(packet_length > 0):
             file_event_handler.add_ignore(("change", file_name))
-            chunk_size = EasySocket.KILOBYTE if packet_length > EasySocket.KILOBYTE else packet_length
+            chunk_size = FileSocket.KILOBYTE if packet_length > FileSocket.KILOBYTE else packet_length
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
             file.flush()
             hub.transfer_progress += chunk_size

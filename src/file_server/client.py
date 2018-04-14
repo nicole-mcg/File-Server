@@ -2,7 +2,7 @@ import socket, time, json
 from collections import deque
 
 from file_server.util.byte_buffer import ByteBuffer
-from file_server.easy_socket import EasySocket
+from file_server.easy_socket import FileSocket
 from file_server.file.packet.impl.idle import IdlePacket
 from file_server.util import send_post_request
 from file_server.web.account import Account
@@ -15,7 +15,7 @@ class Client(Hub):
 
     def __init__(self, directory, address, username, password):
 
-        super(self.__class__, self).__init__(directory, EasySocket.PORT)
+        super(self.__class__, self).__init__(directory, FileSocket.PORT)
 
         self.directory = directory
         self.address = address
@@ -68,8 +68,8 @@ class Client(Hub):
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
-            self.sock = EasySocket(self, None, self.account.session)
-            self.sock.sock.connect((self.host, EasySocket.PORT))
+            self.sock = FileSocket(self, None, self.account.session)
+            self.sock.sock.connect((self.host, FileSocket.PORT))
 
             self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
             self.sock.sock.send(ByteBuffer.from_string(self.account.session).bytes())

@@ -3,7 +3,7 @@ from collections import deque
 from threading import Thread
 
 from file_server.util.byte_buffer import ByteBuffer
-from file_server.easy_socket import EasySocket 
+from file_server.easy_socket import FileSocket 
 from file_server.web.account import Account
 
 from time import time
@@ -11,7 +11,7 @@ from time import time
 from .hub import Hub
 
 class FileServer(Hub):
-    def __init__(self, directory, port=EasySocket.PORT):
+    def __init__(self, directory, port=FileSocket.PORT):
 
         super(self.__class__, self).__init__(directory, port)
 
@@ -80,7 +80,7 @@ class ServerConnection(Thread):
         super().__init__()
         self.account = account
         self.client_host = name
-        self.sock = EasySocket(self, socket)
+        self.sock = FileSocket(self, socket)
         self.server = server
         self.packet_queue = deque()
         self.shutdown = False
