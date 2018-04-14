@@ -3,7 +3,7 @@ from threading import Thread
 
 from watchdog.events import FileSystemEventHandler
 
-from file_server.packet.impl import FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
+from file_server.file.packet.impl import FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
 
 class FileEventHandler(FileSystemEventHandler):
 

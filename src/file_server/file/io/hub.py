@@ -3,7 +3,7 @@ from time import time
 from watchdog.observers import Observer
 
 from file_server.file import FileEventHandler, DirectorySnapshot
-from file_server.io.easy_socket import EasySocket
+from file_server.file.io.easy_socket import EasySocket
 
 class Hub:
     def __init__(self, directory, port=EasySocket.PORT):

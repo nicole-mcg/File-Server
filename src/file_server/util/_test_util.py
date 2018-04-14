@@ -2,7 +2,7 @@ import pytest
 
 import shutil, requests, json, time, inspect
 
-from file_server.io.server import FileServer
+from file_server.file.io.server import FileServer
 from file_server.web.webserver import create_webserver
 from file_server.web.account import Account
 
@@ -14,9 +14,9 @@ import webbrowser
 
 import os, sys, socket, time
 from threading import Thread
-from file_server.io.easy_socket import EasySocket
+from file_server.file.io.easy_socket import EasySocket
 
-from file_server.packet import initialize_packet_manager
+from file_server.file.packet import initialize_packet_manager
 
 # Starts a server on different ports using test directories
 def start_test_server(auto_shutdown=5):

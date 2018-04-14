@@ -1,5 +1,5 @@
 
-from file_server.packet.impl import IdlePacket, FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
+from file_server.file.packet.impl import IdlePacket, FileChangePacket, FileAddPacket, FileDeletePacket, FileMovePacket
 
 packet_handlers = {}
 

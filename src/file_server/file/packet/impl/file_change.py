@@ -1,14 +1,14 @@
-from file_server.packet.packet import Packet
-from file_server.io import ByteBuffer
+from file_server.file.packet.packet import Packet
+from file_server.file.io import ByteBuffer
 
 from file_server.util import get_file_size
 
-class FileAddPacket(Packet):
-    name = "FileAddPacket"
-    id = 2
-    def __init__(self, hub=None, easy_sock=None, length=0,**kwargs):
+class FileChangePacket(Packet):
+    name = "FileChangePacket"
+    id = 1
+    def __init__(self, hub=None, easy_sock=None, length=0, **kwargs):
         super(self.__class__, self).__init__(hub, easy_sock, length)
-        
+
         if "file_name" in kwargs:
             self.file_name = kwargs["file_name"]
 

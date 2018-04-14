@@ -1,8 +1,8 @@
 import socket, time, json
 from collections import deque
 
-from file_server.io import ByteBuffer
-from file_server.packet.impl import IdlePacket
+from file_server.file.io import ByteBuffer
+from file_server.file.packet.impl import IdlePacket
 from file_server.util import send_post_request
 from file_server.web.account import Account
 

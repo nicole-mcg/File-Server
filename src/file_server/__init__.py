@@ -1,7 +1,7 @@
 import sys
 from threading import Thread
 
-from file_server.packet import initialize_packet_manager
+from file_server.file.packet import initialize_packet_manager
 
 def start_hub():
 
@@ -14,7 +14,7 @@ def start_hub():
     # Create the hub
     if isServer:
 
-        from file_server.io.server import FileServer
+        from file_server.file.io.server import FileServer
         from file_server.web.webserver import create_webserver
 
         # Use FileServer class for hub
@@ -35,7 +35,7 @@ def start_hub():
 
     else:
 
-        from file_server.io.client import Client
+        from file_server.file.io.client import Client
 
         # Use Client class for hub
         try:

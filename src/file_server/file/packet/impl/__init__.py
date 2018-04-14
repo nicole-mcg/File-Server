@@ -1,4 +1,4 @@
-#This package contains implementations of the file_server.packet.Packet class
+#This package contains implementations of the file_server.file.packet.Packet class
 
 from .idle import IdlePacket
 from .file_change import FileChangePacket
