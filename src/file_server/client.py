@@ -182,11 +182,11 @@ class FileClient(FileHub):
                 if (len(self.packet_queue) == 0 and time.time() - last_ping >= FileClient.PACKET_IDLE_TIME):
                     self.packet_queue.append(IdlePacket())
 
-                # Check if we are sending any packets
+                # Check if we're sending any packets so we can still know after they're sent
                 has_packet = not len(self.packet_queue) == 0
             
                 # Send all packets in queue
-                while has_packet:
+                while not len(self.packet_queue) == 0:
                     self.sock.send_packet(self.packet_queue.pop())
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
@@ -213,16 +213,10 @@ class FileClient(FileHub):
     # Runs the client connection on the current thread
     def start(self):
 
-        # Reset the socket handle in the event handler
-        self.file_event_handler.sock = None
-
         # Try to connect until it works
         while self.sock == None:
             self.connect()
             time.sleep(0.1)
-
-        # Set the socket handle in the event handler
-        self.file_event_handler.sock = self.sock.sock
 
         # Keep trying to reconnect until shutdown
         while not self.shutdown:
