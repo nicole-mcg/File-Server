@@ -1,7 +1,7 @@
 import sys
 from threading import Thread
 
-from file_server.file.packet import initialize_packet_manager
+from file_server.file.packet.packet_manager import initialize_packet_manager
 
 def start_hub():
 
