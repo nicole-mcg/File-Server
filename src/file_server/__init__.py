@@ -44,12 +44,16 @@ def start_hub():
             print("Invalid username or password")
             return
 
+    # Add all the packet handlers
     initialize_packet_manager()
 
+    # Starts file watch
     hub.initialize()
 
+    # Runs the hub connection on this thread
     hub.start()
 
+    # Cleanup when the connection has ended
     hub.kill()
 
 if __name__ == "__main__":
