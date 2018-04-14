@@ -12,13 +12,17 @@ from file_server.web.account import Account
 
 import json
 
-class Client:
+from .hub import Hub
+
+class Client(Hub):
     TIMEOUT_INTERVALS = [2, 5, 5, 5, 10, 10, 30]
     IDLE_TIME = 1
 
-    def __init__(self, directory, file_processor, address, username, password):
+    def __init__(self, directory, address, username, password):
+
+        super(self.__class__, self).__init__(directory, EasySocket.PORT)
+
         self.directory = directory
-        self.file_processor = file_processor
         self.address = address
         self.host = socket.gethostname()
         self.packet_queue = deque()
@@ -69,7 +73,7 @@ class Client:
             timeout = Client.TIMEOUT_INTERVALS[self.timeout_count]
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
-            self.sock = EasySocket(self, self.file_processor, None, self.account.session)
+            self.sock = EasySocket(self, None, self.account.session)
             self.sock.sock.connect((self.host, EasySocket.PORT))
 
             self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
@@ -97,7 +101,7 @@ class Client:
         while self.connected:#This should listen for file and server changes
 
             try:
-                self.file_processor.pre(self)
+                self.prepare_packets(self)
 
                 # Send an idle packet if queue is empty and enough time has passed
                 if (len(self.packet_queue) == 0 and time.time() - last_ping >= Client.IDLE_TIME):
@@ -115,10 +119,9 @@ class Client:
                 if (has_packet):
                     while (self.sock.read().read_bool()):
                         with self.sock.read_packet(): pass
-                    self.file_processor.process(self)
+
                     last_ping = time.time()
 
-                self.file_processor.post(self)
             except ConnectionResetError as e:
                 print(e)
                 break
@@ -128,13 +131,13 @@ class Client:
 
     def start(self):
 
-        self.file_processor.event_handler.sock = None
+        self.file_event_handler.sock = None
 
         while self.sock == None:
             self.connect()
             time.sleep(0.1)
 
-        self.file_processor.event_handler.sock = self.sock.sock
+        self.file_event_handler.sock = self.sock.sock
 
         while 1:
             if (self.connected):
@@ -143,5 +146,5 @@ class Client:
                 print("Connection to the server has been lost.")
             self.connect()
 
-    def queue_packet(self, packet):
+    def send_packet(self, packet):
         self.packet_queue.append(packet)

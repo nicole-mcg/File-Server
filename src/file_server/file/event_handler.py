@@ -6,18 +6,18 @@ from time import sleep
 from threading import Thread
 
 
-class EventHandler(FileSystemEventHandler):
+class FileEventHandler(FileSystemEventHandler):
 
     events_to_ignore = {}
 
     def add_ignore(self, data):
-        if data in EventHandler.events_to_ignore:
-            EventHandler.events_to_ignore[data] += 1
+        if data in FileEventHandler.events_to_ignore:
+            FileEventHandler.events_to_ignore[data] += 1
         else:
-            EventHandler.events_to_ignore[data] = 1
+            FileEventHandler.events_to_ignore[data] = 1
 
-    def __init__(self, file_processor, directory):
-        self.file_processor = file_processor
+    def __init__(self, hub, directory):
+        self.hub = hub
         self.directory = directory
 
     def send_file_contents(self, file_name, packet_class, data, count=0):
@@ -25,9 +25,9 @@ class EventHandler(FileSystemEventHandler):
             with open(self.directory + file_name, mode='rb') as file:
                 pass
 
-            self.file_processor.queue_packet(
+            self.hub.queue_packet(
                 packet_class(
-                    self.file_processor,
+                    self.hub,
                     file_name=file_name
                 ), data
             )
@@ -37,13 +37,13 @@ class EventHandler(FileSystemEventHandler):
             self.send_file_contents(file_name, packet_class, data, count + 1)
 
     def check_ignore(self, data):
-        if not data in EventHandler.events_to_ignore:
+        if not data in FileEventHandler.events_to_ignore:
             return False
         else:
-            if EventHandler.events_to_ignore[data] == 1:
-                del EventHandler.events_to_ignore[data]
+            if FileEventHandler.events_to_ignore[data] == 1:
+                del FileEventHandler.events_to_ignore[data]
             else:
-                EventHandler.events_to_ignore[data] -= 1
+                FileEventHandler.events_to_ignore[data] -= 1
         return True
 
     def on_created(self, event):
@@ -86,9 +86,9 @@ class EventHandler(FileSystemEventHandler):
         data = ("delete", file_name)
 
         if not self.check_ignore(data):
-            self.file_processor.queue_packet(
+            self.hub.queue_packet(
                 FileDeletePacket(
-                    self.file_processor,
+                    self.hub,
                     file_name=file_name
                 ), data
             )
@@ -106,9 +106,9 @@ class EventHandler(FileSystemEventHandler):
         data = ("move", file_name, new_name)
 
         if not self.check_ignore(data):
-            self.file_processor.queue_packet(
+            self.hub.queue_packet(
                 FileMovePacket(
-                    self.file_processor,
+                    self.hub,
                     file_name=file_name,
                     new_name=new_name
                 ), data

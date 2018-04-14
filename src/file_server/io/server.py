@@ -9,25 +9,20 @@ from file_server.web.account import Account
 
 from time import time
 
-class FileServer:
-    def __init__(self, directory, file_processor, port=EasySocket.PORT):
+from .hub import Hub
 
-        # port for the server
+class FileServer(Hub):
+    def __init__(self, directory, port=EasySocket.PORT):
 
-        self.port = port
-        self.file_processor = file_processor
+        super(self.__class__, self).__init__(directory, port)
+
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connections = []
         self.shutdown = False
         self.webserver = None
 
-        file_processor.update_status = True
-
     def kill(self):
-
-        # Shut down file watch
-        if self.file_processor.observer is not None:
-            self.file_processor.observer.stop()
+        super(self.__class__, self).kill()
 
         # Shut down webserver
         if self.webserver is not None:
@@ -72,23 +67,21 @@ class FileServer:
                 account,
                 clientsocket.getpeername()[0],
                 clientsocket,
-                self.file_processor,
                 self
             )
             self.connections.append(connection)
             connection.start()
 
-    def queue_packet(self, packet):
+    def send_packet(self, packet):
         for conn in self.connections:
             conn.queue_packet(packet)
 
 class ServerConnection(Thread):
-    def __init__(self, account, name, socket, file_processor, server):
+    def __init__(self, account, name, socket, server):
         super().__init__()
         self.account = account
         self.client_host = name
-        self.sock = EasySocket(self, server.file_processor, socket)
-        self.file_processor = file_processor
+        self.sock = EasySocket(self, socket)
         self.server = server
         self.packet_queue = deque()
         self.shutdown = False
@@ -100,25 +93,30 @@ class ServerConnection(Thread):
         self.transferring = None
         self.transfer_progress = 0
 
+    @property
+    def directory(self):
+        return self.server.directory
+
+    @property
+    def file_event_handler(self):
+        return self.server.file_event_handler
+
     def run(self):
         while (not self.shutdown):
             try: 
                 # Wait for a packet
                 with self.sock.read_packet():
-                    self.file_processor.pre(self)
+                    self.server.prepare_packets(self)
                 
                 while self.sock.read().read_bool(): # Handle the rest of the packets
                     with self.sock.read_packet():
                         pass
-
-                self.file_processor.process(self)
 
                 self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
                 while not len(self.packet_queue) == 0:
                     self.sock.send_packet(self.packet_queue.pop())
                     self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
-                self.file_processor.post(self)
             except ConnectionResetError as e:
                 print(e)
                 break

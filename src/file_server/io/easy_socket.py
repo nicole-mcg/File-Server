@@ -10,15 +10,12 @@ from file_server.util import get_file_size
 
 import os
 
-
-
 class EasySocket:
     KILOBYTE = 1024
     PORT = 1234
 
-    def __init__(self, hub, file_processor, sock, session=None):
+    def __init__(self, hub, sock, session=None):
         self.hub = hub
-        self.file_processor = file_processor
         self.session = session
         self.needs_auth = self.session is None
 
@@ -39,7 +36,7 @@ class EasySocket:
     def send_packet(self, packet=None):
 
         if packet is None:
-            packet = IdlePacket(self.file_processor)
+            packet = IdlePacket()
 
         if not hasattr(packet.__class__, "name"):
             import pdb; pdb.set_trace();
@@ -68,7 +65,7 @@ class EasySocket:
             return
 
         #packet sock is not set at the time of writing this
-        packet.handle_outgoing(self, self.hub)
+        packet.handle_outgoing(self.hub, self)
 
         # Handle response
         buff = ByteBuffer(self.sock.recv(4))
@@ -102,7 +99,7 @@ class EasySocket:
         self.sock.send(auth_response.bytes())
 
         # Generate response
-        response = handle_incoming_packet(id, self, length, self.file_processor, self.hub)
+        response = handle_incoming_packet(id, self.hub, self, length)
 
         # Send response if exists
         buff = ByteBuffer()
@@ -116,9 +113,9 @@ class EasySocket:
     def send_file(self, file_name):
         sock = self.sock
         hub = self.hub
-        directory = self.file_processor.directory
+        directory = self.hub.directory
 
-        file_size = get_file_size(self.file_processor.directory + file_name)
+        file_size = get_file_size(self.hub.directory + file_name)
 
         sock.send(ByteBuffer.from_int(file_size).bytes())
         sock.send(ByteBuffer.from_string(file_name).bytes())
@@ -146,8 +143,8 @@ class EasySocket:
     def save_file(self, packet_length):
         sock = self.sock
         hub = self.hub
-        directory = self.file_processor.directory
-        event_handler = self.file_processor.event_handler
+        directory = hub.directory
+        file_event_handler = hub.file_event_handler
 
         file_size = ByteBuffer(sock.recv(4)).read_int()
         packet_length -= 4
@@ -166,13 +163,13 @@ class EasySocket:
         }
 
         if not os.path.isfile(file_path):
-            event_handler.add_ignore(("change", file_name))
+            file_event_handler.add_ignore(("change", file_name))
                 
         file = open(file_path,'wb')
 
         hub.transfer_progress = 0
         while(packet_length > 0):
-            event_handler.add_ignore(("change", file_name))
+            file_event_handler.add_ignore(("change", file_name))
             chunk_size = EasySocket.KILOBYTE if packet_length > EasySocket.KILOBYTE else packet_length
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
             file.flush()
@@ -183,5 +180,5 @@ class EasySocket:
         hub.files_recieved += 1
         hub.transferring = None
 
-        event_handler.add_ignore(("change", file_name))
+        file_event_handler.add_ignore(("change", file_name))
         file.close()

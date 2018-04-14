@@ -1,15 +1,13 @@
 import os, sys, socket, time
 from threading import Thread
-from file_server.file.file_processor import FileProcessor
 
 def start_hub():
 
     # Check if this is supposed to be a server or client based on number of args entered
     isServer = len(sys.argv) <= 2
 
-    # Get directory to sync and create a file_processor instance
+    # Get directory to sync
     directory = sys.argv[1]
-    file_processor = FileProcessor(directory)
 
     # Create the hub
     if isServer:
@@ -19,7 +17,7 @@ def start_hub():
 
         # Use FileServer class for hub
         try: 
-            hub = FileServer(directory, file_processor)
+            hub = FileServer(directory)
         except OSError:
             print("File server could not be started")
             return
@@ -39,16 +37,16 @@ def start_hub():
 
         # Use Client class for hub
         try:
-            hub = Client(directory, file_processor, sys.argv[2], sys.argv[3], sys.argv[4])
+            hub = Client(directory, sys.argv[2], sys.argv[3], sys.argv[4])
         except LookupError: # Couldn't authenticate 
             print("Invalid username or password")
             return
 
-    file_processor.initialize(hub)
+    hub.initialize()
 
     hub.start()
 
-    file_processor.shutdown()
+    hub.kill()
 
 if __name__ == "__main__":
 

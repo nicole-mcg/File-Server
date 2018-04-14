@@ -2,7 +2,6 @@ import pytest
 
 import shutil, requests, json, time, inspect
 
-from file_server.file.file_processor import FileProcessor
 from file_server.io.server import FileServer
 from file_server.web.webserver import create_webserver
 from file_server.web.account import Account
@@ -15,7 +14,6 @@ import webbrowser
 
 import os, sys, socket, time
 from threading import Thread
-from file_server.file.file_processor import FileProcessor
 from file_server.io.easy_socket import EasySocket
 
 # Starts a server on different ports using test directories
@@ -45,12 +43,10 @@ def start_test_server(auto_shutdown=5):
     # Mark the directory for storing account info
     Account.directory = bin_path + "/"
 
-    # Create test server
-    file_processor = FileProcessor(serv_dir)
 
     server = None
     try:
-        server = FileServer(file_processor, 8088)
+        server = FileServer(serv_dir, 8088)
     except OSError:
         assert False, "Another test server is already running"
         return
@@ -64,13 +60,13 @@ def start_test_server(auto_shutdown=5):
         Thread(target=server.webserver.serve_forever).start()
 
         # Initialize file watch
-        file_processor.initialize(server)
+        server.initialize()
 
         # Start file server
         server.serve()
 
         # Shutdown file watch after server is shut down
-        file_processor.shutdown()
+        server.kill()
 
         return server
 

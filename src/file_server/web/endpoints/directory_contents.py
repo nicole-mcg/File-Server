@@ -11,7 +11,7 @@ class DirectoryContentsEndpoint(Endpoint):
 
         response = {"error": "Could not load path"}
         try:
-            response = json.loads(server.file_processor.snapshot.to_json(data["path"], False))
+            response = json.loads(server.directory_snapshot.to_json(data["path"], False))
         except KeyError as e:
             print("KeyError: " + str(e))
 

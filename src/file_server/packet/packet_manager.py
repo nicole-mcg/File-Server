@@ -6,7 +6,7 @@ packet_handlers = {}
 def register_packet(cls):
     packet_handlers[cls.id] = cls
 
-def handle_incoming_packet(id, sock, length, processor, conn=None):
+def handle_incoming_packet(id, hub, sock, length):
     try:
         cls = packet_handlers[id]
     except:
@@ -15,7 +15,7 @@ def handle_incoming_packet(id, sock, length, processor, conn=None):
         return None
 
     if (cls is not None):
-        handler = cls(processor, sock, length, conn)
+        handler = cls(hub, sock, length)
         if id is not 0:
             print("Handling packet: " + cls.name)
         return handler.handle_incoming()
