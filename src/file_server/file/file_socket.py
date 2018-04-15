@@ -78,8 +78,7 @@ class FileSocket:
         self.write(buff)
 
         # Get the authentication response
-        auth_response = ByteBuffer(self.sock.recv(1))
-        authenticated = auth_response.read_bool()
+        authenticated = ByteBuffer(self.sock.recv(1)).read_bool()
 
         # Return if we aren't authenticated
         if not authenticated:
@@ -91,7 +90,6 @@ class FileSocket:
 
         # Get response
         has_response = self.read().read_bool()
-
         if has_response:
             response = self.read()
         else:
@@ -130,9 +128,7 @@ class FileSocket:
             authenticated = True
 
         # Send auth response
-        auth_response = ByteBuffer()
-        auth_response.write_bool(authenticated)
-        self.sock.send(auth_response.bytes())
+        self.sock.send(ByteBuffer.from_bool(authenticated).bytes())
 
         # Return if authentication was incorrect
         if not authenticated:
@@ -142,8 +138,8 @@ class FileSocket:
         response = handle_incoming_packet(id, self.hub, self, length)
         has_response = response != None
 
+        # Write response
         self.write(ByteBuffer.from_bool(has_response))
-
         if has_response:
             self.write(response)
 
