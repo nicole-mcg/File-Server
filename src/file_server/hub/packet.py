@@ -22,10 +22,6 @@ class Packet:
         for key in kwargs.keys():
             setattr(self, key, kwargs[key])
 
-    # Populates the payload for an outgoing packet
-    def create_payload(self):
-        return None
-
     # Handles an outgoing packet
     def handle_outgoing(self, hub, file_sock):
         pass
@@ -39,8 +35,4 @@ class Packet:
     # This should be used to handle responses of outgoing paackets
     def handle_response(self, payload):
         pass
-
-    # Returns the payload
-    def get_payload(self):
-        return self._payload
         
