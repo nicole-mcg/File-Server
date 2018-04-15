@@ -106,6 +106,11 @@ def is_valid_signup_auth(auth_code, invalidate_auth=False):
 
 # Loads an account from current server sessions
 def load_account_from_session(session):
+
+    # The session doesn't exist
+    if not session in sessions:
+        return None
+
     return sessions[session]
 
 # Loads an account from the current account manager directory
