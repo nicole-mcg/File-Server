@@ -113,9 +113,13 @@ def start_test_server(auto_shutdown=5):
 def send_test_api_request(endpoint, data={}, session=""):
 
     # Send the request
-    r = requests.post("http://127.0.0.1:8081/api/{}".format(endpoint), data=json.dumps(data), cookies={"session": session})
+    try:
+        r = requests.post("http://127.0.0.1:8081/api/{}".format(endpoint), data=json.dumps(data), cookies={"session": session})
+    except requests.exceptions.ConnectionError:
+        # Couldn't connect
+        return None
 
-    # Check if the request was successfuly
+    # Check if the request was successful
     if r.status_code == 200:
         return r.text
 
