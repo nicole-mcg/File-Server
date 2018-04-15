@@ -54,7 +54,7 @@ class FileClient(FileHub):
 
         # type: FileSocket
         # The socket used to talk to the server
-        self.sock = None
+        self.file_sock = None
 
         # Unused but collected because of client/server code mix...
         self.data_recieved = 0
@@ -73,7 +73,7 @@ class FileClient(FileHub):
         self.connected = False
 
         # Close the connection
-        self.sock.sock.close()
+        self.file_sock.sock.close()
 
     # Get a valid session ID from the webserver
     def validate(self):
@@ -124,17 +124,17 @@ class FileClient(FileHub):
                 time.sleep(0.5)
 
             # Create a FileSocket instance
-            self.sock = FileSocket(self, None, self.account.session)
+            self.file_sock = FileSocket(self, None, self.account.session)
 
             # Try to connect with the socket
-            self.sock.sock.connect((self.host, FileSocket.PORT))
+            self.file_sock.sock.connect((self.host, FileSocket.PORT))
 
             # Send the session key
-            self.sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
-            self.sock.sock.send(ByteBuffer.from_string(self.account.session).bytes())
+            self.file_sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
+            self.file_sock.sock.send(ByteBuffer.from_string(self.account.session).bytes())
 
             # Check the validation response
-            authenticated = ByteBuffer(self.sock.sock.recv(1)).read_bool()
+            authenticated = ByteBuffer(self.file_sock.sock.recv(1)).read_bool()
 
             # Server didn't think our session was valid
             if not authenticated:
@@ -187,15 +187,15 @@ class FileClient(FileHub):
             
                 # Send all packets in queue
                 while not len(self.packet_queue) == 0:
-                    self.sock.send_packet(self.packet_queue.pop())
-                    self.sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
+                    self.file_sock.send_packet(self.packet_queue.pop())
+                    self.file_sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 # Server will only respond if we actually sent something
                 if has_packet:
 
                     # Read all packets from the server
-                    while (self.sock.read().read_bool()):
-                        with self.sock.read_packet(): pass
+                    while (self.file_sock.read().read_bool()):
+                        with self.file_sock.read_packet(): pass
 
                     # Set the last time we spoke to the server to the current time
                     last_ping = time.time()
@@ -214,7 +214,7 @@ class FileClient(FileHub):
     def start(self):
 
         # Try to connect until it works
-        while self.sock == None:
+        while self.file_sock == None:
             self.connect()
             time.sleep(0.1)
 

@@ -4,8 +4,8 @@ class Packet:
     name = "Packet"
     packet_handlers = {}
 
-    def __init__(self, hub=None, easy_sock=None, length=0):
-        self.easy_sock = easy_sock
+    def __init__(self, hub=None, file_sock=None, length=0):
+        self.file_sock = file_sock
         self.length = length
         self.hub = hub
 
@@ -17,7 +17,7 @@ class Packet:
         return None
 
     # Handles an outgoing packet
-    def handle_outgoing(self, hub, easy_sock):
+    def handle_outgoing(self, hub, file_sock):
         pass
 
     # Handles an incoming packet

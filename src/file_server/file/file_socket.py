@@ -105,8 +105,8 @@ class FileSocket:
         # Read packet info into byte buffer
         buff = self.read()
 
-        # read_packet will wait at "self.sock.recv" above until data is available to be read
-        # this yield allows functions to be performed before incoming packets are handled
+        # this function will wait at "self.sock.recv" above until data is available to be read
+        # this yield allows caller to perform actions before incoming packets are handled
         yield
 
         # Read ID and size
@@ -151,7 +151,6 @@ class FileSocket:
         directory = self.hub.directory
 
         file_size = get_file_size(self.hub.directory + file_name)
-
 
         sock.send(ByteBuffer.from_int(file_size).bytes())
         sock.send(ByteBuffer.from_string(file_name).bytes())

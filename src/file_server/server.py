@@ -125,7 +125,7 @@ class ServerConnection(Thread):
         self.server = server
 
         # Create a FileSocket from the connection socket
-        self.sock = FileSocket(self, socket)
+        self.file_sock = FileSocket(self, socket)
 
         # The queue for packets ready to be sent
         self.packet_queue = deque()
@@ -158,29 +158,29 @@ class ServerConnection(Thread):
             try: 
 
                 # Wait for a packet
-                with self.sock.read_packet():
+                with self.file_sock.read_packet():
 
                     # Process packets in the buffer queue
                     self.server.prepare_packets(self)
                 
                 # Read all available packets from client
-                while self.sock.read().read_bool(): # Handle the rest of the packets
+                while self.file_sock.read().read_bool(): # Handle the rest of the packets
 
                     # Read and handle packet
-                    with self.sock.read_packet():
+                    with self.file_sock.read_packet():
                         pass
 
                 # Let client know if we've got packets to send
-                self.sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
+                self.file_sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 # Send all queued packets
                 while not len(self.packet_queue) == 0:
 
                     # Send the next packet
-                    self.sock.send_packet(self.packet_queue.pop())
+                    self.file_sock.send_packet(self.packet_queue.pop())
 
                     # Let the client know if we've got another one coming
-                    self.sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
+                    self.file_sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
             except ConnectionResetError as e:
                 print(e)
