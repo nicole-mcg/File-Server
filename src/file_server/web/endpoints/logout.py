@@ -2,7 +2,7 @@ from .base import Endpoint
 
 import json
 
-from ..account import Account
+from file_server.account.account_manager import end_session
 
 class LogoutEndpoint(Endpoint):
 
@@ -11,6 +11,6 @@ class LogoutEndpoint(Endpoint):
 
     def handle_request(self, request_handler, server, account, data):
 
-        Account.end_session(account.session)
+        end_session(account.session)
 
         return {"redirect": "/login"}

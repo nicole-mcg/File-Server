@@ -3,8 +3,8 @@ from collections import deque
 from threading import Thread
 
 from file_server.util.byte_buffer import ByteBuffer
-from file_server.file.file_socket import FileSocket 
-from file_server.account.account import Account
+from file_server.file.file_socket import FileSocket
+from file_server.account.account_manager import load_account_from_session
 from file_server.hub.file_hub import FileHub
 
 # This class represents a multithreaded file server
@@ -80,7 +80,7 @@ class FileServer(FileHub):
 
             # Try to load an account from the session
             try:
-                account = Account.sessions[session]
+                account = load_account_from_session(session)
             except KeyError:
                 print("Count not load account")
                 file_sock.write(ByteBuffer.from_bool(False))

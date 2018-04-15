@@ -2,7 +2,7 @@ from .base import Endpoint
 
 import json, os
 
-from ..account import Account
+from file_server.account.account_manager import is_valid_signup_auth, create_account
 
 class SignupEndpoint(Endpoint):
 
@@ -10,6 +10,7 @@ class SignupEndpoint(Endpoint):
         self.needs_auth = False
 
     def handle_request(self, request_handler, server, account, data):
+        print("signup endpoint")
         if data["name"] == "" or data["password"] == "":
             return {"error": "Invalid username or password"}
 
@@ -20,11 +21,11 @@ class SignupEndpoint(Endpoint):
         if "auth_code" in data:
             auth = data["auth_code"]
 
-        if Account.is_valid_auth(auth):
-            account = Account.create_account(name, password, auth)
+        if is_valid_signup_auth(auth):
+            account = create_account(name, password, auth)
             if (account is None):
                 return {"error": "Account already exists"}
             else:
                 return {"session": account.session}
 
-        return {"needs_auth": True}
+        return {"error": "needs auth"}

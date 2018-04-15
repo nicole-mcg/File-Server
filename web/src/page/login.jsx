@@ -98,24 +98,25 @@ export default class LoginPage extends React.Component {
             .then(
                 (result) => {
     
-                    if (result.needs_auth) {
+                    if (result.error != null) {
     
-                        auth = prompt("Please enter an authorization code:");
-                        if (auth != null) {
-                            this.signup(u, e, auth);
+                        if (result.error == "needs auth") {
+                            auth = prompt("Please enter an authorization code:");
+                            if (auth != null) {
+                                this.signup(u, e, auth);
+                            }
+                        } else {
+                            this.setState({
+                                error: result.error,
+                                isLoaded: true,
+                            })
                         }
-    
-    
+                        
                     } else if (result.session != null) {
                         const cookies = new Cookies();
                         cookies.set("session", result.session);
     
                         window.location.href = "/"
-                    } else {
-                        this.setState({
-                            error: result.error,
-                            isLoaded: true,
-                        })
                     }
                 },
                 (error) => {

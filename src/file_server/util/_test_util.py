@@ -4,7 +4,7 @@ import shutil, requests, json, time, inspect
 
 from file_server.server import FileServer
 from file_server.web.webserver import create_webserver
-from file_server.account.account import Account
+from file_server.account.account_manager import set_account_manager_directory
 
 from file_server.util import delete_file
 
@@ -43,7 +43,7 @@ def start_test_server(auto_shutdown=5):
     os.makedirs(serv_dir, exist_ok=True)
 
     # Mark the directory for storing account info
-    Account.directory = bin_path + "/"
+    set_account_manager_directory(bin_path + "/")
 
 
     server = None

@@ -2,7 +2,7 @@ from .base import Endpoint
 
 import json
 
-from ..account import Account
+from file_server.account.account_manager import load_account
 
 class LoginEndpoint(Endpoint):
 
@@ -13,7 +13,7 @@ class LoginEndpoint(Endpoint):
         name = data["name"]
         password = data["password"]
 
-        account = Account.load_account(name, password)
+        account = load_account(name, password)
 
         if (account is None):
             response = {"error": "Invalid username or password"}

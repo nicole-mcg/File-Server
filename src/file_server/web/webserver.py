@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
 
 
-from file_server.account.account import Account
+from file_server.account.account_manager import load_account_from_session
 
 
 from .endpoints.active_clients import ActiveClientsEndpoint
@@ -50,7 +50,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             if "session" in cookie and cookie["session"] != "":
                 try:
-                    account = Account.sessions[cookie.get("session")]
+                    account = load_account_from_session(cookie.get("session"))
                 except KeyError:
                     pass
         return account
@@ -97,7 +97,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     if hasattr(contents, "keys"):
                         if "session" in contents.keys():
                             try:
-                                account = Account.sessions[contents["session"]]
+                                account = load_account_from_session(contents["session"])
                                 expires = False
                             except KeyError:
                                 print("Expected session to exist: " + contents["session"])

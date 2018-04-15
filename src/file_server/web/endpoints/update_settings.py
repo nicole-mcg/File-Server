@@ -2,7 +2,7 @@ from .base import Endpoint
 
 import json
 
-from ..account import Account
+from file_server.account.account_manager import update_settings
 
 class UpdateSettingsEndpoint(Endpoint):
 
@@ -11,6 +11,6 @@ class UpdateSettingsEndpoint(Endpoint):
 
     def handle_request(self, request_handler, server, account, data):
 
-        account.update_settings(data)
+        update_settings(account, data)
 
         return {}
