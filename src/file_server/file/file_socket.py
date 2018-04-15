@@ -67,7 +67,6 @@ class FileSocket:
         buff.write(packet.__class__.id)
         buff.write_int(packet.size())
 
-
         # Check if we have a session to send (client)
         session = ""
         if self.session is not None:
@@ -91,11 +90,15 @@ class FileSocket:
         packet.handle_outgoing(self.hub, self)
 
         # Get response
-        buff = ByteBuffer(self.sock.recv(4))
-        length = buff.read_int()
+        has_response = self.read().read_bool()
+
+        if has_response:
+            response = self.read()
+        else:
+            response = None
 
         # Use packet handler for response
-        packet.handle_response(ByteBuffer(self.sock.recv(length)))
+        packet.handle_response(response)
 
     # Reads and handles a packet from the connection
     @contextlib.contextmanager
@@ -126,8 +129,6 @@ class FileSocket:
             # Session is valid
             authenticated = True
 
-            
-
         # Send auth response
         auth_response = ByteBuffer()
         auth_response.write_bool(authenticated)
@@ -139,15 +140,12 @@ class FileSocket:
 
         # Generate response using packet handler
         response = handle_incoming_packet(id, self.hub, self, length)
+        has_response = response != None
 
-        # Send response if it exists
-        buff = ByteBuffer()
-        if (response != None):
-            buff.write_int(len(response))
-            buff.write(response.bytes())
-        else:
-            buff.write_int(0)
-        self.sock.send(buff.bytes())
+        self.write(ByteBuffer.from_bool(has_response))
+
+        if has_response:
+            self.write(response)
 
     # Sends a file on the connection
     # Updates the hub with transfer progress
