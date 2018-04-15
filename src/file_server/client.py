@@ -123,10 +123,8 @@ class FileClient(FileHub):
             while (time.time() - self.last_attempt <= timeout):
                 time.sleep(0.5)
 
-            # Create a FileSocket instance
+            # Create socket and connect to server
             self.file_sock = FileSocket(None, self, self.account.session)
-
-            # Try to connect with the socket
             self.file_sock.sock.connect((self.host, FileSocket.PORT))
 
             # Send the session key
