@@ -33,7 +33,7 @@ class FileSocket:
     # Converts a ByteBuffer to bytes and sends it on the connection
     # Handles length of data automatically
     # byte_buffer: the ByteBuffer to send
-    def send(self, byte_buffer):
+    def write(self, byte_buffer):
 
         # Send length of data
         self.sock.send(ByteBuffer.from_int(len(byte_buffer)).bytes())
@@ -60,26 +60,23 @@ class FileSocket:
             packet = IdlePacket()
 
         print("Sending packet: {}".format(packet.__class__.name))
+
         buff = ByteBuffer()
 
         # Write packet ID and size
         buff.write(packet.__class__.id)
         buff.write_int(packet.size())
 
+
         # Check if we have a session to send (client)
+        session = ""
         if self.session is not None:
+            session = self.session
 
-            # Send session string
-            buff.write_int(len(self.session) + 1)
-            buff.write_string(self.session)
-
-        else:
-
-            # Send 0 for length of session string
-            buff.write_int(0)
+        buff.write_string(session)
 
         # Send the buffer on the connection
-        self.sock.send(buff.bytes())
+        self.write(buff)
 
         # Get the authentication response
         auth_response = ByteBuffer(self.sock.recv(1))
@@ -104,9 +101,8 @@ class FileSocket:
     @contextlib.contextmanager
     def read_packet(self):
 
-        # Read 5 bytes from stream (id and length)
-        b = self.sock.recv(5)
-        buff = ByteBuffer(b)
+        # Read packet info into byte buffer
+        buff = self.read()
 
         # read_packet will wait at "self.sock.recv" above until data is available to be read
         # this yield allows functions to be performed before incoming packets are handled
@@ -116,22 +112,21 @@ class FileSocket:
         id = buff.read()
         length = buff.read_int()
 
-        # Get session length
-        buff = ByteBuffer(self.sock.recv(4))
-        session_length = buff.read_int()
+        session = buff.read_string()
 
         # Create response to authentication
         authenticated = False
-        if (session_length > 0):
+        if session == "":
 
-            # Check if provided session is valid and respond accordingly
-            session = ByteBuffer(self.sock.recv(session_length)).read_string()
-            if Account.is_valid_session(session):
-                authenticated = True
-        else:
-
-            # No session provided, 
+            # No session provided
             authenticated = not self.needs_auth
+
+        elif Account.is_valid_session(session):
+
+            # Session is valid
+            authenticated = True
+
+            
 
         # Send auth response
         auth_response = ByteBuffer()
@@ -145,7 +140,7 @@ class FileSocket:
         # Generate response using packet handler
         response = handle_incoming_packet(id, self.hub, self, length)
 
-        # Send response if exists
+        # Send response if it exists
         buff = ByteBuffer()
         if (response != None):
             buff.write_int(len(response))
@@ -154,12 +149,15 @@ class FileSocket:
             buff.write_int(0)
         self.sock.send(buff.bytes())
 
+    # Sends a file on the connection
+    # Updates the hub with transfer progress
     def send_file(self, file_name):
         sock = self.sock
         hub = self.hub
         directory = self.hub.directory
 
         file_size = get_file_size(self.hub.directory + file_name)
+
 
         sock.send(ByteBuffer.from_int(file_size).bytes())
         sock.send(ByteBuffer.from_string(file_name).bytes())

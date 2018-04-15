@@ -188,7 +188,7 @@ class FileClient(FileHub):
                 # Send all packets in queue
                 while not len(self.packet_queue) == 0:
                     self.sock.send_packet(self.packet_queue.pop())
-                    self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
+                    self.sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 # Server will only respond if we actually sent something
                 if has_packet:

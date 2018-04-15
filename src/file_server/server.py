@@ -171,7 +171,7 @@ class ServerConnection(Thread):
                         pass
 
                 # Let client know if we've got packets to send
-                self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
+                self.sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
                 # Send all queued packets
                 while not len(self.packet_queue) == 0:
@@ -180,7 +180,7 @@ class ServerConnection(Thread):
                     self.sock.send_packet(self.packet_queue.pop())
 
                     # Let the client know if we've got another one coming
-                    self.sock.send(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
+                    self.sock.write(ByteBuffer.from_bool(not len(self.packet_queue) == 0))
 
             except ConnectionResetError as e:
                 print(e)
