@@ -6,95 +6,143 @@ from file_server.file.packet.impl.idle import IdlePacket
 from file_server.web.account import Account
 from file_server.util import get_file_size
 
+# This class is used to handle common protocols on the server
 class FileSocket:
+    
+    # The size of one kilobyte (in bytes). This is used to make intent more clear
     KILOBYTE = 1024
+
+    # The default port for FileServer and FileClient
     PORT = 1234
 
+    # hub: the FileServer or FileClient this socket is associated with
+    # sock: the raw socket for the connection
     def __init__(self, hub, sock, session=None):
         self.hub = hub
         self.session = session
+
+        # Marks whether sessions need to be authenticated for packets (this is for servers)
         self.needs_auth = self.session is None
 
+        # Create a socket if none is given
         if sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         else:
             self.sock = sock
 
+    # Converts a ByteBuffer to bytes and sends it on the connection
+    # Handles length of data automatically
+    # byte_buffer: the ByteBuffer to send
     def send(self, byte_buffer):
+
+        # Send length of data
         self.sock.send(ByteBuffer.from_int(len(byte_buffer)).bytes())
+
+        # Send data
         self.sock.send(byte_buffer.bytes())
 
+    # Reads a ByteBuffer from the stream
+    # Handles length of data automatically
     def read(self):
-        b = self.sock.recv(4)
-        length = ByteBuffer(b).read_int()
+
+        # Get length of data
+        length = ByteBuffer(self.sock.recv(4)).read_int()
+
+        # Read data
         return ByteBuffer(self.sock.recv(length))
 
+    # Sends a packet on the connection
+    # packet: The packet to send. IdlePacket is used if no packet is specified
     def send_packet(self, packet=None):
 
+        # Use IdlePacket if packet was specified
         if packet is None:
             packet = IdlePacket()
-
-        if not hasattr(packet.__class__, "name"):
-            import pdb; pdb.set_trace();
 
         print("Sending packet: {}".format(packet.__class__.name))
         buff = ByteBuffer()
 
-        # Send ID and size
+        # Write packet ID and size
         buff.write(packet.__class__.id)
         buff.write_int(packet.size())
 
+        # Check if we have a session to send (client)
         if self.session is not None:
+
+            # Send session string
             buff.write_int(len(self.session) + 1)
             buff.write_string(self.session)
+
         else:
+
+            # Send 0 for length of session string
             buff.write_int(0)
 
+        # Send the buffer on the connection
         self.sock.send(buff.bytes())
 
-        
+        # Get the authentication response
         auth_response = ByteBuffer(self.sock.recv(1))
+        authenticated = auth_response.read_bool()
 
-        b = auth_response.read()
-        if b == 0:
-            print("invalid client authentification")
+        # Return if we aren't authenticated
+        if not authenticated:
+            print("Invalid server session")
             return
 
-        #packet sock is not set at the time of writing this
+        # Use to packet handler to send the packet
         packet.handle_outgoing(self.hub, self)
 
-        # Handle response
+        # Get response
         buff = ByteBuffer(self.sock.recv(4))
         length = buff.read_int()
+
+        # Use packet handler for response
         packet.handle_response(ByteBuffer(self.sock.recv(length)))
 
+    # Reads and handles a packet from the connection
     @contextlib.contextmanager
     def read_packet(self):
+
+        # Read 5 bytes from stream (id and length)
         b = self.sock.recv(5)
         buff = ByteBuffer(b)
 
+        # read_packet will wait at "self.sock.recv" above until data is available to be read
+        # this yield allows functions to be performed before incoming packets are handled
         yield
 
         # Read ID and size
         id = buff.read()
         length = buff.read_int()
 
+        # Get session length
         buff = ByteBuffer(self.sock.recv(4))
-        auth_length = buff.read_int()
+        session_length = buff.read_int()
 
-        auth_response = ByteBuffer()
-        if (auth_length > 0):
-            auth = ByteBuffer(self.sock.recv(auth_length)).read_string()
-            if not Account.is_valid_session(auth):
-                auth_response.write(0)
-            else:
-                auth_response.write(1)
+        # Create response to authentication
+        authenticated = False
+        if (session_length > 0):
+
+            # Check if provided session is valid and respond accordingly
+            session = ByteBuffer(self.sock.recv(session_length)).read_string()
+            if Account.is_valid_session(session):
+                authenticated = True
         else:
-            auth_response.write(1 if not self.needs_auth else 0)
 
+            # No session provided, 
+            authenticated = not self.needs_auth
+
+        # Send auth response
+        auth_response = ByteBuffer()
+        auth_response.write_bool(authenticated)
         self.sock.send(auth_response.bytes())
 
-        # Generate response
+        # Return if authentication was incorrect
+        if not authenticated:
+            return
+
+        # Generate response using packet handler
         response = handle_incoming_packet(id, self.hub, self, length)
 
         # Send response if exists
