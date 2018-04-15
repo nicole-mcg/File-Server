@@ -76,7 +76,7 @@ class FileServer(FileHub):
 
             print("Connection recieved: " + clientsocket.getpeername()[0])
 
-            file_sock = FileSocket(None, clientsocket)
+            file_sock = FileSocket(clientsocket)
 
             # Get the session key from the client
             session = file_sock.read().read_string()

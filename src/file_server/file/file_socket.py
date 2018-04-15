@@ -17,7 +17,7 @@ class FileSocket:
 
     # hub: the FileServer or FileClient this socket is associated with
     # sock: the raw socket for the connection
-    def __init__(self, hub, sock, session=None):
+    def __init__(self, sock, hub=None, session=None):
         self.hub = hub
         self.session = session
 

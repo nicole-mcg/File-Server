@@ -124,7 +124,7 @@ class FileClient(FileHub):
                 time.sleep(0.5)
 
             # Create a FileSocket instance
-            self.file_sock = FileSocket(self, None, self.account.session)
+            self.file_sock = FileSocket(None, self, self.account.session)
 
             # Try to connect with the socket
             self.file_sock.sock.connect((self.host, FileSocket.PORT))
