@@ -84,18 +84,8 @@ class FileSocket:
             print("Invalid server session")
             return
 
-        # Use to packet handler to send the packet
+        # Send packet using packet handler
         packet.handle_outgoing(self.hub, self)
-
-        # Get response
-        has_response = self.read().read_bool()
-        if has_response:
-            response = self.read()
-        else:
-            response = None
-
-        # Use packet handler for response
-        packet.handle_response(response)
 
     # Reads and handles a packet from the connection
     @contextlib.contextmanager
@@ -132,14 +122,8 @@ class FileSocket:
         if not authenticated:
             return
 
-        # Generate response using packet handler
-        response = handle_incoming_packet(id, self.hub)
-        has_response = response != None
-
-        # Write response
-        self.write(ByteBuffer.from_bool(has_response))
-        if has_response:
-            self.write(response)
+        # Handle packet using packet handler
+        handle_incoming_packet(id, self.hub)
 
     # Sends a file on the connection
     # Updates the hub with transfer progress

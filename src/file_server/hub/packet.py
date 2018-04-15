@@ -3,10 +3,6 @@ from file_server.util.byte_buffer import ByteBuffer
 # This class is used to handle packet protocol
 class Packet:
 
-    # List of registered packets
-    # Used for incoming packets
-    packet_handlers = {}
-
     # Name and id should be set in child classes
     name = "Packet"
     id = -1
@@ -27,12 +23,5 @@ class Packet:
         pass
 
     # Handles an incoming packet
-    # Should return ByteBuffer or None
     def handle_incoming(self):
         pass
-
-    # Handles an outgoing packet
-    # This should be used to handle responses of outgoing paackets
-    def handle_response(self, payload):
-        pass
-        
