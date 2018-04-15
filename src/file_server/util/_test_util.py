@@ -1,29 +1,17 @@
-import pytest
-
-import shutil, requests, json, time, inspect
+import requests, json, time, inspect
+from threading import Thread
 
 from file_server.server import FileServer
+from file_server.file.file_socket import FileSocket
+from file_server.hub.packet_manager import initialize_packet_manager
 from file_server.web.webserver import create_webserver
 from file_server.account.account_manager import set_account_manager_directory
-
 from file_server.util import delete_file
-
-
-#FIXME remove this
-import webbrowser
-
-import os, sys, socket, time
-from threading import Thread
-from file_server.file.file_socket import FileSocket
-
-from file_server.hub.packet_manager import initialize_packet_manager
 
 # Starts a server on different ports using test directories
 # auto_shutdown: the time (in seconds) before the server is automatically shut down
 #                this might need to be changed for longer tests
 def start_test_server(auto_shutdown=5):
-
-    # webbrowser.open("http://test server started.com", new=2)
 
     # Get info for test being run
     test_path = os.path.split(inspect.stack()[1][1])
