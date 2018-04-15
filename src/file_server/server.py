@@ -76,26 +76,27 @@ class FileServer(FileHub):
 
             print("Connection recieved: " + clientsocket.getpeername()[0])
 
+            file_sock = FileSocket(None, clientsocket)
+
             # Get the session key from the client
-            session_length = ByteBuffer(clientsocket.recv(4)).read_int()
-            session = ByteBuffer(clientsocket.recv(session_length)).read_string()
+            session = file_sock.read().read_string()
 
             # Try to load an account from the session
             try:
                 account = Account.sessions[session]
             except KeyError:
                 print("Count not load account")
-                clientsocket.send(ByteBuffer().from_bool(False).bytes())
+                file_sock.write(ByteBuffer.from_bool(False))
                 continue
 
             # Send session confirmation
-            clientsocket.send(ByteBuffer().from_bool(True).bytes())
+            file_sock.write(ByteBuffer.from_bool(True))
 
             # Create a connection object
             connection = ServerConnection(
                 account,
                 clientsocket.getpeername()[0],
-                clientsocket,
+                file_sock,
                 self
             )
 
@@ -118,14 +119,14 @@ class ServerConnection(Thread):
     # address: the address for the connection 
     # socket: the socket for the connection
     # server: the server this connection is associated with
-    def __init__(self, account, address, socket, server):
+    def __init__(self, account, address, file_sock, server):
         Thread.__init__(self)
         self.account = account
         self.address = address
+        self.file_sock = file_sock
         self.server = server
 
-        # Create a FileSocket from the connection socket
-        self.file_sock = FileSocket(self, socket)
+        file_sock.hub = self
 
         # The queue for packets ready to be sent
         self.packet_queue = deque()

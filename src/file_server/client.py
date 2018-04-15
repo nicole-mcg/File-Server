@@ -130,11 +130,10 @@ class FileClient(FileHub):
             self.file_sock.sock.connect((self.host, FileSocket.PORT))
 
             # Send the session key
-            self.file_sock.sock.send(ByteBuffer.from_int(len(self.account.session) + 1).bytes())
-            self.file_sock.sock.send(ByteBuffer.from_string(self.account.session).bytes())
+            self.file_sock.write(ByteBuffer.from_string(self.account.session))
 
             # Check the validation response
-            authenticated = ByteBuffer(self.file_sock.sock.recv(1)).read_bool()
+            authenticated = self.file_sock.read().read_bool()
 
             # Server didn't think our session was valid
             if not authenticated:
