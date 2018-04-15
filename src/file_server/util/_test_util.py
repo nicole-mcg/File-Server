@@ -4,7 +4,7 @@ import shutil, requests, json, time, inspect
 
 from file_server.server import FileServer
 from file_server.web.webserver import create_webserver
-from file_server.web.account import Account
+from file_server.account.account import Account
 
 from file_server.util import delete_file
 

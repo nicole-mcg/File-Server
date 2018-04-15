@@ -5,7 +5,7 @@ from file_server.util.byte_buffer import ByteBuffer
 from file_server.file.file_socket import FileSocket
 from file_server.hub.packets.idle import IdlePacket
 from file_server.util import send_post_request
-from file_server.web.account import Account
+from file_server.account.account import Account
 
 from .hub.file_hub import FileHub
 

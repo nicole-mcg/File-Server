@@ -4,7 +4,7 @@ from threading import Thread
 
 from file_server.util.byte_buffer import ByteBuffer
 from file_server.file.file_socket import FileSocket 
-from file_server.web.account import Account
+from file_server.account.account import Account
 from file_server.hub.file_hub import FileHub
 
 # This class represents a multithreaded file server

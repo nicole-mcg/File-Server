@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.cookies import SimpleCookie
 
 
-from file_server.web.account import Account
+from file_server.account.account import Account
 
 
 from .endpoints.active_clients import ActiveClientsEndpoint
