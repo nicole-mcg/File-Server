@@ -31,7 +31,7 @@ class FileClient(FileHub):
         self.password = password
 
         # Initialize parent class
-        super(self.__class__, self).__init__(directory, FileSocket.PORT)
+        FileHub.__init__(self, directory, FileSocket.PORT)
 
         #FIXME I believe this is incorrect
         # It will cause issues when a server and client are used on different computers (it should work for testing atm..)
@@ -66,7 +66,7 @@ class FileClient(FileHub):
     def kill(self):
 
         # Call kill in parent class
-        super(self.__class__, self).kill()
+        FileHub.kill(self)
 
         # Mark for shutdown when possible
         self.shutdown = True

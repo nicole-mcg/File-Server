@@ -18,7 +18,7 @@ class FileServer(FileHub):
     def __init__(self, directory, port=FileSocket.PORT):
 
         # Initialize parent class
-        super(self.__class__, self).__init__(directory, port)
+        FileHub.__init__(self, directory, port)
 
         # Create a socket to listen for connections
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,7 +37,7 @@ class FileServer(FileHub):
     def kill(self):
 
         # Call kill in parent class
-        super(self.__class__, self).kill()
+        FileHub.kill(self)
 
         # Shut down webserver
         if self.webserver is not None:
@@ -119,7 +119,7 @@ class ServerConnection(Thread):
     # socket: the socket for the connection
     # server: the server this connection is associated with
     def __init__(self, account, address, socket, server):
-        super().__init__()
+        Thread.__init__(self)
         self.account = account
         self.address = address
         self.server = server

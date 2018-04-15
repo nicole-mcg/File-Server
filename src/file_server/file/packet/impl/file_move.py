@@ -6,7 +6,7 @@ class FileMovePacket(Packet):
     name = "FileMovePacket"
     id = 4
     def __init__(self, hub=None, easy_sock=None, length=0, **kwargs):
-        super(self.__class__, self).__init__(hub, easy_sock, length)
+        Packet.__init__(self, hub, easy_sock, length)
 
         if "file_name" in kwargs:
             self.file_name = kwargs["file_name"]
