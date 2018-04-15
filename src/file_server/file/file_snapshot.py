@@ -3,8 +3,16 @@ from enum import Enum
 
 from file_server.util import split_path
 
+# FIXME Functionality in Snapshot class should be move to FileSnapsnot and DirectorySnapshould should become a child of FileSnapshot
+# This is the base class for a file or directory snapshot
 class Snapshot:
+    # Create an enum of the types
     types = Enum("SnapshotType", "DIRECTORY FILE")
+
+class FileSnapshot:
+    
+    TYPE_DIRECTORY = 1
+    TYPE_FILE = 2
 
     def __init__(self, full_path, file_name, root_path):
         self.full_path = full_path
@@ -16,26 +24,15 @@ class Snapshot:
         pass
 
     def get_type(self):
-        return Snapshot.types.FILE
+        return FileSnapshot.TYPE_FILE
 
     def __str__(self):
-        return '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + '}'
+        return '{"type": ' + str(self.get_type()) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + '}'
 
-class FileSnapshot(Snapshot):
-
-    def __init__(self, full_path, file_name, root_path):
-        Snapshot.__init__(self, full_path, file_name, root_path)
-
-    def update(self, file_path=""):
-        Snapshot.update(self)
-
-    def __str__(self):
-        return Snapshot.__str__(self)
-
-class DirectorySnapshot(Snapshot):
+class DirectorySnapshot(FileSnapshot):
 
     def __init__(self, full_path, file_name, root_path):
-        Snapshot.__init__(self, full_path, file_name, root_path)
+        FileSnapshot.__init__(self, full_path, file_name, root_path)
         self.snapshots = {};
         self.add_path(full_path, root_path)
 
@@ -51,7 +48,7 @@ class DirectorySnapshot(Snapshot):
             self.snapshots[file] = cls(file_path, file, root_path)
 
     def update(self, file_path=""):
-        Snapshot.update(self)
+        FileSnapshot.update(self)
 
         parts = split_path(file_path)
 
@@ -59,10 +56,10 @@ class DirectorySnapshot(Snapshot):
             self.snapshots[allparts[0]].update(file_path)
 
     def get_type(self):
-        return Snapshot.types.DIRECTORY
+        return FileSnapshot.TYPE_DIRECTORY
 
     def to_json(self, path="./", recursive=True):
-        string = '{"type": ' + str(self.get_type().value) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
+        string = '{"type": ' + str(self.get_type()) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
 
         snapshots = self.snapshots
 
