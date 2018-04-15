@@ -6,11 +6,7 @@ class FileMovePacket(Packet):
     name = "FileMovePacket"
     id = 4
     def __init__(self, hub=None, file_sock=None, length=0, **kwargs):
-        Packet.__init__(self, hub, file_sock, length)
-
-        if "file_name" in kwargs:
-            self.file_name = kwargs["file_name"]
-            self.new_name = kwargs["new_name"]
+        Packet.__init__(self, hub, file_sock, length, **kwargs)
 
     def size(self):
         return len(self.file_name) + len(self.new_name) + 6;

@@ -6,11 +6,9 @@ from file_server.util import get_file_size
 class FileChangePacket(Packet):
     name = "FileChangePacket"
     id = 1
+    
     def __init__(self, hub=None, file_sock=None, length=0, **kwargs):
-        Packet.__init__(self, hub, file_sock, length)
-
-        if "file_name" in kwargs:
-            self.file_name = kwargs["file_name"]
+        Packet.__init__(self, hub, file_sock, length, **kwargs)
 
     def size(self):
         return get_file_size(self.hub.directory + self.file_name) + len(self.file_name) + 5;
