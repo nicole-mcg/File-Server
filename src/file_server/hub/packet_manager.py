@@ -17,7 +17,7 @@ def initialize_packet_manager():
 def register_packet(cls):
     packet_handlers[cls.id] = cls
 
-def handle_incoming_packet(id, hub, sock, length):
+def handle_incoming_packet(id, hub, length):
     try:
         cls = packet_handlers[id]
     except:
@@ -26,7 +26,7 @@ def handle_incoming_packet(id, hub, sock, length):
         return None
 
     if (cls is not None):
-        handler = cls(hub, sock, length)
+        handler = cls(hub, length)
         if id is not 0:
             print("Handling packet: " + cls.name)
         return handler.handle_incoming()

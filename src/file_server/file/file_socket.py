@@ -135,7 +135,7 @@ class FileSocket:
             return
 
         # Generate response using packet handler
-        response = handle_incoming_packet(id, self.hub, self, length)
+        response = handle_incoming_packet(id, self.hub, length)
         has_response = response != None
 
         # Write response

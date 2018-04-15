@@ -7,8 +7,8 @@ class FileAddPacket(Packet):
     name = "FileAddPacket"
     id = 2
 
-    def __init__(self, hub=None, file_sock=None, length=0,**kwargs):
-        Packet.__init__(self, hub, file_sock, length, **kwargs)
+    def __init__(self, hub=None, length=0,**kwargs):
+        Packet.__init__(self, hub, length, **kwargs)
 
     def size(self):
         return get_file_size(self.hub.directory + self.file_name) + len(self.file_name) + 5;

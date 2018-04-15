@@ -13,16 +13,18 @@ class Packet:
 
     # hub: the FileHub associated with this packet
     # file_sock: the file_socket associated with the hub
-    # length: the length of the packet
+    # length: the length of the packet. exclusively for outgoing packets
     # kwargs: exclusively for sending packets, sets properties in class for use later
-    def __init__(self, hub=None, file_sock=None, length=0,**kwargs):
-        self.file_sock = file_sock
-        self.length = length
+    def __init__(self, hub=None, length=0,**kwargs):
         self.hub = hub
+        self.file_sock = hub.file_sock if hub != None else None
+        self.length = length
 
+        # Set class properties from kwargs
         for key in kwargs.keys():
             setattr(self, key, kwargs[key])
 
+    # Get the size of the packet
     def size(self):
         return 0;
 

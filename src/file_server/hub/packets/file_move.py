@@ -5,8 +5,8 @@ from file_server.util import move_file
 class FileMovePacket(Packet):
     name = "FileMovePacket"
     id = 4
-    def __init__(self, hub=None, file_sock=None, length=0, **kwargs):
-        Packet.__init__(self, hub, file_sock, length, **kwargs)
+    def __init__(self, hub=None, length=0, **kwargs):
+        Packet.__init__(self, hub, length, **kwargs)
 
     def size(self):
         return len(self.file_name) + len(self.new_name) + 6;
