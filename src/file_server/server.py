@@ -85,11 +85,11 @@ class FileServer(FileHub):
                 account = Account.sessions[session]
             except KeyError:
                 print("Count not load account")
-                clientsocket.send(ByteBuffer(b"0")).bytes()
+                clientsocket.send(ByteBuffer().from_bool(False).bytes())
                 continue
 
             # Send session confirmation
-            clientsocket.send(ByteBuffer(b"1").bytes())
+            clientsocket.send(ByteBuffer().from_bool(True).bytes())
 
             # Create a connection object
             connection = ServerConnection(

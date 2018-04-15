@@ -134,10 +134,10 @@ class FileClient(FileHub):
             self.sock.sock.send(ByteBuffer.from_string(self.account.session).bytes())
 
             # Check the validation response
-            b = ByteBuffer(self.sock.sock.recv(1)).read()
+            authenticated = ByteBuffer(self.sock.sock.recv(1)).read_bool()
 
             # Server didn't think our session was valid
-            if b == 0:
+            if not authenticated:
                 print("Could not authenticate with server")
                 return
 
