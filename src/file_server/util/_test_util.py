@@ -45,7 +45,6 @@ def start_test_server(auto_shutdown=5):
     # Mark the directory for storing account info
     set_account_manager_directory(bin_path + "/")
 
-
     server = None
     try:
         server = FileServer(serv_dir, 8088)

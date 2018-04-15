@@ -3,14 +3,15 @@ from passlib.hash import sha512_crypt
 
 from file_server.account.account import Account
 
+# Two days in seconds
 TWO_DAYS = 172800
-sessions = {}
 
 #This can be changed in tests to avoid changing or loading real accounts
 #To get current python file directory:
 #   import os, inspect
 #   curr_path = os.path.split(inspect.stack()[0][1])[0]
 directory = "../bin/"
+sessions = {}
 
 def set_account_manager_directory(new_directory):
     global directory
@@ -63,7 +64,7 @@ def is_valid_signup_auth(auth_code, invalidate_auth=False):
     existing_auths = json.loads(contents)
 
     if auth_code in existing_auths.keys() and existing_auths[auth_code] > time.time():
-        
+
         if invalidate_auth:
             del existing_auths[auth_code]
             file = open(file_name, "w")
