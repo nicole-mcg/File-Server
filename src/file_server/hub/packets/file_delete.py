@@ -5,11 +5,8 @@ from file_server.util import delete_file
 class FileDeletePacket(Packet):
     name = "FileDeletePacket"
     id = 3
-    def __init__(self, hub=None, length=0, **kwargs):
-        Packet.__init__(self, hub, length, **kwargs)
-
-    def size(self):
-        return len(self.file_name) + 5;
+    def __init__(self, hub=None, **kwargs):
+        Packet.__init__(self, hub, **kwargs)
 
     def handle_outgoing(self, hub, file_sock):
         file_sock.sock.send(ByteBuffer.from_string(self.file_name).bytes())

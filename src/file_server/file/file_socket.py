@@ -65,7 +65,6 @@ class FileSocket:
 
         # Write packet ID and size
         buff.write(packet.__class__.id)
-        buff.write_int(packet.size())
 
         # Check if we have a session to send (client)
         session = ""
@@ -111,7 +110,6 @@ class FileSocket:
 
         # Read ID and size
         id = buff.read()
-        length = buff.read_int()
 
         session = buff.read_string()
 
@@ -135,7 +133,7 @@ class FileSocket:
             return
 
         # Generate response using packet handler
-        response = handle_incoming_packet(id, self.hub, length)
+        response = handle_incoming_packet(id, self.hub)
         has_response = response != None
 
         # Write response
@@ -190,7 +188,7 @@ class FileSocket:
 
     # Recieved a file on the connection and saves it locally
     # Updates the hub with transfer progress
-    def save_file(self, packet_length):
+    def save_file(self):
         sock = self.sock
         hub = self.hub
         directory = hub.directory
