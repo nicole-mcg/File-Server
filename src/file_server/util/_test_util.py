@@ -16,7 +16,7 @@ import os, sys, socket, time
 from threading import Thread
 from file_server.file.file_socket import FileSocket
 
-from file_server.file.packet.packet_manager import initialize_packet_manager
+from file_server.hub.packet_manager import initialize_packet_manager
 
 # Starts a server on different ports using test directories
 def start_test_server(auto_shutdown=5):

@@ -3,10 +3,10 @@ from threading import Thread
 
 from watchdog.events import FileSystemEventHandler
 
-from file_server.file.packet.impl.file_change import FileChangePacket
-from file_server.file.packet.impl.file_add import FileAddPacket
-from file_server.file.packet.impl.file_delete import FileDeletePacket
-from file_server.file.packet.impl.file_move import FileMovePacket
+from file_server.hub.packets.file_change import FileChangePacket
+from file_server.hub.packets.file_add import FileAddPacket
+from file_server.hub.packets.file_delete import FileDeletePacket
+from file_server.hub.packets.file_move import FileMovePacket
 
 # This class is used to handle events from the file watch
 class FileEventHandler(FileSystemEventHandler):
