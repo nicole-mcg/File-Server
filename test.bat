@@ -2,7 +2,7 @@
 
 cd src
 echo Testing back end
-call python -m pytest
+call python -m pytest -x
 cd ..
 
 cd web
