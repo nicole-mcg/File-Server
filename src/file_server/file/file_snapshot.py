@@ -3,14 +3,7 @@ from enum import Enum
 
 from file_server.util import split_path
 
-# FIXME Functionality in Snapshot class should be move to FileSnapsnot and DirectorySnapshould should become a child of FileSnapshot
-# This is the base class for a file or directory snapshot
-class Snapshot:
-    # Create an enum of the types
-    types = Enum("SnapshotType", "DIRECTORY FILE")
-
 class FileSnapshot:
-    
     TYPE_DIRECTORY = 1
     TYPE_FILE = 2
 
