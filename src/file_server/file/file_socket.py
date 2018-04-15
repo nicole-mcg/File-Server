@@ -152,8 +152,10 @@ class FileSocket:
 
         file_size = get_file_size(self.hub.directory + file_name)
 
-        sock.send(ByteBuffer.from_int(file_size).bytes())
-        sock.send(ByteBuffer.from_string(file_name).bytes())
+        # Send file name and size
+        buff = ByteBuffer.from_string(file_name)
+        buff.write_int(file_size)
+        self.write(buff)
 
         hub.transferring = {
             "direction": "send",
@@ -181,12 +183,9 @@ class FileSocket:
         directory = hub.directory
         file_event_handler = hub.file_event_handler
 
-        file_size = ByteBuffer(sock.recv(4)).read_int()
-        packet_length -= 4
-
-        name_length = packet_length - file_size
-        file_name = ByteBuffer(sock.recv(name_length)).read_string()
-        packet_length -= name_length
+        buff = self.read()
+        file_name = buff.read_string()
+        file_size = buff.read_int()
 
         file_path = directory + file_name
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -203,14 +202,14 @@ class FileSocket:
         file = open(file_path,'wb')
 
         hub.transfer_progress = 0
-        while(packet_length > 0):
+        while(file_size > 0):
             file_event_handler.add_ignore(("change", file_name))
-            chunk_size = FileSocket.KILOBYTE if packet_length > FileSocket.KILOBYTE else packet_length
+            chunk_size = FileSocket.KILOBYTE if file_size > FileSocket.KILOBYTE else file_size
             file.write(ByteBuffer(sock.recv(chunk_size)).bytes())
             file.flush()
             hub.transfer_progress += chunk_size
             hub.data_recieved += chunk_size
-            packet_length -= chunk_size
+            file_size -= chunk_size
 
         hub.files_recieved += 1
         hub.transferring = None
