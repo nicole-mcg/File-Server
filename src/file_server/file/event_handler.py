@@ -8,86 +8,155 @@ from file_server.file.packet.impl.file_add import FileAddPacket
 from file_server.file.packet.impl.file_delete import FileDeletePacket
 from file_server.file.packet.impl.file_move import FileMovePacket
 
+# This class is used to handle events from the file watch
 class FileEventHandler(FileSystemEventHandler):
 
+    # FIXME this should be move into an instance of FileEventHandler to be consistent with add_ignore and pop_ignore methods
+    # The dictionary of events to ignore
+    # key: See comments for add_ignore
+    # value: An integer representing the number of times to ignore this event
     events_to_ignore = {}
 
-    def add_ignore(self, data):
-        if data in FileEventHandler.events_to_ignore:
-            FileEventHandler.events_to_ignore[data] += 1
-        else:
-            FileEventHandler.events_to_ignore[data] = 1
-
+    # hub: the hub that the file watch is associated with
+    # directory: the directory that is being watched
     def __init__(self, hub, directory):
         self.hub = hub
         self.directory = directory
 
-    def send_file_contents(self, file_name, packet_class, data, count=0):
+    # Adds an event to be ignored once
+    # data: A tuple containing a string for the type of event and the file path from the root directory. E.g ("change", path)
+    def add_ignore(self, data):
+
+        if data in FileEventHandler.events_to_ignore:
+
+            # Increment num time to ignore this event
+            FileEventHandler.events_to_ignore[data] += 1
+
+        else:
+
+            # Add the ignore and set num times to ignore to 1
+            FileEventHandler.events_to_ignore[data] = 1
+
+    # Checks if an event should be ignored
+    # Decrements the number of times to ignore the event (this method "uses" an ignore)
+    def pop_ignore(self, data):
+
+        # Check if the ignore exists
+        if not data in FileEventHandler.events_to_ignore:
+
+            # Don't ignore the event
+            return False
+
+        else:
+
+            # Check if this is the last time to ignore the event
+            if FileEventHandler.events_to_ignore[data] == 1:
+
+                # Remove the ignore
+                del FileEventHandler.events_to_ignore[data]
+
+            else:
+
+                # decrement the number of times to ignore this event
+                FileEventHandler.events_to_ignore[data] -= 1
+
+        # This event should be ignored
+        return True
+
+    # Queues a file change packet
+    # Waits until the file is allowed to be accessed
+    def send_file_contents(self, file_name, packet_class, data, num_attempts=0):
+
         try:
+
+            # Try to open the file
             with open(self.directory + file_name, mode='rb') as file:
                 pass
 
-            self.hub.queue_packet(
-                packet_class(
-                    self.hub,
-                    file_name=file_name
-                ), data
-            )
         except PermissionError:
-            # Wait until we can actually read the file
+            # The file can't be accessed at the moment
+
+            # Let's wait
             time.sleep(500)
-            self.send_file_contents(file_name, packet_class, data, count + 1)
 
-    def check_ignore(self, data):
-        if not data in FileEventHandler.events_to_ignore:
-            return False
-        else:
-            if FileEventHandler.events_to_ignore[data] == 1:
-                del FileEventHandler.events_to_ignore[data]
-            else:
-                FileEventHandler.events_to_ignore[data] -= 1
-        return True
+            # Try again adding 1 to the number of attempts
+            self.send_file_contents(file_name, packet_class, data, num_attempts + 1)
 
+            return # We didn't get it this attempt
+
+        # We were able to open the file, so let's queue the packet
+        self.hub.queue_packet(
+            packet_class(
+                self.hub,
+                file_name=file_name
+            ), data
+        )
+
+    # Called when a local file is created
     def on_created(self, event):
+
+        # FIXME directories are not currently handled
         if (event.is_directory): 
             print("Created directory: " + str(event.src_path))
             return False
 
+        # Get the path of the file changed (from the root watch directory)
         file_name = event.src_path[len(self.directory):]
 
         print("Local File Modified: {}".format(file_name))
 
+        # Event ignore data
         data = ("change", file_name)
 
-        if not self.check_ignore(data):
+        # Check if this event should be ignored
+        if not self.pop_ignore(data):
+
+            # Queue the FileAddPacket when the file is allowed to be opened
             Thread(target = self.send_file_contents, args = [file_name, FileAddPacket, data]).start()
 
+    # Called when a local file is modified
+    # This can be called when a file is created (on top of on_created)
     def on_modified(self, event):
+
+        # FIXME directories are not currently handled
         if (event.is_directory): 
             print("Modified directory: " + str(event.src_path))
             return False
 
+        # Get the path of the file changed (from the root watch directory)
         file_name = event.src_path[len(self.directory):]
 
         print("Local File Modified: {}".format(file_name))
 
+        # Event ignore data
         data = ("change", file_name)
 
-        if not self.check_ignore(data):
+        # Check if this event should be ignored
+        if not self.pop_ignore(data):
+
+            # Queue the FileChangePacket when the file is allowed to be opened
             Thread(target = self.send_file_contents, args = [file_name, FileChangePacket, data]).start()
 
+    # Called when a local file is deleted
     def on_deleted(self, event):
+
+        # FIXME directories are not currently handled
         if (event.is_directory): 
             print("Deleted directory: " + str(event.src_path))
             return False
 
+        # Get the path of the file changed (from the root directory)
         file_name = event.src_path[len(self.directory):]
 
         print("Local File Deleted: {}".format(file_name))
 
+        # Event ignore data
         data = ("delete", file_name)
 
-        if not self.check_ignore(data):
+        # Check if this event should be ignored
+        if not self.pop_ignore(data):
+
+            # Queue the FileDeletePacket
             self.hub.queue_packet(
                 FileDeletePacket(
                     self.hub,
@@ -95,19 +164,29 @@ class FileEventHandler(FileSystemEventHandler):
                 ), data
             )
 
+    # Called when a local file is moved
     def on_moved(self, event):
+
+        # FIXME directories are not currently handled
         if (event.is_directory): 
             print("Moved directory: " + str(event.src_path))
             return False
 
+        # Get the old file path (from the root directory)
         file_name = event.src_path[len(self.directory):]
+
+        # Get the new file path (from the root directory)
         new_name = event.dest_path[len(self.directory):]
 
         print("Local File Moved: {}".format(file_name))
 
+        # Event ignore data
         data = ("move", file_name, new_name)
 
-        if not self.check_ignore(data):
+        # Check if this event should be ignored
+        if not self.pop_ignore(data):
+
+            # Queue the FileMovePacket
             self.hub.queue_packet(
                 FileMovePacket(
                     self.hub,
