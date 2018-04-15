@@ -19,6 +19,8 @@ from file_server.file.file_socket import FileSocket
 from file_server.hub.packet_manager import initialize_packet_manager
 
 # Starts a server on different ports using test directories
+# auto_shutdown: the time (in seconds) before the server is automatically shut down
+#                this might need to be changed for longer tests
 def start_test_server(auto_shutdown=5):
 
     # webbrowser.open("http://test server started.com", new=2)
@@ -45,7 +47,7 @@ def start_test_server(auto_shutdown=5):
     # Mark the directory for storing account info
     set_account_manager_directory(bin_path + "/")
 
-    server = None
+    # Try to create the server
     try:
         server = FileServer(serv_dir, 8088)
     except OSError:
@@ -77,37 +79,57 @@ def start_test_server(auto_shutdown=5):
     def kill_server():
         start = time.time()
 
+        # Wait until auto shutdown time is reached
         while(time.time() < start + auto_shutdown):
+
+            # Stop waiting if the server is already shut down
             if server.shutdown:
                 return
+
+            # Wait 500ms
             time.sleep(0.5)
 
+        # Make sure the server isn't already shut down
         if not server.shutdown:
+
+            # Kill the server
             server.kill()
+
+            # Create an AssertionError because this is only a safety net
             assert False, "TEST \"{}\" DID NOT PROPERLY KILL SERVER. FAILSAFE TEST SERVER SHUTDOWN USED.".format(test_name)
 
-    # Open the file server connection
+    # Try to open the file server connection
     try:
         server.start(False)
     except OSError as e:
-        # print(e)
+
+        # Kill anything the server was able to start
         server.kill()
+
         assert False, "Another test server is already running."
         return
 
+    # Start the server on a new thread so the test can keep running
     thread = Thread(target=start_server)
-
     thread.start()
 
+    # Start the auto shutdown on a new thread
     Thread(target=kill_server, args=[server, auto_shutdown, test_name]).start()
 
     return server
 
-# endpoint should be a string
+# Used to easily send a post request to a test server endpoint
+# endpoint: the endpoint to send a request to (E.g endpoint="login")
+# data: Any data to send along with the api request. This is turned into JSON
+# session: The session for the request (for endpoints that require login)
 def send_test_api_request(endpoint, data={}, session=""):
+
+    # Send the request
     r = requests.post("http://127.0.0.1:8081/api/{}".format(endpoint), data=json.dumps(data), cookies={"session": session})
 
+    # Check if the request was successfuly
     if r.status_code == 200:
         return r.text
 
+    # Request wasn't successful
     return None
