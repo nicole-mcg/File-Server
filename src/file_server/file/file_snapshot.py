@@ -59,10 +59,8 @@ class DirectorySnapshot(FileSnapshot):
             # Default to FileSnapshot to represent the file
             cls = FileSnapshot
 
-            # Check if file is a directory
+            # Use DirectorySnapshot to represent file if it's a directory
             if os.path.isdir(file_path):
-
-                # Used DirectorySnapshot class to represent the file
                 cls = DirectorySnapshot
 
             # Create the snapshot and add it to snapshots dict
@@ -101,17 +99,15 @@ class DirectorySnapshot(FileSnapshot):
             # Pass the job to a child snapshot
             return snapshots[part].to_json("/".join(path_parts[index:]))
 
-        # Convert directory metadata to JSON
         string = '{"type": ' + str(self.get_type()) + ', "file_name": "' +  self.file_name + '", "full_path": "' + self.rel_path + '", "last_modified": ' + str(self.last_modified) + ', "snapshots": ['
 
         # Recursively convert child snapshots to JSON
         for index, key in enumerate(snapshots.keys()):
             snapshot = snapshots[key]
 
-            # Check if this is a directory and we're not checking recursively
             if not recursive and isinstance(snapshot, DirectorySnapshot):
 
-                # Convert the DirectorySnapshot to JSON using FileSnapshot
+                # Convert the DirectorySnapshot to JSON using FileSnapshot if not recursive
                 string += FileSnapshot.__str__(snapshot)
 
             else:
@@ -123,7 +119,6 @@ class DirectorySnapshot(FileSnapshot):
             if index != len(snapshots) - 1:
                 string +=  ","
 
-        # Close the JSON string
         string += "]}"
 
         return string

@@ -27,14 +27,10 @@ class FileEventHandler(FileSystemEventHandler):
     # data: A tuple containing a string for the type of event and the file path from the root directory. E.g ("change", path)
     def add_ignore(self, data):
 
+        # Adds ignore or increments by 1 if it exists
         if data in FileEventHandler.events_to_ignore:
-
-            # Increment num time to ignore this event
             FileEventHandler.events_to_ignore[data] += 1
-
         else:
-
-            # Add the ignore and set num times to ignore to 1
             FileEventHandler.events_to_ignore[data] = 1
 
     # Checks if an event should be ignored
@@ -49,15 +45,10 @@ class FileEventHandler(FileSystemEventHandler):
 
         else:
 
-            # Check if this is the last time to ignore the event
+            # Remove the ignore or decrement it by 1
             if FileEventHandler.events_to_ignore[data] == 1:
-
-                # Remove the ignore
                 del FileEventHandler.events_to_ignore[data]
-
             else:
-
-                # decrement the number of times to ignore this event
                 FileEventHandler.events_to_ignore[data] -= 1
 
         # This event should be ignored
@@ -74,15 +65,13 @@ class FileEventHandler(FileSystemEventHandler):
                 pass
 
         except PermissionError:
-            # The file can't be accessed at the moment
+            # The file can't be accessed at the moment so wait 500ms
+            time.sleep(0.5)
 
-            # Let's wait
-            time.sleep(500)
-
-            # Try again adding 1 to the number of attempts
+            # Try again
             self.send_file_contents(file_name, packet_class, data, num_attempts + 1)
 
-            return # We didn't get it this attempt
+            return
 
         # We were able to open the file, so let's queue the packet
         self.hub.queue_packet(
@@ -153,10 +142,8 @@ class FileEventHandler(FileSystemEventHandler):
         # Event ignore data
         data = ("delete", file_name)
 
-        # Check if this event should be ignored
+        # Queue the packet if this event shouldn't be ignored
         if not self.pop_ignore(data):
-
-            # Queue the FileDeletePacket
             self.hub.queue_packet(
                 FileDeletePacket(
                     self.hub,
@@ -183,10 +170,8 @@ class FileEventHandler(FileSystemEventHandler):
         # Event ignore data
         data = ("move", file_name, new_name)
 
-        # Check if this event should be ignored
+        # Queue the packet if this event shouldn't be ignored
         if not self.pop_ignore(data):
-
-            # Queue the FileMovePacket
             self.hub.queue_packet(
                 FileMovePacket(
                     self.hub,
