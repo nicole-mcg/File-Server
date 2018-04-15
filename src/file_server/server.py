@@ -1,14 +1,11 @@
-import socket
+import socket, time
 from collections import deque
 from threading import Thread
 
 from file_server.util.byte_buffer import ByteBuffer
 from file_server.file.file_socket import FileSocket 
 from file_server.web.account import Account
-
-from time import time
-
-from .hub import FileHub
+from file_server.hub.file_hub import FileHub
 
 # This class represents a multithreaded file server
 class FileServer(FileHub):
@@ -135,7 +132,7 @@ class ServerConnection(Thread):
         self.shutdown = False
 
         # Connection info for web UI
-        self.connect_time = time()
+        self.connect_time = time.time()
         self.data_recieved = 0
         self.files_recieved = 0
         self.data_sent = 0

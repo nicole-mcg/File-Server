@@ -7,7 +7,7 @@ from file_server.file.packet.impl.idle import IdlePacket
 from file_server.util import send_post_request
 from file_server.web.account import Account
 
-from .hub import FileHub
+from .hub.file_hub import FileHub
 
 # This class represents a client that can connect to a a FileServer
 class FileClient(FileHub):
