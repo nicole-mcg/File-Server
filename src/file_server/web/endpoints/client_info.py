@@ -15,7 +15,7 @@ class ClientInfoEndpoint(Endpoint):
 
             return {
                 "name": conn.account.name,
-                "address": conn.client_host,
+                "address": conn.address,
                 "status": "Idle" if conn.transferring is None else "Transferring Files",
                 "time": conn.connect_time,
                 "files_sent": conn.files_sent,

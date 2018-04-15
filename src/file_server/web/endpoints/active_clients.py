@@ -17,7 +17,7 @@ class ActiveClientsEndpoint(Endpoint):
             response.append({
                 "id": i,
                 "name": conn.account.name,
-                "address": conn.client_host,
+                "address": conn.address,
                 "status": "Idle" if conn.transferring is None else "Transferring Files"
             })
             i += 1
