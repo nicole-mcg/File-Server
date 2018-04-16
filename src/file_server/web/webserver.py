@@ -21,6 +21,7 @@ from file_server.util import send_post_request
 def create_webserver(server, port=8080):
     webserver = ThreadedHTTPServer(server, port)
 
+    print(os.getcwd())
     os.chdir("../web")
 
     RequestHandler.endpoints = {
@@ -56,8 +57,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
         # FIXME this could probably be done a better way
         # Open the web browser if this is the real port (not a test)
-        if self.port == 8080:
-            webbrowser.open('http://127.0.0.1:8080', new=2)
+        webbrowser.open('http://127.0.0.1:8080', new=2)
 
         # Handle requests until shutdown
         # Because of the nature of handle_request, shutdown will not happen until a request is made
