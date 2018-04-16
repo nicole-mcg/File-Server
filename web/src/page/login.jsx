@@ -96,7 +96,18 @@ export default class LoginPage extends React.Component {
             .then(res => res.json())
             .then(
                 (result) => {
-    
+
+                    if (result.session != null) {
+                        //We don't need use the result because the session set in the cookies
+                        window.location.href = "/"
+
+                    } else {
+                        this.setState({
+                            error: result.error,
+                            isLoaded: true,
+                        })
+                    }
+                    
                     if (result.error != null) {
     
                         if (result.error == "needs auth") {
