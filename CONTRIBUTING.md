@@ -69,15 +69,24 @@
     * Classes should be named with upper camel case. E.g `ExampleClass`
   * ### Back End (Python)
     * **Variables**: should be named with underscores between words. E.g `example_var`
-    * **Classes**: should be named with upper camel case. E.g `ExampleClass`
+    * **Classes**
+      * should be named with upper camel case. E.g `ExampleClass`
+      * Comments should be in the following format:
+        ```
+          # Short description of what class handles or represents
+          # Any additional information for the class (such a usage and/or warnings)
+          class ExampleClass():
+              def __init__(self):
+                  pass
+        ```
     * **Functions, and Methods**
       * should be named with underscores between words. E.g `example_function`
       * Comments should be in the following format:
-      ```
-        # Short description of what the method does
-        # Any additional information (Such as warnings for improper usage)
-        # first_parameter: a description of the first paremeter. Any warnings or additional information
-        # Returns "A short description of what is returned and how it can be used"
-        def example_method(self, first_parameter):
-            return False
-      ```
+        ```
+          # Short description of what the method does
+          # Any additional information (Such as warnings for improper usage)
+          # first_parameter: a description of the first paremeter. Any warnings or additional information
+          # Returns "A short description of what is returned and how it can be used"
+          def example_method(self, first_parameter):
+              return False
+        ```
