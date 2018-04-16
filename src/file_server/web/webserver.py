@@ -167,7 +167,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_error(404,'File Not Found: %s' % self.path)
 
     # Handles an api request
-    # path: The path for the endpoint. E.g path="/ENDPOINT/ID"
+    # path: The path for the endpoint. E.g path="/ENDPOINT/OPTIONAL_ID"
     # data: The post data sent with the request (if any)
     # response: the current response object. This is modified in this function
     # Returns true if a response was sent
