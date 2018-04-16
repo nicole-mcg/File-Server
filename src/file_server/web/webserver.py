@@ -54,8 +54,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     # Listens for connections until shutdown
     def serve_forever(self):
 
-        # FIXME this could probably be done a better way
-        # Open the web browser if this is the real port (not a test)
+        # Open the web browser
         webbrowser.open('http://127.0.0.1:8080', new=2)
 
         # Handle requests until shutdown
