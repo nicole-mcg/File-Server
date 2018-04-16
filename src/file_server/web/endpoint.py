@@ -1,9 +1,10 @@
-
-
 # This class represents a web server endpoint
 # Calls to endpoints look like this: http://127.0.0.1:8080/api/ENDPOINT/OPTIONAL_ID
 # Endpoints take optional POST input (GET can also be used), and return a JSON string to the client
 class Endpoint:
+
+    # The path name for the endpoint to handle
+    # E.g http://127.0.0.1:8080/api/PATH/OPTIONAL_ID
     PATH = ""
 
     # needs_auth: if true, the endpoint requires a valid session (logged in)
