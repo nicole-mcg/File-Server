@@ -21,7 +21,6 @@ from file_server.util import send_post_request
 def create_webserver(server, port=8080):
     webserver = ThreadedHTTPServer(server, port)
 
-    print(os.getcwd())
     os.chdir("../web")
 
     RequestHandler.endpoints = {
