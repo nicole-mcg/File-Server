@@ -18,6 +18,8 @@ from .endpoints.directory_contents import DirectoryContentsEndpoint
 
 from file_server.util import send_post_request
 
+# Registers an endpoint handler class to handle requests
+# endpoint_class: The class of the endpoint handler
 def register_endpoint(endpoint_class):
 
     # Make sure the endpoint class has a PATH property
@@ -27,13 +29,22 @@ def register_endpoint(endpoint_class):
     # Add the endpoint class to the dict of handlers
     RequestHandler.endpoints[endpoint_class.PATH] = endpoint_class
 
+# Creates a new ThreadedHTTPServer instance
+# The HTTP server is not started
+# server: the FileServer associated with the webserver
+# port: the port for the webserver to listen on
 def create_webserver(server, port=8080):
     webserver = ThreadedHTTPServer(server, port)
 
+    # Change the directory to the web serving directory
     os.chdir("../web")
 
+    # The dict of endpoint handler classes
+    # key: the URL for the endpoint:
+    #       E.g http://127.0.0.1:8080/api/KEY/OPTIONAL_ID, where KEY is the key for the endpoints dict
     RequestHandler.endpoints = {}
 
+    # Regiester endpoint handlers
     register_endpoint(ActiveClientsEndpoint)
     register_endpoint(ClientInfoEndpoint)
     register_endpoint(LoginEndpoint)
@@ -43,7 +54,6 @@ def create_webserver(server, port=8080):
     register_endpoint(CreateAuthEndpoint)
     register_endpoint(UpdateSettingsEndpoint)
     register_endpoint(DirectoryContentsEndpoint)
-    
 
     return webserver
 
