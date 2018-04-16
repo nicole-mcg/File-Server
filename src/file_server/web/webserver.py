@@ -20,9 +20,11 @@ from file_server.util import send_post_request
 
 def register_endpoint(endpoint_class):
 
+    # Make sure the endpoint class has a PATH property
     if not hasattr(endpoint_class, "PATH"):
         raise AssertionError("Endpoint class does not have PATH attribute")
 
+    # Add the endpoint class to the dict of handlers
     RequestHandler.endpoints[endpoint_class.PATH] = endpoint_class
 
 def create_webserver(server, port=8080):
@@ -193,7 +195,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             # Create an instance of the endpoint class
             endpoint = RequestHandler.endpoints[endpoint_str]()
-            
+
         except KeyError:
             print("Tried to connect to non-existent endpoint: {}".format(endpoint_str))
 
