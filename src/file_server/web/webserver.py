@@ -298,6 +298,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 # It's used to pass the data between methods cleanly
 class RequestResponse:
 
+    # account: the account loaded from the request session (if any)
+    # status_code: the HTTP status code for the response
+    # content_type: value for "Content-type" HTTP header
+    # contents: the contents of the response. This could be a file or JSON text
     def __init__(self, account=None, status_code=200, content_type="text/html", contents=b""):
         self.account = account
         self.status_code = status_code
