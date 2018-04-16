@@ -5,7 +5,7 @@ import json
 class UserEndpoint(Endpoint):
 
     def __init__(self):
-        self.needs_auth = True
+        Endpoint.__init__(self)
 
     def handle_request(self, request_handler, server, account, data):
 
