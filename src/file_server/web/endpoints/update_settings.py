@@ -1,4 +1,4 @@
-from .base import Endpoint
+from file_server.web.endpoint import Endpoint
 
 import json
 
