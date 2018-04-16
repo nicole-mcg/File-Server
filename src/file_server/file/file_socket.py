@@ -59,7 +59,9 @@ class FileSocket:
         if packet is None:
             packet = IdlePacket()
 
-        print("Sending packet: {}".format(packet.__class__.name))
+        # Don't print for IdlePacket
+        if packet.id != 0:
+            print("Sending packet: {}".format(packet.__class__.name))
 
         buff = ByteBuffer()
 
