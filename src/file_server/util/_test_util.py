@@ -1,4 +1,4 @@
-import requests, json, time, inspect
+import os, requests, json, time, inspect
 from threading import Thread
 
 from file_server.server import FileServer
@@ -102,7 +102,7 @@ def start_test_server(auto_shutdown=5):
     thread.start()
 
     # Start the auto shutdown on a new thread
-    Thread(target=kill_server, args=[server, auto_shutdown, test_name]).start()
+    Thread(target=kill_server).start()
 
     return server
 
