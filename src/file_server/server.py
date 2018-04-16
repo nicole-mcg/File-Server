@@ -38,7 +38,7 @@ class FileServer(FileHub):
 
         # Shut down webserver
         if self.webserver is not None:
-            self.webserver.force_stop()
+            self.webserver.kill()
 
         # Stop file server listening
         self.shutdown = True
