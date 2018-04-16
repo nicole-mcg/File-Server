@@ -3,6 +3,7 @@ from file_server.web.endpoint import Endpoint
 import json
 
 class ActiveClientsEndpoint(Endpoint):
+    PATH = "activeclients"
 
     def __init__(self):
         Endpoint.__init__(self)

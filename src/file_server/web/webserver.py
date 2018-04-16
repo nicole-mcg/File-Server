@@ -18,22 +18,30 @@ from .endpoints.directory_contents import DirectoryContentsEndpoint
 
 from file_server.util import send_post_request
 
+def register_endpoint(endpoint_class):
+
+    if not hasattr(endpoint_class, "PATH"):
+        raise AssertionError("Endpoint class does not have PATH attribute")
+
+    RequestHandler.endpoints[endpoint_class.PATH] = endpoint_class
+
 def create_webserver(server, port=8080):
     webserver = ThreadedHTTPServer(server, port)
 
     os.chdir("../web")
 
-    RequestHandler.endpoints = {
-        "/activeclients": ActiveClientsEndpoint(),
-        "/clientinfo": ClientInfoEndpoint(),
-        "/login": LoginEndpoint(),
-        "/logout": LogoutEndpoint(),
-        "/signup": SignupEndpoint(),
-        "/user": UserEndpoint(),
-        "/createauth": CreateAuthEndpoint(),
-        "/updatesettings": UpdateSettingsEndpoint(),
-        "/directorycontents": DirectoryContentsEndpoint(),
-    }
+    RequestHandler.endpoints = {}
+
+    register_endpoint(ActiveClientsEndpoint)
+    register_endpoint(ClientInfoEndpoint)
+    register_endpoint(LoginEndpoint)
+    register_endpoint(LogoutEndpoint)
+    register_endpoint(SignupEndpoint)
+    register_endpoint(UserEndpoint)
+    register_endpoint(CreateAuthEndpoint)
+    register_endpoint(UpdateSettingsEndpoint)
+    register_endpoint(DirectoryContentsEndpoint)
+    
 
     return webserver
 
@@ -111,7 +119,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             # The request is for an endpoint
             if path.startswith("/api/"):
-                path = path[4:]
+                path = path[5:]
 
                 # Handle the endpoint request
                 # Return if a response was sent
@@ -173,10 +181,8 @@ class RequestHandler(BaseHTTPRequestHandler):
     # Returns true if a response was sent
     def handle_endpoint_request(self, path, data, response):
 
-        # Look for a trailing forward slash
-        index = path.find("/", 1)
-
-        # Get the endpoint name from the path
+        # Remove trailing "/" if it exists
+        index = path.find("/")
         if index == -1:
             endpoint_str = path
         else:
@@ -184,7 +190,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         # Try to find the endpoint handler
         try:
-            endpoint = RequestHandler.endpoints[endpoint_str]
+
+            # Create an instance of the endpoint class
+            endpoint = RequestHandler.endpoints[endpoint_str]()
+            
         except KeyError:
             print("Tried to connect to non-existent endpoint: {}".format(endpoint_str))
 

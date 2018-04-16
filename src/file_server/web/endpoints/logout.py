@@ -5,6 +5,7 @@ import json
 from file_server.account.account_manager import end_session
 
 class LogoutEndpoint(Endpoint):
+    PATH = "logout"
 
     def __init__(self):
         Endpoint.__init__(self)

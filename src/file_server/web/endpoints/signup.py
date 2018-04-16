@@ -5,6 +5,7 @@ import json, os
 from file_server.account.account_manager import is_valid_signup_auth, create_account
 
 class SignupEndpoint(Endpoint):
+    PATH = "signup"
 
     def __init__(self):
         Endpoint.__init__(self, False)

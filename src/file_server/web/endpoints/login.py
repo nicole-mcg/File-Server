@@ -5,6 +5,7 @@ import json
 from file_server.account.account_manager import load_account
 
 class LoginEndpoint(Endpoint):
+    PATH = "login"
 
     def __init__(self):
         Endpoint.__init__(self, False)
