@@ -10,10 +10,8 @@ bin/**
 build/
 .pytest_cache/
 
-# Eclipse project files
-.classpath
-.project
-
+# Eclipse project
+**/.metadata
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
