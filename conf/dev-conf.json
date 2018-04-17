@@ -1,0 +1,5 @@
+{
+    "show-setup-warning": true,
+    "use-java": true,
+    "install-node": true
+}
