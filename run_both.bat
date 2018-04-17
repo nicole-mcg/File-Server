@@ -7,5 +7,5 @@ echo Creating test files
 call create_test_files
 cd ..
 
-start "Server" cmd /c run_server.bat
-start "Client" cmd /c run_client.bat
+start run_server.bat
+start run_client.bat
