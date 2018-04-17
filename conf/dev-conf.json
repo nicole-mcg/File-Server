@@ -1,6 +1,11 @@
 {
     "show-setup-warning": true,
+    
     "install-node": true,
-    "use-java": true,
-    "install-jdk": true
+
+    "install-java": true,
+    "install-jdk": true,
+
+    "install-jython": false,
+    "use-jython": false
 }
