@@ -1,4 +1,5 @@
 bin/**
+**/bin
 **/test/test_files
 **/test/client_dir
 **/test/serv_dir
@@ -8,7 +9,11 @@ bin/**
 **/node_modules
 build/
 .pytest_cache/
-**/bin
+
+# Eclipse project files
+.classpath
+.project
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
