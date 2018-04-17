@@ -1,5 +1,6 @@
 {
     "show-setup-warning": true,
+    "install-node": true,
     "use-java": true,
-    "install-node": true
+    "install-jdk": true
 }
