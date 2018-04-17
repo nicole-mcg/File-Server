@@ -1,4 +1,4 @@
-import os, sys, platform, requests, subprocess
+import os, sys, platform, subprocess
 
 def is_node_installed():
     try:
@@ -11,6 +11,8 @@ def install_node():
     is_64 = sys.maxsize > 2**32
 
     if platform.system() == "Windows":
+        import requests
+
         url = "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x86.msi"
         if is_64:
             url = "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x64.msi"
@@ -43,7 +45,7 @@ if __name__ == "__main__":
 
     if not skip_to_end:
         print("Installing pip requirements")
-        os.system("python -m pip install -r requirements.txt")
+        os.system("python -m pip install --no-cache -r requirements.txt")
 
         if not is_node_installed():
             install_node()
