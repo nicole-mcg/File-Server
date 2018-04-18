@@ -6,6 +6,7 @@ from file_server.util.byte_buffer import ByteBuffer
 from file_server.file.file_socket import FileSocket
 from file_server.account.account_manager import load_account_from_session
 from file_server.hub.file_hub import FileHub
+from file_server.web.webserver import create_webserver
 
 # This class represents a multithreaded file server
 class FileServer(FileHub):
@@ -51,8 +52,20 @@ class FileServer(FileHub):
     # Start listening for connections
     # serve: Will start listening for connections on this thread if True
     def start(self, serve=True):
-        self.sock.bind((socket.gethostname(), self.port))
-        self.sock.listen(5)
+        try:
+            self.sock.bind((socket.gethostname(), self.port))
+            self.sock.listen(5)
+        except OSError as e:
+            print("Server already running on port")
+            return
+
+        try:
+            self.webserver = create_webserver(self)
+            Thread(target = self.webserver.serve_forever).start()
+        except OSError:
+            print("File server could not be started")
+            self.kill()
+            return
 
         # Listen for connections
         if serve:
@@ -60,6 +73,8 @@ class FileServer(FileHub):
 
     # Listens for connections indefinitely
     def serve(self):
+        #FIXME make sure sock is bound
+
         print("Waiting for connections on " + str(socket.gethostname()))
 
         # Keep listening for connections until shutdown
