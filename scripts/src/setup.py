@@ -1,11 +1,12 @@
 import os, sys, platform, subprocess
 
+EXPECTED_NODE_PATH = "{}\\nodejs".format(os.environ["ProgramFiles"])
+
+def rerun(arg, env=os.environ):
+    subprocess.Popen(["python", "./scripts/src/setup.py", arg], cwd=os.getcwd(), env=env)
+
 def is_node_installed():
-    try:
-        subprocess.check_output("node --version")
-        return True
-    except:
-        return False
+    return os.system("node --version") == 0
 
 def install_node():
     is_64 = sys.maxsize > 2**32
@@ -27,21 +28,23 @@ def install_node():
         print("Installing Node.js")
         os.system("msiexec.exe /i node_setup.msi /QN")
         os.remove("node_setup.msi")
-
-        my_env = os.environ
-
-        node_path = "{}/nodejs".format(os.environ["ProgramFiles"])
-        if os.path.isfile("{}/node.exe".format(node_path)):
-            my_env = os.environ.copy()
-            my_env["PATH"] = "{};{}".format(node_path, my_env["PATH"])
         
-        subprocess.Popen(["python", "./scripts/src/setup.py".format(os.getcwd()), "skip_to_end"], cwd=os.getcwd(), env=my_env)
-
+        rerun("skip_to_end")
         sys.exit(0)
 
 if __name__ == "__main__":
 
     skip_to_end = len(sys.argv) > 1 and sys.argv[1] == "skip_to_end"
+
+    if not is_node_installed() and os.path.isdir(EXPECTED_NODE_PATH):
+        print("Adding node to system path")
+        process = subprocess.Popen(["powershell", "-Command", "[Environment]::SetEnvironmentVariable(\"Path\", $env:Path + \";{};\", [EnvironmentVariableTarget]::Machine)".format(EXPECTED_NODE_PATH)])
+        process.wait()
+
+        env = os.environ.copy()
+        env.update({"PATH": "{};{};".format(EXPECTED_NODE_PATH, os.environ["PATH"])})
+        rerun(sys.argv[1] if len(sys.argv) > 1 else "", env)
+        sys.exit(0)
 
     if not skip_to_end:
         print("Installing pip requirements")
