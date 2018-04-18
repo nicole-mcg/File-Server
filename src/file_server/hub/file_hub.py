@@ -53,6 +53,7 @@ class FileHub:
         # Shut down file watch
         if self.file_observer is not None:
             self.file_observer.stop()
+            self.file_observer.join()
 
     # Used to send a packet to other connected hubs
     def send_packet(self, packet):

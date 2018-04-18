@@ -12,7 +12,10 @@ class Packet:
     def __init__(self, hub=None, **kwargs):
         self.hub = hub
 
-        self.file_sock = hub.file_sock if hub != None else None
+        if hub != None and hasattr(hub, "file_sock"):
+            self.file_sock = hub.file_sock
+        else:
+            self.file_sock = None
 
         # Set class properties from kwargs
         for key in kwargs.keys():
