@@ -114,13 +114,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         # Send a redirect request if URL is set
         if response.redirect != None:
-            print("redirect: {}".format(response.redirect))
             self.send_header('Location', response.redirect)
 
         self.send_header('Content-type', response.content_type)
-
-        if self.path.startswith("/api"):
-            print("sending respnose: {} {} {}".format(self.path, response.status_code, response.contents))
 
         self.end_headers()
         self.wfile.write(response.contents)
