@@ -1,5 +1,5 @@
 import sys, builtins, traceback
-from threading import Thread
+from threading import Thread, Lock
 
 from file_server.hub.packet_manager import initialize_packet_manager
 
@@ -73,27 +73,29 @@ http://spyced.blogspot.com/2007/06/workaround-for-sysexcepthook-bug.html
         self.run = run_with_except_hook
     Thread.__init__ = init
 
+print_lock = Lock()
+
 def exception_hook(*args):
-    sys.stdout.write(traceback.print_last() + "\n")
-    sys.stdout.flush()
+    builtins.print("Error occured in subthread: {}".format(str(traceback.print_last())))
     sys.exit(1)
-    builtins.print("test")
 
 sys.excepthook = exception_hook
 
 if __name__ == "__main__":
 
-    installThreadExcepthook()
-
     builtins.old_print = builtins.print
 
     def new_print(*objects, sep='', end='\n', file=sys.stdout, flush=False):
+        print_lock.acquire(True)
         if file is sys.stdout or file is sys.stderr:
             builtins.old_print(*objects, sep=sep, end=end, file=sys.stdout, flush=True)
         else:
             builtins.old_print(*objects, sep=sep, end=end, file=file, flush=flush)
+        print_lock.release()
 
     builtins.print = new_print
+
+    installThreadExcepthook()
 
     # Make sure args length is correct
     if (len(sys.argv) <= 1):
