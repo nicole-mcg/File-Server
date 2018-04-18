@@ -106,7 +106,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     def send_request_response(self, response):
 
         # Send HTTP response code and Content-type
-        self.send_response(response.status_code if response.redirect is None else 302)
+        self.send_response(response.status_code)
 
         # Send the session key if there is an account
         if response.account is not None:
@@ -114,12 +114,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         # Send a redirect request if URL is set
         if response.redirect != None:
+            print("redirect: {}".format(response.redirect))
             self.send_header('Location', response.redirect)
 
         self.send_header('Content-type', response.content_type)
 
-        if len(response.contents) < 100:
-            print("sending respnose: {} {}".format(self.path, response.contents))
+        if self.path.startswith("/api"):
+            print("sending respnose: {} {} {}".format(self.path, response.status_code, response.contents))
 
         self.end_headers()
         self.wfile.write(response.contents)
@@ -213,7 +214,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             endpoint = RequestHandler.endpoints[endpoint_str]()
 
         except KeyError:
+            response.code = 401
             print("Tried to connect to non-existent endpoint: {}".format(endpoint_str))
+            return
 
         contents = b""
 
@@ -244,13 +247,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             if isinstance(contents, dict):
 
                 # See if the endpoint provided a session and try to use it to get an account
-                if "session" in contents.keys():
+                if "session" in contents:
                     response.account = load_account_from_session(contents["session"])
 
                 # Redirect if the endpoint provided a redirect URL
-                if "redirect" in contents.keys():
-                    response.redirect(contents["redirect"])
-                    del contents["redirect"]
+                if "redirect" in contents:
+                    response.redirect = str(contents["redirect"])
 
             # Turn the endpoint response into JSON
             contents = str.encode(json.dumps(contents))
@@ -321,6 +323,3 @@ class RequestResponse:
 
         # Set redirect to a URL string to redirect
         self.redirect = None
-
-    def redirect(self, url):
-        self.redirect = url

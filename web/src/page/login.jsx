@@ -47,11 +47,14 @@ export default class LoginPage extends React.Component {
         .then(
             (result) => {
                 if (result.session != null) {
+                    new Cookies().set("session", result.session);
+                }
 
-                    //We don't need use the result because the session set in the cookies
-                    window.location.href = "/"
+                if (result.redirect != null) {
+                    window.location.href = result.redirect;
+                }
 
-                } else {
+                if (result.error != null) {
                     this.setState({
                         error: result.error,
                         isLoaded: true,
