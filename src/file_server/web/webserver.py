@@ -106,12 +106,20 @@ class RequestHandler(BaseHTTPRequestHandler):
     def send_request_response(self, response):
 
         # Send HTTP response code and Content-type
-        self.send_response(response.status_code)
-        self.send_header('Content-type', response.content_type)
+        self.send_response(response.status_code if response.redirect is None else 302)
 
         # Send the session key if there is an account
         if response.account is not None:
             self.send_header('Set-Cookie', 'session=' + response.account.session)
+
+        # Send a redirect request if URL is set
+        if response.redirect != None:
+            self.send_header('Location', response.redirect)
+
+        self.send_header('Content-type', response.content_type)
+
+        if len(response.contents) < 100:
+            print("sending respnose: {} {}".format(self.path, response.contents))
 
         self.end_headers()
         self.wfile.write(response.contents)
@@ -134,9 +142,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 path = path[5:]
 
                 # Handle the endpoint request
-                # Return if a response was sent
-                if self.handle_endpoint_request(path, data, response):
-                    return
+                self.handle_endpoint_request(path, data, response)
 
             else: 
                 # The request is for a file or page
@@ -181,7 +187,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             # Send response
             self.send_request_response(response)
 
-        except (IOError, KeyError) as e:
+        except IOError as e:
             print("exception: " + self.path)
             print(e)
             self.send_error(404,'File Not Found: %s' % self.path)
@@ -235,7 +241,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             contents = endpoint.handle_request(self, self.server.server, response.account, data)
 
             # Check if the response is a dict
-            if hasattr(contents, "keys"):
+            if isinstance(contents, dict):
 
                 # See if the endpoint provided a session and try to use it to get an account
                 if "session" in contents.keys():
@@ -243,18 +249,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 # Redirect if the endpoint provided a redirect URL
                 if "redirect" in contents.keys():
-                    self.send_response(302)
-                    self.send_header('Location', contents["redirect"])
-                    self.end_headers()
-                    return True
+                    response.redirect(contents["redirect"])
+                    del contents["redirect"]
 
             # Turn the endpoint response into JSON
             contents = str.encode(json.dumps(contents))
 
         response.contents = contents
-
-        # We didn't send a response
-        return False
 
     # Loads an account from request cookies
     def load_account_from_cookies(self):
@@ -317,3 +318,9 @@ class RequestResponse:
         self.status_code = status_code
         self.content_type = content_type
         self.contents = contents
+
+        # Set redirect to a URL string to redirect
+        self.redirect = None
+
+    def redirect(self, url):
+        self.redirect = url
