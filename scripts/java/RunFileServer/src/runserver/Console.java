@@ -1,4 +1,4 @@
-package org.cmcg.runserver;
+package runserver;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -13,8 +13,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
+import runserver.process.ConsoleProcess;
+
 @SuppressWarnings("serial")
-public class ServerConsole extends JFrame implements ActionListener {
+public class Console extends JFrame implements ActionListener {
 	
 	private boolean isMainConsole;
 	private ConsoleProcess process;
@@ -22,11 +24,11 @@ public class ServerConsole extends JFrame implements ActionListener {
 	private JTextArea textArea;
 	private JScrollBar scrollBar;
 	
-	public ServerConsole(String title, ConsoleProcess process) {
+	public Console(String title, ConsoleProcess process) {
 		this(title, process, false);
 	}
 
-	public ServerConsole(String title, ConsoleProcess process, boolean isMainConsole) {
+	public Console(String title, ConsoleProcess process, boolean isMainConsole) {
 		super(title);
 		
 		this.process = process;
@@ -90,7 +92,7 @@ public class ServerConsole extends JFrame implements ActionListener {
 	@Override
 	public void dispose() {
 		if (isMainConsole) {
-			RunServer.fileServerProcess.shutdown(true);
+			Main.fileServerProcess.shutdown(true);
 		} else {
 			process.shutdown(true);
 		}

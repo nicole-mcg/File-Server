@@ -1,4 +1,4 @@
-package org.cmcg.runserver;
+package runserver.process;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,15 +6,17 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
+import runserver.Console;
+
 public class ProcessOutputReader extends Thread {
 
-	ServerConsole console;
-	String name;
-	ReadableByteChannel in;
+	private Console console;
+	private String name;
+	private ReadableByteChannel in;
 
 	private boolean shouldShutDown;
 
-	ProcessOutputReader(ServerConsole console, String name, InputStream in) {
+	ProcessOutputReader(Console console, String name, InputStream in) {
 		this.console = console;
 		this.name = name;
 		this.in = Channels.newChannel(in);

@@ -1,7 +1,9 @@
-package org.cmcg.runserver;
+package runserver;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import runserver.process.ConsoleProcess;
 
 /**
  * A simple java program to start the file server // This is used to create
@@ -10,7 +12,7 @@ import java.util.ArrayList;
  * @author Connor
  *
  */
-public class RunServer {
+public class Main {
 	
 	public static ArrayList<ConsoleProcess> clientProcesses;
 

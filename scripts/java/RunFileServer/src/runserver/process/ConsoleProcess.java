@@ -1,8 +1,10 @@
-package org.cmcg.runserver;
+package runserver.process;
 
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
+
+import runserver.Console;
 
 public class ConsoleProcess extends Thread {
 	
@@ -35,7 +37,7 @@ public class ConsoleProcess extends Thread {
 	}
 
 	public void runProcess() {
-		ServerConsole console = new ServerConsole(name, this);
+		Console console = new Console(name, this);
 		
 		processBuilder.redirectErrorStream(false);
 		
