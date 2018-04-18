@@ -40,7 +40,9 @@ public class ServerConsole extends JFrame {
 	}
 	
 	public void print(String message, boolean newLine) {
+		System.out.print(message + (newLine ? "\n" : ""));
 		this.textArea.append(message + (newLine ? "\n" : ""));
+		this.textArea.repaint();
 	}
 	
 	public void close() {

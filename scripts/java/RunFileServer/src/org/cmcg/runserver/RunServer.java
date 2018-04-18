@@ -1,11 +1,15 @@
 package org.cmcg.runserver;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  * A simple java program to start the file server // This is used to create
@@ -17,6 +21,7 @@ import java.lang.ProcessBuilder.Redirect;
 public class RunServer {
 
 	public static boolean shouldShutDown;
+	public static Process pythonProcess;
 
 	// In the future, this will also be used to run the file server using Jython.
 	// Jython will run the file server in a safe cross-platform Java environment, as
@@ -24,17 +29,17 @@ public class RunServer {
 	// (Java is more likely to be installed)
 
 	public static void main(String... args) {
-		
-		//System.setProperty("user.dir", System.getProperty("user.dir") + "\\src");
 
 		ServerConsole console = new ServerConsole();
-		
-		ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__", "../test_directories/serv_dir");
+
+		System.setProperty("user.dir", System.getProperty("user.dir") + "\\src");
+
+		ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__",
+				"../test_directories/serv_dir");
+
+		processBuilder.redirectErrorStream(false);
 		processBuilder.directory(new File("src"));
-		
-		processBuilder.redirectErrorStream(true);
-		processBuilder.redirectOutput(Redirect.PIPE);
-		
+
 		console.print("Starting file server");
 
 		// Start execution of the python file server
@@ -52,24 +57,24 @@ public class RunServer {
 
 		inReader.start();
 		errReader.start();
-		
+
 		shouldShutDown = false;
 
-		while (!shouldShutDown) {
+		while (!shouldShutDown && pythonProcess.isAlive()) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 			}
 		}
-		
-		inReader.shutDown();
+
+		console.print("Shutting down.");
+
 		errReader.shutDown();
-		
+		inReader.shutDown();
+
 		pythonProcess.destroyForcibly();
 
-		int exit = pythonProcess.exitValue();
-		console.print("Exited with code " + exit);
-
+		JOptionPane.showMessageDialog(console.getContentPane(), "Press OK to continue.", "Alert", JOptionPane.INFORMATION_MESSAGE);
 		console.close();
 
 	}
@@ -78,43 +83,56 @@ public class RunServer {
 
 		ServerConsole console;
 		String name;
-		BufferedReader in;
+		ReadableByteChannel in;
 
 		private boolean shouldShutDown;
 
 		ProcessOutputReader(ServerConsole console, String name, InputStream in) {
 			this.console = console;
 			this.name = name;
-			this.in = new BufferedReader(new InputStreamReader(in));
+			this.in = Channels.newChannel(in);
 
 			this.shouldShutDown = false;
 		}
-		
+
 		void shutDown() {
 			this.shouldShutDown = true;
-			super.interrupt();
 		}
 
 		@Override
 		public void run() {
 			try {
 
-				String line;
-
 				// Read input until stream is done
-				while (!shouldShutDown && (line = in.readLine()) != null) {
-					console.print(line, false);
+				while (!shouldShutDown && in.isOpen()) {
+
+					ByteBuffer buff = ByteBuffer.allocate(1);
+					buff.clear();
+
+					in.read(buff);
+
+					buff.flip();
+
+					while (!shouldShutDown && buff.hasRemaining()) {
+						console.print(Character.toString((char) buff.get()), false);
+					}
+
 				}
 
 			} catch (IOException e) {
+
 				console.print(String.format("Error reading output from file server stream=%s", name));
 				console.print(e);
+
 			} finally {
+
 				try {
-					in.close();
+					this.in.close();
 				} catch (IOException e) {
-					console.print(String.format("Failed to close output from file server stream=%s", name));
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+
 			}
 
 		}
