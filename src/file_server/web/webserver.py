@@ -95,7 +95,6 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
 # This class is used to handle requests to the HTTP server
 class RequestHandler(BaseHTTPRequestHandler):
-    server = None
 
     # Used to silence default logging
     def log_message(self, format, *args):
