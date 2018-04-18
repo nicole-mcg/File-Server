@@ -1,6 +1,7 @@
 package org.cmcg.runserver;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
@@ -9,7 +10,7 @@ import javax.swing.ScrollPaneConstants;
 public class ServerConsole extends JFrame {
 	
 	JTextArea textArea;
-	JScrollPane scrollPane;
+	JScrollBar scrollBar;
 
 	public ServerConsole() {
 		super("File Server");
@@ -21,14 +22,24 @@ public class ServerConsole extends JFrame {
 		this.textArea.setLineWrap(true);
 		this.textArea.setWrapStyleWord(true);
 		
-		this.scrollPane = new JScrollPane(textArea);
-		this.scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		this.scrollBar = scrollPane.getVerticalScrollBar();
 		
 		super.add(scrollPane);
 		
 		super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		super.setVisible(true);
+	}
+	
+	public void print(char c) {
+		print(Character.toString(c), false);
+	}
+	
+	public void print(int i) {
+		print(Integer.toString(i));
 	}
 	
 	public void print(Object object) {
@@ -43,6 +54,7 @@ public class ServerConsole extends JFrame {
 		System.out.print(message + (newLine ? "\n" : ""));
 		this.textArea.append(message + (newLine ? "\n" : ""));
 		this.textArea.repaint();
+		scrollBar.setValue(scrollBar.getMaximum());
 	}
 	
 	public void close() {
