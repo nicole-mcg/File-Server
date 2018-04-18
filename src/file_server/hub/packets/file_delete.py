@@ -16,12 +16,12 @@ class FileDeletePacket(Packet):
 
     # Handles an outgoing packet
     def handle_outgoing(self, hub, file_sock):
-        file_sock.sock.send(ByteBuffer.from_string(self.file_name).bytes())
+        file_sock.write(ByteBuffer.from_string(self.file_name))
 
     # Handles an incoming packet
     def handle_incoming(self):
 
-        buff = ByteBuffer(self.file_sock.sock.recv(self.length)) if self.length > 0 else None
+        buff = self.file_sock.read()
         file_name = buff.read_string()
 
         self.hub.file_event_handler.add_ignore(("delete", file_name))
