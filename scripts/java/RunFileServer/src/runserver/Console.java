@@ -1,10 +1,16 @@
 package runserver;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.URL;
 
+import javax.swing.Box;
+import javax.swing.Box.Filler;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -35,6 +41,7 @@ public class Console extends JFrame implements ActionListener {
 		this.isMainConsole = isMainConsole;
 
 		super.setSize(600, 400);
+		super.setResizable(false);
 
 		this.textArea = new JTextArea();
 		this.textArea.setEditable(false);
@@ -42,15 +49,25 @@ public class Console extends JFrame implements ActionListener {
 		this.textArea.setWrapStyleWord(true);
 
 		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new FlowLayout());
 		super.getContentPane().add(topPanel, BorderLayout.NORTH);
-
-		JButton restartButton = new JButton("Restart");
-		restartButton.addActionListener(this);
-		topPanel.add(restartButton, BorderLayout.EAST);
+		
+		JButton browserButton = new JButton("Open Browser");
+		browserButton.addActionListener(this);
+		topPanel.add(browserButton);
 
 		JButton clientButton = new JButton("Start Client");
 		clientButton.addActionListener(this);
-		topPanel.add(clientButton, BorderLayout.WEST);
+		topPanel.add(clientButton);
+		
+		JButton restartButton = new JButton("Restart");
+		
+		Dimension d = new Dimension(250, 5);
+		Filler box = new Filler(d, d, d);
+		topPanel.add(box);
+		
+		restartButton.addActionListener(this);
+		topPanel.add(restartButton);
 
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -101,6 +118,14 @@ public class Console extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
+		
+			case "Open Browser":
+				try {
+			        Desktop.getDesktop().browse(new URL("http://127.0.0.1:8080").toURI());
+			    } catch (Exception ex) {
+			        ex.printStackTrace();
+			    }
+				break;
 		
 			case "Restart":
 				print("Restarting console");

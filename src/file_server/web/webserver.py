@@ -73,10 +73,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
     # Listens for connections until shutdown
     def serve_forever(self):
-
-        # Open the web browser
-        webbrowser.open('http://127.0.0.1:8080', new=2)
-
+        
         # Handle requests until shutdown
         # Because of the nature of handle_request, shutdown will not happen until a request is made
         while not self.shutdown:
