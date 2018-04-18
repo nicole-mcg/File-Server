@@ -103,10 +103,11 @@ public class RunServer {
 		public void run() {
 			try {
 
+				ByteBuffer buff = ByteBuffer.allocate(1);
+				
 				// Read input until stream is done
 				while (!shouldShutDown && in.isOpen()) {
 
-					ByteBuffer buff = ByteBuffer.allocate(1);
 					buff.clear();
 
 					in.read(buff);
@@ -114,7 +115,7 @@ public class RunServer {
 					buff.flip();
 
 					while (!shouldShutDown && buff.hasRemaining()) {
-						console.print(Character.toString((char) buff.get()), false);
+						console.print((char) buff.get());
 					}
 
 				}
