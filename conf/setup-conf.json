@@ -4,7 +4,7 @@
     "install-node": true,
 
     "install-java": true,
-    "install-jdk": true,
+    "install-jdk": false,
 
     "install-jython": false,
     "use-jython": false
