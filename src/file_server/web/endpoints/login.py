@@ -31,5 +31,6 @@ class LoginEndpoint(Endpoint):
         return {
             "session": account.session,
             "auth_code": account.auth_code,
-            "settings": account.settings
+            "settings": account.settings,
+            "redirect": "/login"
         }
