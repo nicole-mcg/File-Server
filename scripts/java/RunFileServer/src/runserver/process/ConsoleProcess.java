@@ -47,6 +47,8 @@ public class ConsoleProcess extends Thread {
 		} catch (IOException e) {
 			console.print("Unable to start Python file-server.");
 			console.print(e);
+			console.close();
+			
 			return;
 		}
 		

@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
 
-import javax.swing.Box;
 import javax.swing.Box.Filler;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -60,14 +59,17 @@ public class Console extends JFrame implements ActionListener {
 		clientButton.addActionListener(this);
 		topPanel.add(clientButton);
 		
-		JButton restartButton = new JButton("Restart");
-		
-		Dimension d = new Dimension(250, 5);
+		Dimension d = new Dimension(150, 5);
 		Filler box = new Filler(d, d, d);
 		topPanel.add(box);
 		
+		JButton restartButton = new JButton("Restart");
 		restartButton.addActionListener(this);
 		topPanel.add(restartButton);
+		
+		JButton shutdownButton = new JButton("Shutdown");
+		shutdownButton.addActionListener(this);
+		topPanel.add(shutdownButton);
 
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -126,11 +128,6 @@ public class Console extends JFrame implements ActionListener {
 			        ex.printStackTrace();
 			    }
 				break;
-		
-			case "Restart":
-				print("Restarting console");
-				process.restart();
-				break;
 				
 			case "Start Client":
 				ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__", "../test_directories/client_dir", "localhost", "test", "test");
@@ -138,6 +135,15 @@ public class Console extends JFrame implements ActionListener {
 				
 				new ConsoleProcess("File Client", processBuilder).start();
 				
+				break;
+		
+			case "Restart":
+				print("Restarting console");
+				process.restart();
+				break;
+				
+			case "Shutdown":
+				process.shutdown();
 				break;
 				
 		}
