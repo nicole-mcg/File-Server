@@ -1,30 +1,68 @@
 import os, sys, platform, subprocess, json, webbrowser, time
 
-JAVA_INSTALLER_URLS = {
-    "Windows": {
-        "32": "http://download2098.mediafire.com/f8114fw87tjg/yg8gamtuvqbj583/jre-8u171-windows-i586.exe",
-        "64": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x64.msi"
+NODE_NAME = "Node.js"
+JAVA_NAME = "Java"
+
+INSTALL_INFO = {
+    JAVA_NAME: {
+        "commands_to_check": [
+            ["java", "-version"], 
+            ["java", "--version"],
+        ],
+        "expected_path": "",
+        "urls": {
+            "Windows": {
+                "32": "http://download2098.mediafire.com/f8114fw87tjg/yg8gamtuvqbj583/jre-8u171-windows-i586.exe",
+                "64": "http://download876.mediafire.com/5dcubdcdefxg/auxybmuydx9bnbt/jre-8u171-windows-x64.exe"
+            }
+        }
+    },
+    NODE_NAME: {
+        "commands_to_check": [
+            ["node", "--version"]
+        ],
+        "expected_path": "",
+        "urls": {
+            "Windows": {
+                "32": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x86.msi",
+                "64": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x64.msi"
+            }
+        }
     }
 }
 
-NODE_INSTALLER_URLS = {
-    "Windows": {
-        "32": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x86.msi",
-        "64": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x64.msi"
+INSTALLER_URLS = {
+    JAVA_NAME: {
+        "Windows": {
+            "32": "http://download2098.mediafire.com/f8114fw87tjg/yg8gamtuvqbj583/jre-8u171-windows-i586.exe",
+            "64": "http://download876.mediafire.com/5dcubdcdefxg/auxybmuydx9bnbt/jre-8u171-windows-x64.exe"
+        }
+    },
+    NODE_NAME: {
+        "Windows": {
+            "32": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x86.msi",
+            "64": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x64.msi"
+        }
     }
+}
+
+EXPECTED_PATHS = {
+    JAVA_NAME: "",
+    NODE_NAME: ""
 }
 
 is_64 = sys.maxsize > 2**32
 curr_os = platform.system()
 
-
-EXPECTED_JAVA_PATH = ""
-EXPECTED_NODE_PATH = ""
-
 if curr_os == "Windows":
-    EXPECTED_NODE_PATH = "{}\\nodejs".format(os.environ["ProgramFiles"])
-    EXPECTED_JAVA_PATH = "{}\\Common Files\\Oracle\\Java\\javapath".format(os.environ["ProgramFiles(X86)"])
+    INSTALL_INFO[JAVA_NAME]["expected_path"] = "{}\\Common Files\\Oracle\\Java\\javapath".format(os.environ["ProgramFiles(X86)"])
+    INSTALL_INFO[NODE_NAME]["expected_path"] = "{}\\nodejs".format(os.environ["ProgramFiles"])
 
+attempted_installs = []
+for key in INSTALL_INFO.keys():
+    if key in sys.argv:
+        print("Adding {} to attempted_installs".format(key))
+        attempted_installs.append(key)
 
 def add_conf_if_needed(conf, default=False):
     if not conf in setup_conf:
@@ -39,9 +77,8 @@ setup_conf = json.loads(setup_conf)
 add_conf_if_needed("install-java", True)
 add_conf_if_needed("install-node", True)
 
-
-
-def add_path(path, addToSystem=False):
+def add_path(program_name, addToSystem=False):
+    path = INSTALL_INFO[program_name]["expected_path"]
 
     if addToSystem:
         if curr_os == "Windows":
@@ -55,15 +92,19 @@ def add_path(path, addToSystem=False):
     env = os.environ.copy()
     env.update({"PATH": "{};{};".format(path, os.environ["PATH"])})
 
-    rerun(sys.argv[1] if len(sys.argv) > 1 else "", env)
+    rerun(program_name, env)
     sys.exit(0)
 
 def rerun(arg, env=os.environ):
-    subprocess.Popen(["python", "./scripts/src/setup.py", arg], cwd=os.getcwd(), env=env)
+    print("Rerunning with args: {}".format(["python", "./scripts/src/setup.py", arg, *attempted_installs]))
+    subprocess.Popen(["python", "./scripts/src/setup.py", arg, *attempted_installs], cwd=os.getcwd(), env=env)
 
-def download_and_install(program_name, urls, install_file_name, install_cmd, rerun_args):
+def download_and_install(program_name, install_file_name, install_cmd):
 
-    url = urls["Windows"]["64" if is_64 else "32"]
+    if program_name in attempted_installs:
+        return
+
+    url = INSTALL_INFO[program_name]["urls"]["Windows"]["64" if is_64 else "32"]
 
     if curr_os == "Windows":
         import requests
@@ -76,51 +117,57 @@ def download_and_install(program_name, urls, install_file_name, install_cmd, rer
                 setup_file.write(chunk)
 
         print("Installing {}".format(program_name))
-        os.system(install_cmd)
+        return_code = os.system(install_cmd)
+        if return_code == 0:
+            print("{} installed successfully".format(program_name))
+        else:
+            print("Error installing {}. Return code: {}".format(program_name, return_code))
         os.remove(install_file_name)
 
-        add_path(EXPECTED_NODE_PATH)
-        
-        rerun(rerun_args)
-        sys.exit(0)
+        add_path(program_name)
 
-def node_path_exists():
-    return os.system("node --version") == 0
+def check_program_path_exists(program_name):
+    for cmd in INSTALL_INFO[program_name]["commands_to_check"]:
+        try:
+            if subprocess.check_call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
+                return True
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            pass
+    return False
 
-def java_path_exists():
-    return os.system("java -version") == 0 or os.system("java --version") == 0
+def verify_program_install(program_name, install_file_name, install_cmd):
+
+    if not check_program_path_exists(program_name):
+
+        # Add program to system path if command doesn't exist but path does
+        if os.path.isdir(INSTALL_INFO[program_name]["expected_path"]):
+            print("Adding Java to system path")
+            add_path(program_name, True)
+
+        if not check_program_path_exists(program_name):
+            #print("Please download and install Java from the website")
+            #print("Java is currently not available for automatic download due to licensing (External hosting coming soon)")
+            #time.sleep(2)
+            #webbrowser.open("https://java.com/en/download/", new=2)
+            download_and_install(program_name, install_file_name, install_cmd)
     
 if __name__ == "__main__":
 
-    if setup_conf["install-java"] and not java_path_exists():
+    try:
+        import requests
+    except ModuleNotFoundError:
+        os.system("python -m pip install --no-cache requests")
 
-        # Add Node to system path if command doesn't exist but path does
-        if not java_path_exists() and os.path.isdir(EXPECTED_JAVA_PATH):
-            print("Adding Java to system path")
-            add_path(EXPECTED_JAVA_PATH, True)
+    if setup_conf["install-java"]:
+        verify_program_install(JAVA_NAME, "java_setup.exe", "java_setup.exe /s")
 
-        if not java_path_exists():
-            print("Please download and install Java from the website")
-            print("Java is currently not available for automatic download due to licensing (External hosting coming soon)")
-            time.sleep(2)
-            webbrowser.open("https://java.com/en/download/", new=2)
-            #download_and_install("Java", NODE_INSTALLER_URLS, "node_setup.msi", "msiexec.exe /i node_setup.msi /QN", "node_was_installed")
-
-    if setup_conf["install-node"] and not node_path_exists():
-        node_was_installed = len(sys.argv) > 1 and sys.argv[1] == "node_was_installed"
-
-        # Add Node to system path if command doesn't exist but path does
-        if os.path.isdir(EXPECTED_NODE_PATH):
-            print("Adding Node.js to system path")
-            add_path(EXPECTED_NODE_PATH, True)
-
-        if not node_path_exists():
-            download_and_install("Node.js", NODE_INSTALLER_URLS, "node_setup.msi", "msiexec.exe /i node_setup.msi /QN", "node_was_installed")
+    if setup_conf["install-node"]:
+        verify_program_install(NODE_NAME, "node_setup.msi", "msiexec.exe /i node_setup.msi /QN")
 
     print("Installing pip requirements")
     os.system("python -m pip install --no-cache -r requirements.txt")
 
-    if node_path_exists():
+    if check_program_path_exists(NODE_NAME):
         print("Installing node modules")
         os.chdir("web")
         os.system("npm install package.json")
