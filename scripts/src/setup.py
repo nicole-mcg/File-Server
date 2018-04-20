@@ -109,10 +109,13 @@ def download_and_install(program_name, install_file_name, install_cmd):
     if curr_os == "Windows":
         import requests
 
-        print("Downloading {} {}-bit installer to {}".format(program_name, 64 if is_64 else 32, install_file_name))
+        if not os.path.exists("temp"):
+            os.makedirs("temp")
+
+        print("Downloading {} {}-bit installer to temp/{}".format(program_name, 64 if is_64 else 32, install_file_name))
         file_stream = requests.get(url, stream=True)
         file_stream.raise_for_status()
-        with open(install_file_name, 'wb') as setup_file:
+        with open("./temp/{}".format(install_file_name), 'wb') as setup_file:
             for chunk in file_stream.iter_content(1024):
                 setup_file.write(chunk)
 
@@ -122,7 +125,8 @@ def download_and_install(program_name, install_file_name, install_cmd):
             print("{} installed successfully".format(program_name))
         else:
             print("Error installing {}. Return code: {}".format(program_name, return_code))
-        os.remove(install_file_name)
+
+        os.system("powershell -Command \"Remove-Item temp -Force -Recurse\"")
 
         add_path(program_name)
 
@@ -159,7 +163,7 @@ if __name__ == "__main__":
         os.system("python -m pip install --no-cache requests")
 
     if setup_conf["install-java"]:
-        verify_program_install(JAVA_NAME, "java_setup.exe", "java_setup.exe /s")
+        verify_program_install(JAVA_NAME, "java_setup.exe", "\".\\temp\\java_setup.exe\" /s")
 
     if setup_conf["install-node"]:
         verify_program_install(NODE_NAME, "node_setup.msi", "msiexec.exe /i node_setup.msi /QN")

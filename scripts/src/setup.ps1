@@ -47,17 +47,20 @@ if (!(PythonPathExists)) {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+    New-Item -Name temp -ItemType directory -force | Out-Null
+
     if (Test-Path "$env:PROGRAMFILES (x86)") {
-        Write-host "Downloading Python 64-bit installer to py_setup.exe"
-        Invoke-WebRequest -OutFile py_setup.exe -Uri "https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe"
+        Write-host "Downloading Python 64-bit installer to temp/py_setup.exe"
+        Invoke-WebRequest -OutFile temp/py_setup.exe -Uri "https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe"
     } else {
-        Write-host "Downloading Python 32-bit installer to py_setup.exe"
-        Invoke-WebRequest -OutFile py_setup.exe -Uri "https://www.python.org/ftp/python/3.6.5/python-3.6.5.exe"
+        Write-host "Downloading Python 32-bit installer to temp/py_setup.exe"
+        Invoke-WebRequest -OutFile temp/py_setup.exe -Uri "https://www.python.org/ftp/python/3.6.5/python-3.6.5.exe"
     }
 
     Write-host "Running Python setup (script will continue when complete)"
-    Start-Process $workingdirectory/"py_setup.exe" -ArgumentList "/quiet" -WorkingDirectory $workingdirectory -wait
-    Remove-Item -path "py_setup.exe"
+    Start-Process $workingdirectory/temp/py_setup.exe -ArgumentList "/quiet" -WorkingDirectory $workingdirectory -wait
+
+    Remove-Item temp -Force -Recurse
 
     TryAddPythonPath
 } else {
