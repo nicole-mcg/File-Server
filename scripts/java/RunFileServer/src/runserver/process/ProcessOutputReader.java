@@ -38,14 +38,10 @@ public class ProcessOutputReader extends Thread {
 			while (!shouldShutDown && in.isOpen()) {
 
 				buff.clear();
-
 				in.read(buff);
-
 				buff.flip();
 
-				while (!shouldShutDown && buff.hasRemaining()) {
-					console.print((char) buff.get());
-				}
+				console.print((char) buff.get());
 
 			}
 

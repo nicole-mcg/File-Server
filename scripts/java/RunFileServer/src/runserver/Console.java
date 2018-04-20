@@ -51,7 +51,7 @@ public class Console extends JFrame implements ActionListener {
 		topPanel.setLayout(new FlowLayout());
 		super.getContentPane().add(topPanel, BorderLayout.NORTH);
 		
-		JButton browserButton = new JButton("Open Browser");
+		JButton browserButton = new JButton("Open Web UI");
 		browserButton.addActionListener(this);
 		topPanel.add(browserButton);
 
@@ -59,9 +59,13 @@ public class Console extends JFrame implements ActionListener {
 		clientButton.addActionListener(this);
 		topPanel.add(clientButton);
 		
-		Dimension d = new Dimension(150, 5);
-		Filler box = new Filler(d, d, d);
-		topPanel.add(box);
+		//Dimension d = new Dimension(150, 5);
+		//Filler box = new Filler(d, d, d);
+		//topPanel.add(box);
+		
+		JButton testsButton = new JButton("Run Tests");
+		testsButton.addActionListener(this);
+		topPanel.add(testsButton);
 		
 		JButton restartButton = new JButton("Restart");
 		restartButton.addActionListener(this);
@@ -119,9 +123,10 @@ public class Console extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		ProcessBuilder processBuilder;
 		switch (e.getActionCommand()) {
 		
-			case "Open Browser":
+			case "Open Web UI":
 				try {
 			        Desktop.getDesktop().browse(new URL("http://127.0.0.1:8080").toURI());
 			    } catch (Exception ex) {
@@ -130,13 +135,26 @@ public class Console extends JFrame implements ActionListener {
 				break;
 				
 			case "Start Client":
-				ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__", "../test_directories/client_dir", "localhost", "test", "test");
+				processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__", "../test_directories/client_dir", "localhost", "test", "test");
 				processBuilder.directory(new File("src"));
 				
 				new ConsoleProcess("File Client", processBuilder).start();
 				
 				break;
 		
+			case "Run Tests":
+				processBuilder = new ProcessBuilder("test.bat");
+				
+				File currDir = new File(System.getProperty("user.dir"));
+				if (currDir.getName() == "src") {
+					processBuilder.directory(currDir.getParentFile());
+				} else {
+					processBuilder.directory(currDir);
+				}
+				new ConsoleProcess("Running Tests", processBuilder).start();
+		
+				break;
+				
 			case "Restart":
 				print("Restarting console");
 				process.restart();

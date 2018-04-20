@@ -39,7 +39,7 @@ public class ConsoleProcess extends Thread {
 	public void runProcess() {
 		Console console = new Console(name, this);
 		
-		processBuilder.redirectErrorStream(false);
+		processBuilder.redirectErrorStream(true);
 		
 		Process process;
 		try {

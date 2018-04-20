@@ -26,13 +26,14 @@ public class Main {
 	public static void main(String... args) {
 		
 		clientProcesses = new ArrayList<ConsoleProcess>();
-
 		
 		ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__",
 				"../test_directories/serv_dir");
 		processBuilder.directory(new File("src"));
 		
 		new ConsoleProcess("File Server", processBuilder).runProcess();
+		
+		
 	}
 
 }
