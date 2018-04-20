@@ -166,7 +166,7 @@ if __name__ == "__main__":
         verify_program_install(JAVA_NAME, "java_setup.exe", "\".\\temp\\java_setup.exe\" /s")
 
     if setup_conf["install-node"]:
-        verify_program_install(NODE_NAME, "node_setup.msi", "msiexec.exe /i node_setup.msi /QN")
+        verify_program_install(NODE_NAME, "node_setup.msi", "msiexec.exe /i \"temp\\node_setup.msi\" /QN")
 
     print("Installing pip requirements")
     os.system("python -m pip install --no-cache -r requirements.txt")
