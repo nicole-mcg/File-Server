@@ -4,20 +4,22 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
-import runserver.Console;
+import runserver.gui.Console;
 
 public class ConsoleProcess extends Thread {
 	
 	private String name;
-	private ProcessBuilder processBuilder;
+	private Console console;
+	
+	private ProcessBuilder[] processBuilders;
 	
 	private boolean shouldShutDown;
 	private boolean shouldRestart;
 	private boolean skipPopup;
 	
-	public ConsoleProcess(String name, ProcessBuilder processBuilder) {
+	public ConsoleProcess(String name, ProcessBuilder... processBuilders) {
 		this.name = name;
-		this.processBuilder = processBuilder;
+		this.processBuilders = processBuilders;
 	}
 	
 	public void shutdown() {
@@ -35,9 +37,31 @@ public class ConsoleProcess extends Thread {
 		this.shouldShutDown = true;
 		this.skipPopup = true;
 	}
-
+	
 	public void runProcess() {
-		Console console = new Console(name, this);
+		console = new Console(name, this);
+		
+		for (int i = 0; i < processBuilders.length; i++) {
+			runProcess(i);
+		}
+		
+		if (!skipPopup) {
+			JOptionPane.showMessageDialog(console, "Press OK to exit.", "Alert", JOptionPane.INFORMATION_MESSAGE);
+		}
+		
+		console.close();
+		
+		if (shouldRestart) {
+			runProcess();
+		}
+	}
+
+	private void runProcess(int index) {
+		if (index < 0 || index > processBuilders.length) {
+			return;
+		}
+		
+		ProcessBuilder processBuilder = processBuilders[index];
 		
 		processBuilder.redirectErrorStream(true);
 		
@@ -45,10 +69,8 @@ public class ConsoleProcess extends Thread {
 		try {
 			process = processBuilder.start();
 		} catch (IOException e) {
-			console.print("Unable to start Python file-server.");
+			console.print("Unable to start process.");
 			console.print(e);
-			console.close();
-			
 			return;
 		}
 		
@@ -78,15 +100,6 @@ public class ConsoleProcess extends Thread {
 
 		process.destroyForcibly();
 		
-		if (!skipPopup) {
-			JOptionPane.showMessageDialog(console, "Press OK to exit.", "Alert", JOptionPane.INFORMATION_MESSAGE);
-		}
-		
-		console.close();
-		
-		if (shouldRestart) {
-			runProcess();
-		}
 	}
 	
 	@Override

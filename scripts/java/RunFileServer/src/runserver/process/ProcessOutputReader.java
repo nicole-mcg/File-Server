@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
-import runserver.Console;
+import runserver.gui.Console;
 
 public class ProcessOutputReader extends Thread {
 
