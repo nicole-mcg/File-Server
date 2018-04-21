@@ -6,20 +6,54 @@ import javax.swing.JOptionPane;
 
 import runserver.gui.Console;
 
+/**
+ * 
+ * @author c-mcg
+ *
+ */
 public class ConsoleProcess extends Thread {
 	
-	private String name;
+	/**
+	 * The console this process should output to
+	 */
 	private Console console;
 	
+	/**
+	 * ProcessBuilders used to create the processes
+	 */
 	private ProcessBuilder[] processBuilders;
 	
+	boolean closeConsoleWhenDone;
+	
+	/**
+	 * When true, the process will shut down when possible
+	 */
 	private boolean shouldShutDown;
+	
+	/**
+	 * When true, the process will restart when shut down
+	 */
 	private boolean shouldRestart;
+	
+	/**
+	 * When true, the "Click okay to exit" popup won't show
+	 * Currently only used for `shouldRestart`
+	 */
 	private boolean skipPopup;
 	
-	public ConsoleProcess(String name, ProcessBuilder... processBuilders) {
-		this.name = name;
+	public ConsoleProcess(Console console, ProcessBuilder... processBuilders) {
+		this(console, true, processBuilders);
+	}
+	
+	public ConsoleProcess(Console console, boolean closeConsoleWhenDone, ProcessBuilder... processBuilders) {
+		this.console = console;
 		this.processBuilders = processBuilders;
+		
+		this.closeConsoleWhenDone = closeConsoleWhenDone;
+		
+		if (console != null) {
+			console.setProcess(this);
+		}
 	}
 	
 	public void shutdown() {
@@ -39,7 +73,6 @@ public class ConsoleProcess extends Thread {
 	}
 	
 	public void runProcess() {
-		console = new Console(name, this);
 		
 		for (int i = 0; i < processBuilders.length; i++) {
 			runProcess(i);
@@ -49,10 +82,13 @@ public class ConsoleProcess extends Thread {
 			JOptionPane.showMessageDialog(console, "Press OK to exit.", "Alert", JOptionPane.INFORMATION_MESSAGE);
 		}
 		
-		console.close();
-		
 		if (shouldRestart) {
 			runProcess();
+			return;
+		}
+		
+		if (closeConsoleWhenDone) {
+			console.close();
 		}
 	}
 
