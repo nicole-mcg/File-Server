@@ -75,14 +75,14 @@ public class Console extends JFrame implements ActionListener {
 		    } catch (Exception ex) {
 		        ex.printStackTrace();
 		    }
-		});
+		}, buttonPanel);
 		
 		addButton("Start Client", () -> {
 			ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "file_server.__init__", String.format("..%ctest_directories%cclient_dir", sepArr(2)), "localhost", "test", "test");
 			processBuilder.directory(new File("src"));
 			
 			new ConsoleProcess("File Client", processBuilder).start();
-		});
+		}, buttonPanel);
 		
 		addButton("Run Tests", () -> {
 			
@@ -103,7 +103,7 @@ public class Console extends JFrame implements ActionListener {
 			cleanProcessBuilder.directory(new File(String.format("%s%cscripts", rootDir.getAbsolutePath(), P_SEP)));
 			
 			new ConsoleProcess("Running tests", pyProcessBuilder, nodeProcessBuilder, cleanProcessBuilder).start();
-		});
+		}, buttonPanel);
 		
 		addButton("Run Webpack", () -> {
 			ProcessBuilder processBuilder = new ProcessBuilder(String.format(".%cnode_modules%c.bin%cwebpack", sepArr(3)),  "--watch");
@@ -115,38 +115,18 @@ public class Console extends JFrame implements ActionListener {
 			
 			processBuilder.directory(new File(String.format("%s%cweb", currDir.getAbsolutePath(), P_SEP)));
 			new ConsoleProcess("Webpack", processBuilder).start();
-		});
+		}, buttonPanel);
 		
 		addButton("Restart", () -> {
 			print("Restarting console");
 			process.restart();
-		});
+		}, buttonPanel);
 		
-		addButton("Shutdown", () -> process.shutdown());
-		
-		JButton browserButton = new JButton("Open Web UI");
-		browserButton.addActionListener(this);
-		buttonPanel.add(browserButton);
-
-		JButton clientButton = new JButton("Start Client");
-		clientButton.addActionListener(this);
-		buttonPanel.add(clientButton);
-		
-		JButton webpackButton = new JButton("Run Tests");
-		webpackButton.addActionListener(this);
-		buttonPanel.add(webpackButton);
+		addButton("Shutdown", () -> process.shutdown(), buttonPanel);
 		
 		//Dimension d = new Dimension(150, 5);
 		//Filler box = new Filler(d, d, d);
 		//buttonPanel.add(box);
-		
-		JButton restartButton = new JButton("Restart");
-		restartButton.addActionListener(this);
-		buttonPanel.add(restartButton);
-		
-		JButton shutdownButton = new JButton("Shutdown");
-		shutdownButton.addActionListener(this);
-		buttonPanel.add(shutdownButton);
 
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -185,11 +165,11 @@ public class Console extends JFrame implements ActionListener {
 		super.dispose();
 	}
 	
-	private void addButton(String text, Runnable onButtonClicked) {
+	private void addButton(String text, Runnable onButtonClicked, JPanel panel) {
 		
 		JButton button = new JButton(text);
 		button.addActionListener(this);
-		buttonPanel.add(button);
+		panel.add(button);
 		
 		buttonHandlers.put(text, onButtonClicked);
 	}
