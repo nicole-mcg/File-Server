@@ -98,6 +98,10 @@ public class Console extends JFrame {
 		scrollBar.setValue(scrollBar.getMaximum());
 	}
 	
+	public Console clone() {
+		return clone(this.getTitle());
+	}
+	
 	public Console clone(String title) {
 		Console console = new Console(title);
 		console.initialize(createTopPanel, createBottomPanel);

@@ -102,7 +102,8 @@ public class Main {
 			
 			SwingUtil.addButton("Restart", buttonPanel, (Console c) -> {
 				c.print("Restarting console");
-				c.getProcess().restart();
+				c.getProcess().restart(c.clone());
+				c.close();
 			});
 			
 			SwingUtil.addButton("Shutdown", buttonPanel, (Console c) -> c.getProcess().shutdown());

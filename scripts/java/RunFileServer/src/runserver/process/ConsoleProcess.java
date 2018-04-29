@@ -67,6 +67,16 @@ public class ConsoleProcess extends Thread {
 	}
 	
 	public void restart() {
+		restart(null);
+	}
+	
+	public void restart(Console newConsole) {
+		
+		if (newConsole != null) {
+			this.console = newConsole;
+			newConsole.setProcess(this);
+		}
+		
 		this.shouldRestart = true;
 		this.shouldShutDown = true;
 		this.skipPopup = true;
