@@ -25,7 +25,7 @@ class FileSnapshot:
 
     # Used to update the metadata for the file
     def update(self):
-        pass
+        self.last_modified = os.path.getmtime(self.full_path)
 
     # Converts the metadata into a JSON format that can be sent via web
     def to_json(self):
@@ -46,15 +46,21 @@ class DirectorySnapshot(FileSnapshot):
 
         # Initialize parent class
         FileSnapshot.__init__(self, full_path, file_name, root_path)
+        self.root_path = root_path
 
         # The dict of child snapshots for files and folders in the directory
         # key: file name
         # value: FileSnapshot or DirectorySnapshot instance
-        self.snapshots = {};
+        self.snapshots = {}
+
+        self.fetch_directory_info()
+
+    def fetch_directory_info(self):
+        self.snapshots = {}
 
         # Loop through files in the directory
-        for file in os.listdir(full_path):
-            file_path = full_path + "/" + file
+        for file in os.listdir(self.full_path):
+            file_path = self.full_path + "/" + file
 
             # Default to FileSnapshot to represent the file
             cls = FileSnapshot
@@ -64,7 +70,7 @@ class DirectorySnapshot(FileSnapshot):
                 cls = DirectorySnapshot
 
             # Create the snapshot and add it to snapshots dict
-            self.snapshots[file] = cls(file_path, file, root_path)
+            self.snapshots[file] = cls(file_path, file, self.root_path)
 
     # Gets the type of snapshot (Directory)
     def get_type(self):
@@ -77,8 +83,20 @@ class DirectorySnapshot(FileSnapshot):
 
         parts = split_path(file_path)
 
-        if parts[0] in self.snapshots.keys():
-            self.snapshots[allparts[0]].update(file_path)
+        for index, part in enumerate(parts):
+            if part == "." or part == "/":
+                continue
+
+            if part in self.snapshots.keys():
+                if isinstance(self.snapshots[part], DirectorySnapshot):
+                    self.snapshots[part].update(os.path.join(*parts[index:]))
+                else:
+                    self.snapshots[part].update()
+                return
+
+        # We are supposed to update this directory
+        self.fetch_directory_info()
+
 
     # Converts a snapshot within the snapshot's directory tree to JSON
     # path: the path of the file or directory to convert

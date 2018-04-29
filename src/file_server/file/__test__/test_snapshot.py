@@ -1,6 +1,7 @@
-# content of test_sample.py
-
 from file_server.file.file_snapshot import DirectorySnapshot
+
+from file_server.util import move_file
+from file_server.util.test_util import touch_file
 
 import inspect, os, json
 
@@ -85,3 +86,10 @@ def test_snapshot():
 
     #Confirm snapshot to json is correct
     confirm_json(snapshots, json.loads(test_snapshot.to_json()))
+
+    old_mod_time = test_snapshot.snapshots["test2"].snapshots["img2.bmp"].last_modified
+
+    touch_file(os.path.join(path, "test2", "img2.bmp"))
+    test_snapshot.update(os.path.join("test2", "img2.bmp"))
+
+    assert test_snapshot.snapshots["test2"].snapshots["img2.bmp"].last_modified != old_mod_time

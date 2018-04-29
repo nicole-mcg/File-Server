@@ -125,3 +125,8 @@ def send_test_api_request(endpoint, data={}, session=""):
 
     # Request wasn't successful
     return None
+
+# https://stackoverflow.com/questions/1158076/implement-touch-using-python
+def touch_file(fname):
+    with open(fname, 'a'):
+        os.utime(fname)
