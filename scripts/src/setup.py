@@ -31,26 +31,6 @@ INSTALL_INFO = {
     }
 }
 
-INSTALLER_URLS = {
-    JAVA_NAME: {
-        "Windows": {
-            "32": "http://download2098.mediafire.com/f8114fw87tjg/yg8gamtuvqbj583/jre-8u171-windows-i586.exe",
-            "64": "http://download876.mediafire.com/5dcubdcdefxg/auxybmuydx9bnbt/jre-8u171-windows-x64.exe"
-        }
-    },
-    NODE_NAME: {
-        "Windows": {
-            "32": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x86.msi",
-            "64": "https://nodejs.org/dist/v8.11.1/node-v8.11.1-x64.msi"
-        }
-    }
-}
-
-EXPECTED_PATHS = {
-    JAVA_NAME: "",
-    NODE_NAME: ""
-}
-
 is_64 = sys.maxsize > 2**32
 curr_os = platform.system()
 
@@ -145,7 +125,7 @@ def verify_program_install(program_name, install_file_name, install_cmd):
 
         # Add program to system path if command doesn't exist but path does
         if os.path.isdir(INSTALL_INFO[program_name]["expected_path"]):
-            print("Adding Java to system path")
+            print("Adding {} to system path".format(program_name))
             add_path(program_name, True)
 
         if not check_program_path_exists(program_name):
@@ -162,8 +142,9 @@ if __name__ == "__main__":
     except ModuleNotFoundError:
         os.system("python -m pip install --no-cache requests")
 
-    if setup_conf["install-java"]:
-        verify_program_install(JAVA_NAME, "java_setup.exe", "\".\\temp\\java_setup.exe\" /s")
+    # Java disabled until proper file hosting can be found
+    #if setup_conf["install-java"]:
+    #    verify_program_install(JAVA_NAME, "java_setup.exe", "\".\\temp\\java_setup.exe\" /s")
 
     if setup_conf["install-node"]:
         verify_program_install(NODE_NAME, "node_setup.msi", "msiexec.exe /i \"temp\\node_setup.msi\" /QN")
