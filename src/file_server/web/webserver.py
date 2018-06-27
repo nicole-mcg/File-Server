@@ -55,6 +55,8 @@ def create_webserver(server, port=8080):
     register_endpoint(UpdateSettingsEndpoint)
     register_endpoint(DirectoryContentsEndpoint)
 
+    print("Webserver listening on port {}".format(port))
+
     return webserver
 
 # This class represents a multithreaded HTTP server that can be shut down
