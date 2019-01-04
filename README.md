@@ -4,7 +4,7 @@
 
 Website: http://ossoftware.ca/portfolio#os-cloud
 
-Check out the [Contribution Guidelines](https://github.com/c-mcg/File-Server/blob/master/CONTRIBUTING.md) for project structure and code formatting
+Check out the [Contribution Guidelines](https://github.com/nik-m2/File-Server/blob/master/CONTRIBUTING.md) for project structure and code formatting
 
 **Setup:**
 

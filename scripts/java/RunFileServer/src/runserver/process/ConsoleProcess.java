@@ -8,7 +8,7 @@ import runserver.gui.Console;
 
 /**
  * 
- * @author c-mcg
+ * @author nik-m2
  *
  */
 public class ConsoleProcess extends Thread {
