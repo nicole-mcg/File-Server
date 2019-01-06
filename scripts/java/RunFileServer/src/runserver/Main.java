@@ -21,7 +21,7 @@ import util.Constants;
  * A simple java program to start the file server // This is used to create
  * cross-platform runnable commands in the root directory
  * 
- * @author Connor
+ * @author Nicole
  *
  */
 public class Main {
