@@ -1,4 +1,4 @@
-# Author: Connor McGrogan
+# Author: Nicole McGrogan
 
 # Import test utilities
 from file_server.util.test_util import start_test_server, send_test_api_request
